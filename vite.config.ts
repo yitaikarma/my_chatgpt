@@ -45,7 +45,8 @@ export default ({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: '@import "@/styles/index.scss";'
+          // additionalData: '@import "./src/styles/index.scss";'
+          // additionalData: '@import "@/styles/index.scss";'
         }
       }
     },
