@@ -14,4 +14,8 @@ import { RouterLink, RouterView } from 'vue-router'
   <RouterView />
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.wrapper {
+  position: fixed;
+}
+</style>

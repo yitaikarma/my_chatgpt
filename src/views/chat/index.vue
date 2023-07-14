@@ -409,7 +409,7 @@ function handleClearMessage() {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 @font-face {
   font-family: 'FiraCode';
   src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
@@ -443,14 +443,16 @@ function handleClearMessage() {
   overflow-y: auto;
   padding: 20px;
   width: 100%;
-  height: 500px;
+  /* height: 500px; */
+  height: 100%;
   border-radius: 6px;
   background-color: #232425;
 }
 
 .message_item {
   display: grid;
-  grid-template-columns: 60px 700px 60px;
+  /* grid-template-columns: 60px 700px 60px; */
+  grid-template-columns: 60px 1fr 60px;
   margin-bottom: 20px;
 }
 
@@ -522,31 +524,31 @@ function handleClearMessage() {
   width: 100%;
 }
 
-.message_item[user] {
+.message_item[user='true'] {
   justify-items: end;
 }
 
-.message_item[user] .avatar {
+.message_item[user='true'] .avatar {
   grid-column: 3;
   margin-left: 20px;
   margin-right: 0;
   background-color: #2a2b78;
 }
 
-.message_item[user] .fake_avatar_img {
+.message_item[user='true'] .fake_avatar_img {
   background-color: #2a2b78;
 }
 
-.message_item[user] .message {
+.message_item[user='true'] .message {
   grid-row: 1;
   grid-column: 2;
 }
 
-.message_item[user] .message_header {
+.message_item[user='true'] .message_header {
   justify-content: flex-end;
 }
 
-.message_item[user] .message_content {
+.message_item[user='true'] .message_content {
   background-color: #2a2b78;
 }
 
