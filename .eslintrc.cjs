@@ -33,6 +33,7 @@ module.exports = {
     'no-unsafe-negation': 'off',
     'no-unsafe-optional-chaining': 'off',
     'no-unsafe-return': 'off',
-    'no-var': 'warn'
+    'no-var': 'warn',
+    'vue/multi-word-component-names': 'off'
   }
 }

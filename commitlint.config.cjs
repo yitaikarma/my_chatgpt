@@ -33,7 +33,8 @@ module.exports = {
         'chore', // 构建过程或辅助工具的变动
         'ci', // ci 配置文件修改
         'revert', // 回退
-        'build' // 打包
+        'build', // 打包
+        'remove' // 删除
       ]
     ],
     // subject 大小写不做校验
