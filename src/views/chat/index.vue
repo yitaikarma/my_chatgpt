@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onBeforeMount, onBeforeUnmount, nextTick } from 'vue'
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
@@ -20,14 +20,20 @@ const url = 'https://api.openai.com/v1/chat/completions'
 const apiKey = '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'
 // let openai = null
 
-const resquesting = ref(false)
+interface Message {
+  role: string
+  content: string
+}
+type MessageList = (Message | any)[]
+
+const requesting = ref(false)
 // FIXME: 状态管理，需要重新设计
 const msgStatus = ref('requesting')
 const defaultMessage = ref({
   role: 'assistant',
   content: '任何问题都可以问我，我会尽力回答的。'
 })
-const messagesList = ref([
+const messagesList = ref<MessageList>([
   // {
   //   role: "assistant",
   //   content: "任何问题都可以问我，我会尽力回答的。"
@@ -52,7 +58,7 @@ const messagesList = ref([
   //   content: "“鸡你太美”指的是中国大陆哪位男艺人？给你个提示，他喜欢唱、跳、篮球、Rap"
   // },
 ])
-const questionMessage = ref({
+const questionMessage = ref<Message>({
   role: 'user',
   // content: "“鸡你太美”指的是中国大陆哪位男艺人？给你个提示，他喜欢唱、跳、篮球、Rap"
   // content: "js实现节流"
@@ -65,8 +71,8 @@ const prompt = [
     content: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.`
   }
 ]
-let chatHistoryList = []
-let md = null
+let chatHistoryList: MessageList = []
+let md: MarkdownIt | null = null
 
 onBeforeMount(() => {
   initChatSystem()
@@ -119,7 +125,7 @@ function initMessage() {
 function createMarkdownIt() {
   // 创建 markdown-it 实例
   md = new MarkdownIt({
-    highlight: false
+    highlight: null
   })
 
   // 处理代码块
@@ -134,9 +140,10 @@ function createMarkdownIt() {
     const clipboard = new Clipboard('.copy-button')
 
     clipboard.on('success', function (e) {
-      e.trigger.innerText = 'Copied!'
+      // e.trigger.innerText = 'Copied!'
+      e.trigger.textContent = 'Copied!'
       setTimeout(() => {
-        e.trigger.innerText = 'Copy'
+        e.trigger.textContent = 'Copy'
       }, 2000)
     })
 
@@ -169,14 +176,14 @@ function createMarkdownIt() {
     // console.log(tokens, idx, options, env, self);
     const token = tokens[idx]
     const code = token.content
-    const highlighted = hljs.highlightAuto(code).value
     return '<code class="code_inline">' + code + '</code>'
+    // const highlighted = hljs.highlightAuto(code).value
     // return '<code class="code_inline">' + highlighted + '</code>';
   }
 }
 // 渲染markdown
-function renderMarkdown(text) {
-  return md.render(text)
+function renderMarkdown(text: string) {
+  return md && md.render(text)
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
@@ -195,12 +202,12 @@ function hookBeforeSendMessage() {
   })
 }
 // 接收消息时的处理
-function hookAfterReceiveMessage(done, messages, currentChat) {
+function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentChat: Message) {
   if (done) {
     chatHistoryList.push(currentChat)
     // FIXME: 消息传输状态待优化
     msgStatus.value = 'requesting'
-    resquesting.value = false
+    requesting.value = false
     console.log('done')
     return
   }
@@ -210,11 +217,11 @@ function hookAfterReceiveMessage(done, messages, currentChat) {
     msgStatus.value = 'generating'
   }
 
-  for (let i = 0; i < messages.length; i++) {
-    const message = messages[i]
-    if (message.choices) {
-      const choice = message.choices[0]
-      const content = choice.delta.content
+  for (let i = 0; i < messageTextList.length; i++) {
+    const messageTextObj = messageTextList[i]
+    if (messageTextObj?.choices) {
+      const choice = messageTextObj.choices?.[0]
+      const content: string = choice?.delta?.content
       if (content) {
         currentChat.content += content
         scrollToBottom('message_list')
@@ -223,8 +230,12 @@ function hookAfterReceiveMessage(done, messages, currentChat) {
   }
 }
 // 处理SSE流消息
-function transformSSEMessage(response, callback) {
+function transformSSEMessage(
+  response: Response,
+  callback: (done: boolean, messageTextList: any[]) => void
+) {
   // FIXME: 健壮性需要优化
+  if (!response?.body) return
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
 
@@ -239,17 +250,18 @@ function transformSSEMessage(response, callback) {
       // 提取json字符串中的对象字符串
       const jsonList = message.match(/(?<=data: )\{.*\}/g)
       // console.log('jsonList: ', jsonList);
-
-      for (let i = 0; i < jsonList.length; i++) {
-        const json = jsonList[i]
-        if (json) {
-          try {
-            const obj = JSON.parse(json)
-            if (obj instanceof Object) {
-              result.push(obj)
+      if (jsonList) {
+        for (let i = 0; i < jsonList.length; i++) {
+          const json = jsonList[i]
+          if (json) {
+            try {
+              const obj = JSON.parse(json)
+              if (obj instanceof Object) {
+                result.push(obj)
+              }
+            } catch (e) {
+              console.log(e)
             }
-          } catch (e) {
-            console.log(e)
           }
         }
       }
@@ -273,32 +285,32 @@ function sendMessage() {
     return
   }
 
-  resquesting.value = true
+  requesting.value = true
 
   hookBeforeSendMessage()
 
-  const resquestOptions = {
+  const requestOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`
     },
-    body: {
+    body: JSON.stringify({
       messages: chatHistoryList,
       model: 'gpt-3.5-turbo',
       temperature: 0.5,
       max_tokens: 1000,
       stream: true
-    }
+    })
   }
-  resquestOptions.body = JSON.stringify(resquestOptions.body)
+  // requestOptions.body = JSON.stringify(requestOptions.body)
 
-  // openai.createChatCompletion(resquestOptions.body)
-  fetch(url, resquestOptions)
-    .then((response) => {
-      const currentChat = messagesList.value[messagesList.value.length - 1]
-      transformSSEMessage(response, (done, messages) => {
-        hookAfterReceiveMessage(done, messages, currentChat)
+  // openai.createChatCompletion(requestOptions.body)
+  fetch(url, requestOptions)
+    .then((response: Response) => {
+      const currentChat: Message = messagesList.value[messagesList.value.length - 1]
+      transformSSEMessage(response, (done, messageTextList) => {
+        hookAfterReceiveMessage(done, messageTextList, currentChat)
       })
     })
     .catch((error) => {
@@ -306,18 +318,18 @@ function sendMessage() {
     })
 }
 // Enter键发送消息与换行
-function handleEnter(e) {
+function handleEnter(e: KeyboardEvent) {
   if (e.keyCode === 13) {
     if (e.shiftKey) return // shift + enter 换行
     e.preventDefault()
-    if (!resquesting.value) sendMessage()
+    if (!requesting.value) sendMessage()
     // console.log('enter', e);
   }
 }
 // 滚动到底部
-function scrollToBottom(id) {
+function scrollToBottom(id: string) {
   const container = document.getElementById(id)
-  if (container.scrollTop + container.clientHeight < container.scrollHeight) {
+  if (container && container.scrollTop + container.clientHeight < container.scrollHeight) {
     // console.log('滚动到底部');
     container.scrollTo({
       top: container.scrollHeight,
@@ -403,8 +415,8 @@ function handleClearMessage() {
         placeholder="请入内容后，按Enter键发送"
         rows="3"
       ></textarea>
-      <button v-show="!resquesting" @click="sendMessage">send</button>
-      <button v-show="resquesting">sending</button>
+      <button v-show="!requesting" @click="sendMessage">send</button>
+      <button v-show="requesting">sending</button>
     </div>
   </div>
 </template>
