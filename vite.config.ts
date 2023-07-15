@@ -8,8 +8,17 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import viteCompression from 'vite-plugin-compression';
 
+interface ConfigParams {
+  command: string;
+  mode: string;
+  isProduction: boolean;
+  isBuild: boolean;
+  isServe: boolean;
+  configEnv: Record<string, any>;
+}
+
 // https://vitejs.dev/config/
-export default ({ mode }) => {
+export default ({ mode }: ConfigParams) => {
   console.log('mode', mode, loadEnv(mode, process.cwd()).VITE_BASE_URL); //127.0.0.1:8080
   return defineConfig({
 
