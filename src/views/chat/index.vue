@@ -23,8 +23,9 @@ const apiKey = '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'
 interface Message {
   role: string
   content: string
+  time?: string
 }
-type MessageList = (Message | any)[]
+type MessageList = Message[]
 
 const requesting = ref(false)
 // FIXME: 状态管理，需要重新设计
