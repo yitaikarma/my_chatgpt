@@ -3,19 +3,123 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
+  <div class="mian">
+    <div class="header"></div>
+    <div class="side_nav">
       <nav>
-        <RouterLink to="/">Chat</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <div class="menu_nav">
+          <RouterLink to="/">Chat</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </div>
+        <div class="utils_nav">
+          <div class="settings_btn">设置</div>
+        </div>
       </nav>
     </div>
-  </header>
-  <RouterView />
+    <div class="view_content">
+      <RouterView />
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.wrapper {
-  position: fixed;
+.mian {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-auto-columns: auto 1fr;
+  grid-auto-rows: 60px 1fr;
+
+  .header {
+    grid-column: 1/3;
+    grid-row: 1/2;
+    height: 60px;
+    width: 100%;
+    background-color: #202124;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .side_nav {
+    grid-column: 1/2;
+    grid-row: 2/3;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    transition: all 1s ease-in-out;
+
+    nav {
+      width: fit-content;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background-color: #202124;
+
+      .menu_nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+
+        a {
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background-color: #353535;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 16px;
+          color: #c3c3c3;
+
+          &:hover {
+            color: #1890ff;
+          }
+        }
+      }
+
+      .utils_nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
+
+        .settings_btn {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background-color: #353535;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 12px;
+          color: #c3c3c3;
+
+          &:hover {
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+
+  .view_content {
+    grid-column: 2/3;
+    grid-row: 2/3;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>

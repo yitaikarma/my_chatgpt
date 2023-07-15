@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Settings from './conmpoents/settings.vue'
+
 import { ref, onBeforeMount, onBeforeUnmount, nextTick } from 'vue'
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
@@ -374,57 +376,72 @@ function handleClearMessage() {
 //   html = '<ol>' + html + '</ol>'
 //   return `<pre class="hljs"><code>${html}</code></pre>`
 // }
+
+const settingsVisible = ref<boolean>(false)
+// 设置
+function handleChangeSettingsDisplay() {
+  settingsVisible.value = !settingsVisible.value
+}
 </script>
 
 <template>
-  <div class="chat_container">
-    <div id="message_list" class="chat_history_container scroll">
-      <div
-        class="message_item"
-        :user="item.role === 'user'"
-        v-for="(item, i) in messagesList"
-        :key="i"
-      >
-        <div class="avatar">
-          <img v-if="item.role === 'assistant'" src="@/assets/svg/chatgpt.svg" alt="" />
-          <div v-if="item.role === 'user'" class="fake_avatar_img">
-            {{ item.role.slice(0, 1).toLocaleUpperCase() }}
+  <div class="chat_view">
+    <div class="chat_list_wrapper">
+      <div class="chat_list"></div>
+      <div class="utils_nav">
+        <div class="settings_btn" @click="handleChangeSettingsDisplay">设置</div>
+      </div>
+    </div>
+    <div class="chat_container">
+      <div id="message_list" class="chat_history_container scroll">
+        <div
+          class="message_item"
+          :user="item.role === 'user'"
+          v-for="(item, i) in messagesList"
+          :key="i"
+        >
+          <div class="avatar">
+            <img v-if="item.role === 'assistant'" src="@/assets/svg/chatgpt.svg" alt="" />
+            <div v-if="item.role === 'user'" class="fake_avatar_img">
+              {{ item.role.slice(0, 1).toLocaleUpperCase() }}
+            </div>
           </div>
-        </div>
-        <div class="message" :user="item.role === 'user'">
-          <div class="message_header">
-            <div class="message_role">{{ item.role }}</div>
-            <div class="message_time">{{ item.time }}</div>
-          </div>
-          <div class="message_content">
-            <div v-if="item.role === 'user'" class="message_text">{{ item.content }}</div>
-            <div v-else class="message_text" v-html="`${renderMarkdown(item.content)}`"></div>
+          <div class="message" :user="item.role === 'user'">
+            <div class="message_header">
+              <div class="message_role">{{ item.role }}</div>
+              <div class="message_time">{{ item.time }}</div>
+            </div>
+            <div class="message_content">
+              <div v-if="item.role === 'user'" class="message_text">{{ item.content }}</div>
+              <div v-else class="message_text" v-html="`${renderMarkdown(item.content)}`"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="toolbar">
-      <div class="clear_msg" @click="handleClearMessage">
-        <span>重新开始</span>
+      <div class="toolbar">
+        <div class="clear_msg" @click="handleClearMessage">
+          <span>重新开始</span>
+        </div>
+      </div>
+      <div class="user_wrapper">
+        <textarea
+          name="user"
+          id="user"
+          class="scroll textarea_scroll"
+          v-model="questionMessage.content"
+          cols="60"
+          placeholder="请入内容后，按Enter键发送"
+          rows="3"
+        ></textarea>
+        <button v-show="!requesting" @click="sendMessage">send</button>
+        <button v-show="requesting">sending</button>
       </div>
     </div>
-    <div class="user_wrapper">
-      <textarea
-        name="user"
-        id="user"
-        class="scroll textarea_scroll"
-        v-model="questionMessage.content"
-        cols="60"
-        placeholder="请入内容后，按Enter键发送"
-        rows="3"
-      ></textarea>
-      <button v-show="!requesting" @click="sendMessage">send</button>
-      <button v-show="requesting">sending</button>
-    </div>
+    <settings v-show="settingsVisible" @close="settingsVisible = false" />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 @font-face {
   font-family: 'FiraCode';
   src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
@@ -439,6 +456,60 @@ function handleClearMessage() {
 
 :deep(.scroll)::-webkit-scrollbar-track {
   background: #232425;
+}
+
+.chat_view {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  background-color: #232425;
+}
+
+.chat_list_wrapper {
+  width: 300px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #232425;
+  // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+
+  .chat_list {
+    width: 300px;
+    height: 100%;
+    padding: 20px;
+    background-color: #23252b;
+    // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .utils_nav {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px;
+
+    .settings_btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: #353535;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      color: #c3c3c3;
+
+      &:hover {
+        color: #1890ff;
+      }
+    }
+  }
 }
 
 .chat_container {
