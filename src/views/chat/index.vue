@@ -98,6 +98,7 @@ function initMessage() {
   questionMessage.value.content = ''
   messagesList.value.push(defaultMessage.value)
   chatHistoryList.push(...prompt)
+  requesting.value = false
 }
 // 创建 Node-GPT
 // function createGPT() {
@@ -340,6 +341,7 @@ function scrollToBottom(id: string) {
 }
 // 清空历史消息
 function handleClearMessage() {
+  // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
 }
 // 代码高亮
