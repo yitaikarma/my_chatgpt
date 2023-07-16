@@ -191,11 +191,11 @@ function renderMarkdown(text: string) {
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
-  const question = JSON.parse(JSON.stringify(questionMessage.value))
+  const question: Message = JSON.parse(JSON.stringify(questionMessage.value))
   messagesList.value.push(question)
   chatHistoryList.push(question)
   questionMessage.value.content = ''
-  const newReply = {
+  const newReply: Message = {
     role: 'assistant',
     content: '正在绞尽脑汁...'
   }
