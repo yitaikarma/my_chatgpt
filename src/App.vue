@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { darkTheme, zhCN, dateZhCN, NConfigProvider } from 'naive-ui'
 </script>
 
 <template>
-  <div class="mian">
-    <div class="header"></div>
-    <div class="side_nav">
-      <nav>
-        <div class="menu_nav">
-          <RouterLink to="/">Chat</RouterLink>
-          <RouterLink to="/about">About</RouterLink>
-        </div>
-        <div class="utils_nav">
-          <div class="settings_btn">设置</div>
-        </div>
-      </nav>
+  <NConfigProvider :theme="darkTheme" :locale="zhCN" :date-locale="dateZhCN">
+    <div class="mian">
+      <div class="header"></div>
+      <div class="side_nav">
+        <nav>
+          <div class="menu_nav">
+            <RouterLink to="/">Chat</RouterLink>
+            <RouterLink to="/about">About</RouterLink>
+          </div>
+          <div class="utils_nav">
+            <div class="settings_btn">设置</div>
+          </div>
+        </nav>
+      </div>
+      <div class="view_content">
+        <RouterView />
+      </div>
     </div>
-    <div class="view_content">
-      <RouterView />
-    </div>
-  </div>
+  </NConfigProvider>
 </template>
 
 <style scoped lang="scss">

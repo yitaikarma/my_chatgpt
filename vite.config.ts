@@ -1,35 +1,27 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
+import type { ConfigEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import { ElementPlusResolver, NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import viteCompression from 'vite-plugin-compression';
 
-interface ConfigParams {
-  command: string;
-  mode: string;
-  isProduction: boolean;
-  isBuild: boolean;
-  isServe: boolean;
-  configEnv: Record<string, any>;
-}
-
 // https://vitejs.dev/config/
-export default ({ mode }: ConfigParams) => {
+export default ({ mode }: ConfigEnv) => {
   console.log('mode', mode, loadEnv(mode, process.cwd()).VITE_BASE_URL); //127.0.0.1:8080
-  return defineConfig({
 
+  return defineConfig({
     plugins: [
       vue(),
       vueJsx(),
       AutoImport({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver(), NaiveUiResolver()],
       }),
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver(), NaiveUiResolver()],
       }),
       {
         ...viteCompression({

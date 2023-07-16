@@ -10,7 +10,7 @@
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
-    "types": ["node"],
+    "types": ["node", "naive-ui/volar"],
     "skipLibCheck": true,
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true
