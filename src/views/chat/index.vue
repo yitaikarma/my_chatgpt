@@ -377,10 +377,10 @@ function handleClearMessage() {
 //   return `<pre class="hljs"><code>${html}</code></pre>`
 // }
 
-const settingsVisible = ref<boolean>(false)
+const settings = ref<InstanceType<typeof Settings> | null>(null)
 // 设置
 function handleChangeSettingsDisplay() {
-  settingsVisible.value = !settingsVisible.value
+  settings.value?.openSettings()
 }
 </script>
 
@@ -437,7 +437,7 @@ function handleChangeSettingsDisplay() {
         <button v-show="requesting">sending</button>
       </div>
     </div>
-    <settings v-show="settingsVisible" @close="settingsVisible = false" />
+    <settings ref="settings" />
   </div>
 </template>
 
