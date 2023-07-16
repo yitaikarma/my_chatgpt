@@ -33,8 +33,9 @@ import { RouterLink, RouterView } from 'vue-router'
   .header {
     grid-column: 1/3;
     grid-row: 1/2;
-    height: 60px;
     width: 100%;
+    height: 60px;
+    border-bottom: 1px solid #2e3035;
     background-color: #202124;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   }
@@ -44,6 +45,7 @@ import { RouterLink, RouterView } from 'vue-router'
     grid-row: 2/3;
     display: flex;
     align-items: center;
+    border-right: 1px solid #2e3035;
     background-color: #fff;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
     transition: all 1s ease-in-out;

@@ -473,15 +473,13 @@ function handleChangeSettingsDisplay() {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background-color: #232425;
-  // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #3c3f45;
+  background-color: #23252b;
 
   .chat_list {
     width: 300px;
     height: 100%;
     padding: 20px;
-    background-color: #23252b;
-    // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   }
 
   .utils_nav {
@@ -491,6 +489,7 @@ function handleChangeSettingsDisplay() {
     align-items: center;
     justify-content: flex-end;
     padding: 10px;
+    border-top: 1px solid #2e3035;
 
     .settings_btn {
       width: 40px;
