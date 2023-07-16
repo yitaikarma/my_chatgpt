@@ -1,10 +1,32 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { darkTheme, zhCN, dateZhCN, NConfigProvider } from 'naive-ui'
+import { NConfigProvider, GlobalThemeOverrides, darkTheme, zhCN, dateZhCN } from 'naive-ui'
+
+// 自定义 NaiveUI 主题
+const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    borderRadius: '10px'
+  },
+  Button: {
+    borderRadiusSmall: '6px'
+  },
+  Select: {
+    peers: {
+      InternalSelection: {
+        // textColor: '#FF0000'
+      }
+    }
+  }
+}
 </script>
 
 <template>
-  <NConfigProvider :theme="darkTheme" :locale="zhCN" :date-locale="dateZhCN">
+  <NConfigProvider
+    :theme="darkTheme"
+    :locale="zhCN"
+    :date-locale="dateZhCN"
+    :theme-overrides="themeOverrides"
+  >
     <div class="mian">
       <div class="header"></div>
       <div class="side_nav">
