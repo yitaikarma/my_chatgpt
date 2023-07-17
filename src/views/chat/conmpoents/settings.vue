@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { NForm, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
+import {
+  NForm,
+  NFormItemGi,
+  NGrid,
+  NInput,
+  NModal,
+  NRadio,
+  NRadioGroup,
+  NSelect,
+  NSpace,
+  useMessage
+} from 'naive-ui'
 import type { FormRules, FormInst, SelectOption } from 'naive-ui'
 import { useSettingsStore } from '@/stores/modules/settings'
 
@@ -19,6 +30,24 @@ const rules: FormRules = {
     message: '请输入 API 秘钥'
   }
 }
+interface ThemeRadio {
+  value: string
+  label: string
+}
+const themeOptions: ThemeRadio[] = [
+  {
+    value: 'auto',
+    label: '自动'
+  },
+  {
+    value: 'light',
+    label: '浅色'
+  },
+  {
+    value: 'dark',
+    label: '深色'
+  }
+]
 const options: SelectOption[] = [
   {
     label: 'GPT-3.5-turbo-0613',
@@ -95,21 +124,30 @@ function cancelCallback() {
         style="margin-top: 40px"
       >
         <NGrid cols="24" y-gap="10">
-          <NFormItemGridItem span="24" path="api_url" label="API地址">
+          <NFormItemGi span="24" path="theme" label="主题模式">
+            <NRadioGroup v-model:value="model.theme" name="radiogroup">
+              <NSpace>
+                <NRadio v-for="theme in themeOptions" :key="theme.value" :value="theme.value">
+                  {{ theme.label }}
+                </NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </NFormItemGi>
+          <NFormItemGi span="24" path="api_url" label="API地址">
             <NInput v-model:value="model.api_url" clearable placeholder="https://api.openai.com" />
-          </NFormItemGridItem>
-          <NFormItemGridItem span="24" path="api_key" label="API秘钥">
+          </NFormItemGi>
+          <NFormItemGi span="24" path="api_key" label="API秘钥">
             <NInput v-model:value="model.api_key" clearable placeholder="必填" />
-          </NFormItemGridItem>
-          <NFormItemGridItem span="24" path="model" label="模型">
+          </NFormItemGi>
+          <NFormItemGi span="24" path="model" label="模型">
             <NSelect v-model:value="model.model" :options="options" clearable placeholder="必填" />
-          </NFormItemGridItem>
-          <NFormItemGridItem span="24" path="role_nick_name" label="角色昵称" :required="true">
+          </NFormItemGi>
+          <NFormItemGi span="24" path="role_nick_name" label="角色昵称">
             <NInput v-model:value="model.role_nick_name" clearable placeholder="必填" />
-          </NFormItemGridItem>
-          <NFormItemGridItem span="24" path="role_remarks" label="角色备注">
+          </NFormItemGi>
+          <NFormItemGi span="24" path="role_remarks" label="角色备注">
             <NInput v-model:value="model.role_remarks" clearable placeholder="必填" />
-          </NFormItemGridItem>
+          </NFormItemGi>
           <NFormItemGridItem
             span="24"
             path="role_directive"

@@ -12,10 +12,12 @@ declare module 'vue' {
     NForm: typeof import('naive-ui')['NForm']
     NFormItemGi: typeof import('naive-ui')['NFormItemGi']
     NFormItemGridItem: typeof import('naive-ui')['NFormItemGridItem']
-    NFormNFormItemGridItemItem: typeof import('naive-ui')['NFormNFormItemGridItemItem']
     NGrid: typeof import('naive-ui')['NGrid']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
+    NRadio: typeof import('naive-ui')['NRadio']
+    NRadioGroup: typeof import('naive-ui')['NRadioGroup']
+    NSpace: typeof import('naive-ui')['NSpace']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

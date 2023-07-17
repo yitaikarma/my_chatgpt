@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useSettingsStore = defineStore('settings', {
   state: (): { config: Settings.Option } => ({
     config: {
-      theme: 'light',
+      theme: 'auto',
       api_url: 'https://api.finalvk.com',
       api_key: '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',
       model: 'GPT-3.5-turbo-16k',
