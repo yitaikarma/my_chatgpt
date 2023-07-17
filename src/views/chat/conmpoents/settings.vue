@@ -133,8 +133,15 @@ function cancelCallback() {
               </NSpace>
             </NRadioGroup>
           </NFormItemGi>
-          <NFormItemGi span="24" path="api_url" label="API地址">
-            <NInput v-model:value="model.api_url" clearable placeholder="https://api.openai.com" />
+          <NFormItemGi span="24" path="api_base_url" label="API地址">
+            <NInput
+              v-model:value="model.api_base_url"
+              clearable
+              placeholder="https://api.openai.com"
+            />
+          </NFormItemGi>
+          <NFormItemGi span="24" path="api_path" label="API路径">
+            <NInput v-model:value="model.api_path" clearable placeholder="/v1/chat/completions" />
           </NFormItemGi>
           <NFormItemGi span="24" path="api_key" label="API秘钥">
             <NInput v-model:value="model.api_key" clearable placeholder="必填" />

@@ -4,7 +4,8 @@ export const useSettingsStore = defineStore('settings', {
   state: (): { config: Settings.Option } => ({
     config: {
       theme: 'auto',
-      api_url: 'https://api.finalvk.com',
+      api_base_url: 'https://api.finalvk.com',
+      api_path: '/v1/chat/completions',
       api_key: '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',
       model: 'GPT-3.5-turbo-16k',
       role_nick_name: '小明',
@@ -19,8 +20,11 @@ export const useSettingsStore = defineStore('settings', {
     setTheme(theme: string) {
       this.config.theme = theme
     },
-    setApiUrl(api_url: string) {
-      this.config.api_url = api_url
+    setApiBaseUrl(api_base_url: string) {
+      this.config.api_base_url = api_base_url
+    },
+    setApiPath(api_path: string) {
+      this.config.api_path = api_path
     },
     setApiKey(api_key: string) {
       this.config.api_key = api_key

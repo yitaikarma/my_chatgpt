@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
 
-import { ref, onBeforeMount, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onBeforeMount, onBeforeUnmount, nextTick, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/modules/settings'
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
@@ -18,8 +20,11 @@ import 'highlight.js/styles/tokyo-night-dark.css'
 
 // hljs.registerLanguage('javascript', javascript);
 
-const url = 'https://api.openai.com/v1/chat/completions'
-const apiKey = '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'
+const settingsStore = useSettingsStore()
+const { config } = storeToRefs(settingsStore)
+
+const api_url = computed(() => config.value.api_base_url + config.value.api_path)
+const api_key = computed(() => config.value.api_key)
 // let openai = null
 
 interface Message {
@@ -41,31 +46,9 @@ const messagesList = ref<MessageList>([
   //   role: "assistant",
   //   content: "任何问题都可以问我，我会尽力回答的。"
   // },
-  // {
-  //   role: "user",
-  //   content: "overflow和flex不能一起使用吗？"
-  // },
-  // {
-  //   role: "assistant",
-  //   content: `可以一起使用，但是需要注意一些细节。
-  // 当使用flex布局时，子元素的大小和位置是由flex属性控制的，而不是由overflow属性控制的。因此，在使用flex布局时，设置overflow属性可能会影响flex布局的效果。
-  // 举个例子，如果一个容器使用了flex布局，并且子元素设置了flex-shrink属性，那么当容器的大小不足以容纳所有子元素时，某些子元素可能会被压缩。如果这个容器同时设置了overflow属性，那么被压缩的子元素可能会被隐藏，因为它们已经超出了容器的范围。
-  // 因此，在使用flex布局时，建议谨慎使用overflow属性，以免影响布局效果。如果必须使用overflow属性，可以尝试将其应用于子元素而不是容器本身。`
-  // },
-  // {
-  //   role: "user",
-  //   content: "用js随便写一个函数"
-  // },
-  // {
-  //   role: "user",
-  //   content: "“鸡你太美”指的是中国大陆哪位男艺人？给你个提示，他喜欢唱、跳、篮球、Rap"
-  // },
 ])
 const questionMessage = ref<Message>({
   role: 'user',
-  // content: "“鸡你太美”指的是中国大陆哪位男艺人？给你个提示，他喜欢唱、跳、篮球、Rap"
-  // content: "js实现节流"
-  // content: "用js随便写一个函数"
   content: '你好'
 })
 const prompt = [
@@ -297,7 +280,7 @@ function sendMessage() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
+      Authorization: `Bearer ${api_key.value}`
     },
     body: JSON.stringify({
       messages: chatHistoryList,
@@ -310,7 +293,7 @@ function sendMessage() {
   // requestOptions.body = JSON.stringify(requestOptions.body)
 
   // openai.createChatCompletion(requestOptions.body)
-  fetch(url, requestOptions)
+  fetch(api_url.value, requestOptions)
     .then((response: Response) => {
       const currentChat: Message = messagesList.value[messagesList.value.length - 1]
       transformSSEMessage(response, (done, messageTextList) => {
@@ -387,7 +370,7 @@ function handleChangeSettingsDisplay() {
 <template>
   <div class="chat_view">
     <div class="chat_list_wrapper">
-      <div class="chat_list"></div>
+      <div class="chat_list">{{ aa }}</div>
       <div class="utils_nav">
         <div class="settings_btn" @click="handleChangeSettingsDisplay">设置</div>
       </div>
