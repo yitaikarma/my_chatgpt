@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { NConfigProvider, GlobalThemeOverrides, darkTheme, zhCN, dateZhCN } from 'naive-ui'
+import {
+  NConfigProvider,
+  GlobalThemeOverrides,
+  darkTheme,
+  zhCN,
+  dateZhCN,
+  NMessageProvider
+} from 'naive-ui'
 
 // 自定义 NaiveUI 主题
 const themeOverrides: GlobalThemeOverrides = {
@@ -41,7 +48,9 @@ const themeOverrides: GlobalThemeOverrides = {
         </nav>
       </div>
       <div class="view_content">
-        <RouterView />
+        <NMessageProvider>
+          <RouterView />
+        </NMessageProvider>
       </div>
     </div>
   </NConfigProvider>
