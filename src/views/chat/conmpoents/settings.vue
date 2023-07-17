@@ -1,31 +1,25 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { NForm, NFormItemGridItem, NGrid, NInput, NModal, NSelect } from 'naive-ui'
+import { NForm, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
+import type { FormRules, FormInst, SelectOption } from 'naive-ui'
+import { useSettingsStore } from '@/stores/modules/settings'
 
-// export interface Props {
-//   visible: boolean
-// }
-// withDefaults(defineProps<Props>(), {
-//   visible: false
-// })
+const settingsStore = useSettingsStore()
 
+const message = useMessage()
+
+const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const model = ref({
-  api_url: 'https://api.finalvk.com',
-  api_key: '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',
-  model: 'GPT-3.5-turbo-16k',
-  role_nick_name: '小明',
-  role_remarks: '小明是一个小学生',
-  role_directive: '小明想要去上学'
-})
-const rules = {
+const model = ref<Settings.Option>({ ...settingsStore.config })
+
+const rules: FormRules = {
   api_key: {
     required: true,
     trigger: ['blur', 'input'],
     message: '请输入 API 秘钥'
   }
 }
-const options = [
+const options: SelectOption[] = [
   {
     label: 'GPT-3.5-turbo-0613',
     value: 'GPT-3.5-turbo-0613'
@@ -52,6 +46,7 @@ defineExpose({
 
 function openSettings() {
   showModal.value = true
+  model.value = { ...settingsStore.config }
 }
 
 function closeSettings() {
@@ -59,7 +54,15 @@ function closeSettings() {
 }
 
 function submitCallback() {
-  closeSettings()
+  return formRef.value?.validate((errors) => {
+    if (!errors) {
+      model.value && settingsStore.setConfig(model.value)
+      message.success('已保存')
+    } else {
+      console.log(errors)
+      message.error('验证失败')
+    }
+  })
 }
 
 function cancelCallback() {
@@ -73,6 +76,7 @@ function cancelCallback() {
       preset="dialog"
       title="设置"
       :show-icon="false"
+      bordered
       transform-origin="center"
       positive-text="保存"
       negative-text="取消"
