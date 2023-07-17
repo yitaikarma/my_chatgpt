@@ -377,10 +377,10 @@ function handleClearMessage() {
 //   return `<pre class="hljs"><code>${html}</code></pre>`
 // }
 
-const settings = ref<InstanceType<typeof Settings> | null>(null)
+const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 // 设置
 function handleChangeSettingsDisplay() {
-  settings.value?.openSettings()
+  settingsRef.value?.openSettings()
 }
 </script>
 
@@ -437,7 +437,7 @@ function handleChangeSettingsDisplay() {
         <button v-show="requesting">sending</button>
       </div>
     </div>
-    <settings ref="settings" />
+    <settings ref="settingsRef" />
   </div>
 </template>
 
@@ -492,6 +492,7 @@ function handleChangeSettingsDisplay() {
     border-top: 1px solid #2e3035;
 
     .settings_btn {
+      cursor: pointer;
       width: 40px;
       height: 40px;
       display: flex;
