@@ -370,7 +370,7 @@ function handleChangeSettingsDisplay() {
 <template>
   <div class="chat_view">
     <div class="chat_list_wrapper">
-      <div class="chat_list">{{ aa }}</div>
+      <div class="chat_list"></div>
       <div class="utils_nav">
         <div class="settings_btn" @click="handleChangeSettingsDisplay">设置</div>
       </div>
