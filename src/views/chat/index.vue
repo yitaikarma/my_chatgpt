@@ -73,15 +73,16 @@ function updateRoleDirective() {
   }
 }
 
-// 设定角色
-function setRole(
-  role: string,
-  name: string,
-  content: string,
-  isParmasData: boolean = false
-): Message {
+/**
+ * 设置消息
+ * @param role 角色
+ * @param content 内容
+ * @param name 昵称
+ * @returns Message 消息
+ */
+function setRoleMessage(role: string, content: string, name?: string): Message {
   const message: Message = { role, content }
-  if (!isParmasData) {
+  if (name) {
     message.name = name
     message.time = new Date().toLocaleString()
   }
@@ -99,8 +100,8 @@ function initChatSystem() {
 function initMessage() {
   questionMessage.value = ''
   // FIXME: 清空数组可以使用 arr.length = 0
-  messageList.value = [setRole('assistant', roleNick.value, content)]
-  requestMessageList = [setRole('user', userNick.value, roleDirective.value, true)]
+  messageList.value = [setRoleMessage('assistant', content, roleNick.value)]
+  requestMessageList = [setRoleMessage('user', roleDirective.value)]
 
   requesting.value = false
 }
@@ -193,9 +194,9 @@ function renderMarkdown(text: string) {
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
-  const userMessage: Message = setRole('user', userNick.value, questionMessage.value, true)
-  const questionMsg: Message = setRole('user', userNick.value, questionMessage.value)
-  const waitMessage: Message = setRole('assistant', roleNick.value, '正在绞尽脑汁...', true)
+  const userMessage: Message = setRoleMessage('user', questionMessage.value, userNick.value)
+  const waitMessage: Message = setRoleMessage('assistant', '正在绞尽脑汁...', roleNick.value)
+  const questionMsg: Message = setRoleMessage('user', questionMessage.value)
 
   messageList.value.push(userMessage, waitMessage)
   requestMessageList.push(questionMsg)
@@ -208,7 +209,7 @@ function hookBeforeSendMessage() {
 // 接收消息时的处理
 function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentMessage: Message) {
   if (done) {
-    const message: Message = setRole('assistant', roleNick.value, messageTextList[0].text)
+    const message: Message = setRoleMessage('assistant', currentMessage.content)
     requestMessageList.push(message)
     // FIXME: 消息传输状态待优化
     msgStatus.value = 'requesting'
