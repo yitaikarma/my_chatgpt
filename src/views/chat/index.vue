@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
 
-import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick } from 'vue'
+import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 // import { ChatGPTAPI } from 'chatgpt'
@@ -10,15 +10,7 @@ import { useSettingsStore } from '@/stores/modules/settings'
 import MarkdownIt from 'markdown-it'
 import Clipboard from 'clipboard'
 import hljs from 'highlight.js'
-// import hljs from 'highlight.js/lib/core';
-// import javascript from 'highlight.js/lib/languages/javascript';
-// import typescript from 'highlight.js/lib/languages/typescript';
-
-// import 'highlight.js/styles/atom-one-dark.css'
-// import 'highlight.js/styles/github-dark.css'
 import 'highlight.js/styles/tokyo-night-dark.css'
-
-// hljs.registerLanguage('javascript', javascript);
 
 const settingsStore = useSettingsStore()
 const { config } = storeToRefs(settingsStore)
@@ -26,8 +18,9 @@ const { config } = storeToRefs(settingsStore)
 const apiURL = toRef(() => config.value.api_base_url + config.value.api_path)
 const apiKey = toRef(() => config.value.api_key)
 const model = toRef(() => config.value.model)
-const userNick = toRef(() => 'You')
+const userNick = toRef(() => config.value.user_nick_name)
 const roleNick = toRef(() => config.value.role_nick_name)
+const roleDirective = toRef(() => config.value.role_directive)
 // let openai = null
 
 type Content<T> = T
@@ -41,35 +34,22 @@ interface Message {
   content: Content<string>
   time?: string
 }
-// interface MessageAffiliatedAttr {
-//   name?: string
-//   time?: string
-// }
 
-const requesting = ref(false)
+const requesting = ref<boolean>(false)
 // FIXME: 状态管理，需要重新设计
-const msgStatus = ref('requesting')
-// 默认消息
-const defaultMessage = ref<Message>({
-  role: 'assistant',
-  content: '任何问题都可以问我，我会尽力回答的。'
-})
+const msgStatus = ref<string>('requesting')
+const content = '任何问题都可以问我，我会尽力回答的。'
+
 // 用户输入的消息
-const questionMessage = ref<Message>({
-  role: 'user',
-  content: ''
-})
-// 提示消息
-const promptMessageList: RequestMessage[] = [
-  {
-    role: 'user',
-    content: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.`
-  }
-]
+const questionMessage = ref<string>('')
+// const questionMessage = ref<Message>({
+//   role: 'user',
+//   content: ''
+// })
 // 请求消息
 let requestMessageList: RequestMessage[] = []
 // 客户端消息
-const messagesList = ref<Message[]>([])
+const messageList = ref<Message[]>([])
 
 let md: MarkdownIt | null = null
 
@@ -82,6 +62,32 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleEnter)
 })
 
+watch(roleDirective, () => {
+  updateRoleDirective()
+})
+
+// 更新角色指令
+function updateRoleDirective() {
+  if (requestMessageList?.[0]) {
+    requestMessageList[0].content = config.value.role_directive
+  }
+}
+
+// 设定角色
+function setRole(
+  role: string,
+  name: string,
+  content: string,
+  isParmasData: boolean = false
+): Message {
+  const message: Message = { role, content }
+  if (!isParmasData) {
+    message.name = name
+    message.time = new Date().toLocaleString()
+  }
+  return message
+}
+
 // 系统初始化
 function initChatSystem() {
   // createGPT()
@@ -91,19 +97,11 @@ function initChatSystem() {
 }
 // 消息初始化
 function initMessage() {
+  questionMessage.value = ''
   // FIXME: 清空数组可以使用 arr.length = 0
-  messagesList.value = []
-  requestMessageList = []
-  questionMessage.value.content = ''
+  messageList.value = [setRole('assistant', roleNick.value, content)]
+  requestMessageList = [setRole('user', userNick.value, roleDirective.value, true)]
 
-  const greetingMessage: Message = {
-    ...defaultMessage.value,
-    name: roleNick.value,
-    time: new Date().toLocaleString()
-  }
-  messagesList.value.push(greetingMessage)
-
-  requestMessageList.push(...promptMessageList)
   requesting.value = false
 }
 // 创建 Node-GPT
@@ -195,22 +193,13 @@ function renderMarkdown(text: string) {
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
-  const questionMsg: Message = JSON.parse(JSON.stringify(questionMessage.value))
-  const userMessage: Message = {
-    ...questionMsg,
-    name: userNick.value,
-    time: new Date().toLocaleString()
-  }
-  const waitMessage: Message = {
-    role: 'assistant',
-    content: '正在绞尽脑汁...',
-    name: roleNick.value,
-    time: new Date().toLocaleString()
-  }
+  const userMessage: Message = setRole('user', userNick.value, questionMessage.value, true)
+  const questionMsg: Message = setRole('user', userNick.value, questionMessage.value)
+  const waitMessage: Message = setRole('assistant', roleNick.value, '正在绞尽脑汁...', true)
 
-  messagesList.value.push(userMessage, waitMessage)
+  messageList.value.push(userMessage, waitMessage)
   requestMessageList.push(questionMsg)
-  questionMessage.value.content = ''
+  questionMessage.value = ''
 
   nextTick(() => {
     scrollToBottom('message_list')
@@ -219,11 +208,8 @@ function hookBeforeSendMessage() {
 // 接收消息时的处理
 function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentMessage: Message) {
   if (done) {
-    const requestMessage: Message = {
-      role: currentMessage.role,
-      content: currentMessage.content
-    }
-    requestMessageList.push(requestMessage)
+    const message: Message = setRole('assistant', roleNick.value, messageTextList[0].text)
+    requestMessageList.push(message)
     // FIXME: 消息传输状态待优化
     msgStatus.value = 'requesting'
     requesting.value = false
@@ -299,7 +285,7 @@ function transformSSEMessage(
 function sendMessage() {
   // TODO: 需要添加节流控制
   // 若用户未输入内容（包括换行和空格），则不发送请求
-  if (!questionMessage.value.content.trim()) {
+  if (!questionMessage.value.trim()) {
     console.log('请输入内容或合法内容')
     return
   }
@@ -327,10 +313,9 @@ function sendMessage() {
   fetch(apiURL.value, requestOptions)
     .then((response: Response) => {
       // FIXME: 当前消息赋值类型待优化
-      // const currentMessage: Message = messagesList.value[messagesList.value.length - 1]
-      const currentMessage: Message = messagesList.value.at(-1) || {
-        content: '',
-        role: 'assistant'
+      const currentMessage: Message = messageList.value.at(-1) || {
+        role: 'assistant',
+        content: ''
       }
       transformSSEMessage(response, (done, messageTextList) => {
         hookAfterReceiveMessage(done, messageTextList, currentMessage)
@@ -417,7 +402,7 @@ function handleChangeSettingsDisplay() {
         <div
           class="message_item"
           :user="item.role === 'user'"
-          v-for="(item, i) in messagesList"
+          v-for="(item, i) in messageList"
           :key="i"
         >
           <div class="avatar">
@@ -428,8 +413,7 @@ function handleChangeSettingsDisplay() {
           </div>
           <div class="message" :user="item.role === 'user'">
             <div class="message_header">
-              <!-- <div class="message_role">{{ item.role }}</div> -->
-              <div class="message_role">{{ item.name }}</div>
+              <div class="message_role">{{ item.role === 'user' ? userNick : roleNick }}</div>
               <div class="message_time">{{ item.time }}</div>
             </div>
             <div class="message_content">
@@ -449,7 +433,7 @@ function handleChangeSettingsDisplay() {
           name="user"
           id="user"
           class="scroll textarea_scroll"
-          v-model="questionMessage.content"
+          v-model="questionMessage"
           cols="60"
           placeholder="请入内容后，按Enter键发送"
           rows="3"
@@ -739,9 +723,9 @@ textarea::placeholder {
   color: #555;
 }
 
-textarea:focus {
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
-}
+// textarea:focus {
+//   /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+// }
 
 button {
   /* position: absolute; */
