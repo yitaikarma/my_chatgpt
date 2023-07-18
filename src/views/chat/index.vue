@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
 
-import { ref, onBeforeMount, onBeforeUnmount, nextTick, computed } from 'vue'
+import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 // import { ChatGPTAPI } from 'chatgpt'
@@ -23,41 +23,54 @@ import 'highlight.js/styles/tokyo-night-dark.css'
 const settingsStore = useSettingsStore()
 const { config } = storeToRefs(settingsStore)
 
-const api_url = computed(() => config.value.api_base_url + config.value.api_path)
-const api_key = computed(() => config.value.api_key)
+const apiURL = toRef(() => config.value.api_base_url + config.value.api_path)
+const apiKey = toRef(() => config.value.api_key)
+const model = toRef(() => config.value.model)
+const userNick = toRef(() => 'You')
+const roleNick = toRef(() => config.value.role_nick_name)
 // let openai = null
 
+type Content<T> = T
+interface RequestMessage {
+  role: string
+  content: Content<string>
+}
 interface Message {
   role: string
-  content: string
+  name?: string
+  content: Content<string>
   time?: string
 }
-type MessageList = Message[]
+// interface MessageAffiliatedAttr {
+//   name?: string
+//   time?: string
+// }
 
 const requesting = ref(false)
 // FIXME: 状态管理，需要重新设计
 const msgStatus = ref('requesting')
-const defaultMessage = ref({
+// 默认消息
+const defaultMessage = ref<Message>({
   role: 'assistant',
   content: '任何问题都可以问我，我会尽力回答的。'
 })
-const messagesList = ref<MessageList>([
-  // {
-  //   role: "assistant",
-  //   content: "任何问题都可以问我，我会尽力回答的。"
-  // },
-])
+// 用户输入的消息
 const questionMessage = ref<Message>({
   role: 'user',
-  content: '你好'
+  content: ''
 })
-const prompt = [
+// 提示消息
+const promptMessageList: RequestMessage[] = [
   {
     role: 'user',
     content: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.`
   }
 ]
-let chatHistoryList: MessageList = []
+// 请求消息
+let requestMessageList: RequestMessage[] = []
+// 客户端消息
+const messagesList = ref<Message[]>([])
+
 let md: MarkdownIt | null = null
 
 onBeforeMount(() => {
@@ -78,11 +91,19 @@ function initChatSystem() {
 }
 // 消息初始化
 function initMessage() {
+  // FIXME: 清空数组可以使用 arr.length = 0
   messagesList.value = []
-  chatHistoryList = []
+  requestMessageList = []
   questionMessage.value.content = ''
-  messagesList.value.push(defaultMessage.value)
-  chatHistoryList.push(...prompt)
+
+  const greetingMessage: Message = {
+    ...defaultMessage.value,
+    name: roleNick.value,
+    time: new Date().toLocaleString()
+  }
+  messagesList.value.push(greetingMessage)
+
+  requestMessageList.push(...promptMessageList)
   requesting.value = false
 }
 // 创建 Node-GPT
@@ -174,24 +195,35 @@ function renderMarkdown(text: string) {
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
-  const question: Message = JSON.parse(JSON.stringify(questionMessage.value))
-  messagesList.value.push(question)
-  chatHistoryList.push(question)
-  questionMessage.value.content = ''
-  const newReply: Message = {
-    role: 'assistant',
-    content: '正在绞尽脑汁...'
+  const questionMsg: Message = JSON.parse(JSON.stringify(questionMessage.value))
+  const userMessage: Message = {
+    ...questionMsg,
+    name: userNick.value,
+    time: new Date().toLocaleString()
   }
-  messagesList.value.push(newReply)
+  const waitMessage: Message = {
+    role: 'assistant',
+    content: '正在绞尽脑汁...',
+    name: roleNick.value,
+    time: new Date().toLocaleString()
+  }
+
+  messagesList.value.push(userMessage, waitMessage)
+  requestMessageList.push(questionMsg)
+  questionMessage.value.content = ''
 
   nextTick(() => {
     scrollToBottom('message_list')
   })
 }
 // 接收消息时的处理
-function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentChat: Message) {
+function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentMessage: Message) {
   if (done) {
-    chatHistoryList.push(currentChat)
+    const requestMessage: Message = {
+      role: currentMessage.role,
+      content: currentMessage.content
+    }
+    requestMessageList.push(requestMessage)
     // FIXME: 消息传输状态待优化
     msgStatus.value = 'requesting'
     requesting.value = false
@@ -200,7 +232,7 @@ function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentC
   }
   // 状态从请求中转为生成中
   if (msgStatus.value === 'requesting') {
-    currentChat.content = ''
+    currentMessage.content = ''
     msgStatus.value = 'generating'
   }
 
@@ -210,7 +242,7 @@ function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentC
       const choice = messageTextObj.choices?.[0]
       const content: string = choice?.delta?.content
       if (content) {
-        currentChat.content += content
+        currentMessage.content += content
         scrollToBottom('message_list')
       }
     }
@@ -280,24 +312,28 @@ function sendMessage() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${api_key.value}`
+      Authorization: `Bearer ${apiKey.value}`
     },
     body: JSON.stringify({
-      messages: chatHistoryList,
-      model: 'gpt-3.5-turbo',
+      messages: requestMessageList,
+      model: model.value || 'gpt-3.5-turbo',
       temperature: 0.5,
       max_tokens: 1000,
       stream: true
     })
   }
-  // requestOptions.body = JSON.stringify(requestOptions.body)
 
   // openai.createChatCompletion(requestOptions.body)
-  fetch(api_url.value, requestOptions)
+  fetch(apiURL.value, requestOptions)
     .then((response: Response) => {
-      const currentChat: Message = messagesList.value[messagesList.value.length - 1]
+      // FIXME: 当前消息赋值类型待优化
+      // const currentMessage: Message = messagesList.value[messagesList.value.length - 1]
+      const currentMessage: Message = messagesList.value.at(-1) || {
+        content: '',
+        role: 'assistant'
+      }
       transformSSEMessage(response, (done, messageTextList) => {
-        hookAfterReceiveMessage(done, messageTextList, currentChat)
+        hookAfterReceiveMessage(done, messageTextList, currentMessage)
       })
     })
     .catch((error) => {
@@ -366,6 +402,7 @@ function handleChangeSettingsDisplay() {
   settingsRef.value?.openSettings()
 }
 </script>
+``
 
 <template>
   <div class="chat_view">
@@ -391,7 +428,8 @@ function handleChangeSettingsDisplay() {
           </div>
           <div class="message" :user="item.role === 'user'">
             <div class="message_header">
-              <div class="message_role">{{ item.role }}</div>
+              <!-- <div class="message_role">{{ item.role }}</div> -->
+              <div class="message_role">{{ item.name }}</div>
               <div class="message_time">{{ item.time }}</div>
             </div>
             <div class="message_content">
@@ -576,6 +614,12 @@ function handleChangeSettingsDisplay() {
   font-size: 14px;
   color: #fff;
 }
+.message_time {
+  margin: 0 6px;
+  letter-spacing: -1px;
+  font-size: 12px;
+  color: #b9b9b9;
+}
 
 .message_content {
   display: flex;
@@ -592,7 +636,7 @@ function handleChangeSettingsDisplay() {
 .message_text {
   width: 100%;
 }
-
+// FIXME: 优化CSS格式
 .message_item[user='true'] {
   justify-items: end;
 }
@@ -611,6 +655,7 @@ function handleChangeSettingsDisplay() {
 .message_item[user='true'] .message {
   grid-row: 1;
   grid-column: 2;
+  align-items: flex-end;
 }
 
 .message_item[user='true'] .message_header {
@@ -619,6 +664,9 @@ function handleChangeSettingsDisplay() {
 
 .message_item[user='true'] .message_content {
   background-color: #2a2b78;
+}
+.message_item[user='true'] .message_role {
+  order: 1;
 }
 
 .assistant {
