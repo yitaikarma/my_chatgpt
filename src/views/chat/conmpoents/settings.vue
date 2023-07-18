@@ -51,16 +51,16 @@ const themeOptions: ThemeRadio[] = [
 const options: SelectOption[] = [
   {
     label: 'GPT-3.5-turbo-0613',
-    value: 'GPT-3.5-turbo-0613'
+    value: 'gpt-3.5-turbo-0613'
     // disabled: true
   },
   {
     label: 'GPT-3.5-turbo-16k',
-    value: 'GPT-3.5-turbo-16k'
+    value: 'gpt-3.5-turbo-16k'
   },
   {
     label: 'GPT-4',
-    value: 'GPT-4'
+    value: 'gpt-4'
   }
 ]
 
