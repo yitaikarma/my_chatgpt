@@ -62,7 +62,7 @@ const themeOverrides: GlobalThemeOverrides = {
   width: 100vw;
   display: grid;
   grid-auto-columns: auto 1fr;
-  grid-auto-rows: 60px 1fr;
+  grid-auto-rows: 60px minmax(100px, auto);
 
   .header {
     grid-column: 1/3;
