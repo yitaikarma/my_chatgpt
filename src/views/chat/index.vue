@@ -782,7 +782,7 @@ button {
   /* padding: .1em .2em; */
   margin: 0.2em;
   border-radius: 4px;
-  background: #262631;
+  // background: #262631;
   font-family: 'FiraCode';
   color: #8f68cd;
   white-space: nowrap;
