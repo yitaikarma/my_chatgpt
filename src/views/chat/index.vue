@@ -23,17 +23,17 @@ const roleNick = toRef(() => config.value.role_nick_name)
 const roleDirective = toRef(() => config.value.role_directive)
 // let openai = null
 
-type Content<T> = T
-interface RequestMessage {
-  role: string
-  content: Content<string>
-}
-interface Message {
-  role: string
-  name?: string
-  content: Content<string>
-  time?: string
-}
+// type Content<T> = T
+// interface RequestMessage {
+//   role: string
+//   content: Content<string>
+// }
+// interface Message {
+//   role: string
+//   name?: string
+//   content: Content<string>
+//   time?: string
+// }
 
 const requesting = ref<boolean>(false)
 // FIXME: 状态管理，需要重新设计
@@ -42,10 +42,6 @@ const content = '任何问题都可以问我，我会尽力回答的。'
 
 // 用户输入的消息
 const questionMessage = ref<string>('')
-// const questionMessage = ref<Message>({
-//   role: 'user',
-//   content: ''
-// })
 // 请求消息
 let requestMessageList: RequestMessage[] = []
 // 客户端消息
