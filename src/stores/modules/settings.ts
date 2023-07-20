@@ -16,11 +16,11 @@ export const useSettingsStore = defineStore('settings', {
   }),
   getters: {
     getConfigAttr(state) {
-      return (name: keyof Settings.Option | string) => {
+      return (name: keyof Settings.Config) => {
         if (name === 'api_url') {
           return state.config.api_base_url + state.config.api_path
         }
-        return state.config[name as keyof Settings.Option]
+        return state.config[name]
       }
     }
   },

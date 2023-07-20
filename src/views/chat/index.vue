@@ -1,243 +1,53 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
-import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, toRef, onBeforeMount, onBeforeUnmount } from 'vue'
 import { useSettings } from './hooks/useSettingsStore'
 import { useChat } from './hooks/useChat'
 import { createMarkdownIt } from './hooks/useMarkdown'
-
 import type MarkdownIt from 'markdown-it'
 
 const { getSettingsAttr } = useSettings()
-const { setRequestMessage, setChatMessage } = useChat()
+const { initMessage, sendMessage, requesting, questionText, messageList } = useChat()
 
-const apiURL = toRef(() => getSettingsAttr('api_url'))
-const apiKey = toRef(() => getSettingsAttr('api_key'))
-const model = toRef(() => getSettingsAttr('model'))
 const userNick = toRef(() => getSettingsAttr('user_nick'))
 const roleNick = toRef(() => getSettingsAttr('role_nick'))
-const roleDirective = toRef(() => getSettingsAttr('role_directive'))
-// let openai = null
 
-// FIXME: 状态管理，需要重新设计
-const requesting = ref<boolean>(false)
-const msgStatus = ref<string>('requesting')
-
-const greetingsText = '任何问题都可以问我，我会尽力回答的。'
-const waitText = '正在绞尽脑汁...'
-// 用户输入的消息
-const questionText = ref<string>('')
-// 请求消息
-let requestMessageList: RequestMessage[] = []
-// 客户端消息
-const messageList = ref<Message[]>([])
-
+const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 let md: MarkdownIt | null = null
 
 onBeforeMount(() => {
-  initChatSystem()
+  // createGPT()
+  md = createMarkdownIt()
   initMessage()
+  // 监听enter键
+  document.addEventListener('keydown', handleEnter)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleEnter)
 })
 
-watch(roleDirective, () => {
-  updateRoleDirective()
-})
-
-// 更新角色指令
-function updateRoleDirective() {
-  console.log('updateRoleDirective', roleDirective.value)
-
-  if (requestMessageList?.[0]) {
-    requestMessageList[0].content = getSettingsAttr('role_directive')
-  }
-}
-
-// 系统初始化
-function initChatSystem() {
-  // createGPT()
-  md = createMarkdownIt()
-  // 监听enter键
-  document.addEventListener('keydown', handleEnter)
-}
-// 消息初始化
-function initMessage() {
-  questionText.value = ''
-  // FIXME: 清空数组可以使用 arr.length = 0
-  messageList.value = [setChatMessage('assistant', greetingsText, roleNick.value)]
-  requestMessageList = [setRequestMessage('user', roleDirective.value)]
-
-  requesting.value = false
-}
-
 // 渲染markdown
 function renderMarkdown(text: string) {
   return md && md.render(text)
 }
-// 发送消息时的处理
-function hookBeforeSendMessage() {
-  const userMessage: Message = setChatMessage('user', questionText.value, userNick.value)
-  // FIXME: 消息传输状态待优化
-  const waitMessage: Message = setChatMessage('assistant', waitText, roleNick.value)
-  const questionMessage: Message = setRequestMessage('user', questionText.value)
 
-  messageList.value.push(userMessage, waitMessage)
-  requestMessageList.push(questionMessage)
-  questionText.value = ''
-
-  nextTick(() => {
-    scrollToBottom('message_list')
-  })
-}
-// 接收消息时的处理
-function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentMessage: Message) {
-  if (done) {
-    const message: Message = setRequestMessage('assistant', currentMessage.content)
-    requestMessageList.push(message)
-    // FIXME: 消息传输状态待优化
-    msgStatus.value = 'requesting'
-    requesting.value = false
-    console.log('done')
-    return
-  }
-  // 状态从请求中转为生成中
-  if (msgStatus.value === 'requesting') {
-    currentMessage.content = ''
-    msgStatus.value = 'generating'
-  }
-
-  for (let i = 0; i < messageTextList.length; i++) {
-    const messageTextObj = messageTextList[i]
-    if (messageTextObj?.choices) {
-      const choice = messageTextObj.choices?.[0]
-      const content: string = choice?.delta?.content
-      if (content) {
-        currentMessage.content += content
-        scrollToBottom('message_list')
-      }
-    }
-  }
-}
-// 处理SSE流消息
-function transformSSEMessage(
-  response: Response,
-  callback: (done: boolean, messageTextList: any[]) => void
-) {
-  // FIXME: 健壮性需要优化
-  if (!response?.body) return
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
-
-  async function readStream() {
-    const { done, value } = await reader.read()
-
-    let result = []
-    if (!done) {
-      const message = decoder.decode(value, { stream: !done })
-      // console.log('Stream: ', message);
-
-      // 提取json字符串中的对象字符串
-      const jsonList = message.match(/(?<=data: )\{.*\}/g)
-      // console.log('jsonList: ', jsonList);
-      if (jsonList) {
-        for (let i = 0; i < jsonList.length; i++) {
-          const json = jsonList[i]
-          if (json) {
-            try {
-              const obj = JSON.parse(json)
-              if (obj instanceof Object) {
-                result.push(obj)
-              }
-            } catch (e) {
-              console.log(e)
-            }
-          }
-        }
-      }
-
-      readStream()
-    } else {
-      console.log('Stream: DONE')
-    }
-
-    callback && callback(done, result)
-  }
-
-  readStream()
-}
-// 发送消息
-function sendMessage() {
-  // TODO: 需要添加节流控制
-  // 若用户未输入内容（包括换行和空格），则不发送请求
-  if (!questionText.value.trim()) {
-    console.log('请输入内容或合法内容')
-    return
-  }
-
-  requesting.value = true
-
-  hookBeforeSendMessage()
-
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.value}`
-    },
-    body: JSON.stringify({
-      messages: requestMessageList,
-      model: model.value || 'gpt-3.5-turbo',
-      temperature: 0.5,
-      max_tokens: 1000,
-      stream: true
-    })
-  }
-
-  // openai.createChatCompletion(requestOptions.body)
-  fetch(apiURL.value, requestOptions)
-    .then((response: Response) => {
-      // FIXME: 当前消息赋值类型待优化
-      const currentMessage: Message = messageList.value.at(-1) || {
-        role: 'assistant',
-        content: ''
-      }
-      transformSSEMessage(response, (done, messageTextList) => {
-        hookAfterReceiveMessage(done, messageTextList, currentMessage)
-      })
-    })
-    .catch((error) => {
-      console.error('Error occurred when fetching SSE endpoint', error)
-    })
-}
 // Enter键发送消息与换行
-function handleEnter(e: KeyboardEvent) {
-  if (e.keyCode === 13) {
-    if (e.shiftKey) return // shift + enter 换行
-    e.preventDefault()
+function handleEnter(event: KeyboardEvent) {
+  if (event.code === 'Enter') {
+    if (event.shiftKey) return // shift + enter 换行
+    event.preventDefault()
     if (!requesting.value) sendMessage()
-    // console.log('enter', e);
+    // console.log('enter', event);
   }
 }
-// 滚动到底部
-function scrollToBottom(id: string) {
-  const container = document.getElementById(id)
-  if (container && container.scrollTop + container.clientHeight < container.scrollHeight) {
-    // console.log('滚动到底部');
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: 'smooth'
-    })
-  }
-}
+
 // 清空历史消息
 function handleClearMessage() {
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
 }
 
-const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 // 设置
 function handleChangeSettingsDisplay() {
   settingsRef.value?.openSettings()

@@ -17,7 +17,7 @@ export function useSettings() {
    * @param name 属性名
    * @returns 属性值
    */
-  const getSettingsAttr = (optionName: keyof Settings.Option) => {
+  const getSettingsAttr = (optionName: keyof Settings.Config) => {
     if (optionName === 'api_url') {
       return settingsStore.config.api_base_url + settingsStore.config.api_path
     }

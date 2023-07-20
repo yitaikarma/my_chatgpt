@@ -2,7 +2,6 @@ declare namespace Settings {
   type base_url = string
   interface Option {
     theme: string
-    api_url?: string
     api_base_url: string
     api_path: string
     api_key: string
@@ -11,5 +10,8 @@ declare namespace Settings {
     role_nick: string
     role_remarks: string
     role_directive: string
+  }
+  interface Config extends Option {
+    api_url: string
   }
 }
