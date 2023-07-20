@@ -2,16 +2,13 @@
 import Settings from './conmpoents/settings.vue'
 import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useSettings } from './hooks/useSettingsStore'
+import { useChat } from './hooks/useChat'
+import { createMarkdownIt } from './hooks/useMarkdown'
 
-// import { ChatGPTAPI } from 'chatgpt'
-// import { Configuration, OpenAIApi } from 'openai';
-
-import MarkdownIt from 'markdown-it'
-import Clipboard from 'clipboard'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/tokyo-night-dark.css'
+import type MarkdownIt from 'markdown-it'
 
 const { getSettingsAttr } = useSettings()
+const { setRequestMessage, setChatMessage } = useChat()
 
 const apiURL = toRef(() => getSettingsAttr('api_url'))
 const apiKey = toRef(() => getSettingsAttr('api_key'))
@@ -25,9 +22,10 @@ const roleDirective = toRef(() => getSettingsAttr('role_directive'))
 const requesting = ref<boolean>(false)
 const msgStatus = ref<string>('requesting')
 
-const content = '任何问题都可以问我，我会尽力回答的。'
+const greetingsText = '任何问题都可以问我，我会尽力回答的。'
+const waitText = '正在绞尽脑汁...'
 // 用户输入的消息
-const questionMessage = ref<string>('')
+const questionText = ref<string>('')
 // 请求消息
 let requestMessageList: RequestMessage[] = []
 // 客户端消息
@@ -57,134 +55,37 @@ function updateRoleDirective() {
   }
 }
 
-/**
- * 设置消息
- * @param role 角色
- * @param content 内容
- * @param name 昵称
- * @returns Message 消息
- */
-function setRoleMessage(role: string, content: string, name?: string): Message {
-  const message: Message = { role, content }
-  if (name) {
-    message.name = name
-    message.time = new Date().toLocaleString()
-  }
-  return message
-}
-
 // 系统初始化
 function initChatSystem() {
   // createGPT()
-  createMarkdownIt()
+  md = createMarkdownIt()
   // 监听enter键
   document.addEventListener('keydown', handleEnter)
 }
 // 消息初始化
 function initMessage() {
-  questionMessage.value = ''
+  questionText.value = ''
   // FIXME: 清空数组可以使用 arr.length = 0
-  messageList.value = [setRoleMessage('assistant', content, roleNick.value)]
-  requestMessageList = [setRoleMessage('user', roleDirective.value)]
+  messageList.value = [setChatMessage('assistant', greetingsText, roleNick.value)]
+  requestMessageList = [setRequestMessage('user', roleDirective.value)]
 
   requesting.value = false
 }
-// 创建 Node-GPT
-// function createGPT() {
 
-//   const configuration = new Configuration({
-//     apiKey
-//   });
-
-//   openai = new OpenAIApi(configuration);
-
-//   // async function getCompletionFromOpenAI() {
-//   //   const completion = await openai.createChatCompletion({
-//   //     model: 'gpt-3.5-turbo',
-//   //     messages: [
-//   //       { role: 'user', content: 'Hello!' }
-//   //     ],
-//   //     temperature: 0,
-//   //   });
-
-//   //   console.log(completion.data.choices[0].message.content);
-//   // }
-
-//   // getCompletionFromOpenAI();
-// }
-// 创建markdown-it实例,并处理代码块
-function createMarkdownIt() {
-  // 创建 markdown-it 实例
-  md = new MarkdownIt({
-    highlight: null
-  })
-
-  // 处理代码块
-  md.renderer.rules.fence = function (...args) {
-    // const [tokens, idx, options, env, self] = args;
-    const [tokens, idx] = args
-    const token = tokens[idx]
-    const lang = token.info.trim()
-
-    const buttonId = `copyButton${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`
-
-    const clipboard = new Clipboard('.copy-button')
-
-    clipboard.on('success', function (e) {
-      // e.trigger.innerText = 'Copied!'
-      e.trigger.textContent = 'Copied!'
-      setTimeout(() => {
-        e.trigger.textContent = 'Copy'
-      }, 2000)
-    })
-
-    clipboard.on('error', function (e) {
-      console.error('Action:', e.action)
-      console.error('Trigger:', e.trigger)
-    })
-
-    if (lang && hljs.getLanguage(lang)) {
-      // console.log(tokens, idx, options, env, self);
-      const code = hljs.highlight(lang, token.content).value
-      return `<div class="code-block">
-                <div class="code-block-info">
-                  <span>${lang.toUpperCase()}</span>
-                  <button id="${buttonId}" class="copy-button" data-clipboard-text="${
-        token.content
-      }">Copy</button>
-                </div>
-                <pre><code class="hljs language-${lang} scroll code_scroll">${code}</code></pre>
-              </div>`
-    }
-
-    return `<pre><code>${token.content}</code></pre>`
-  }
-
-  // 处理行内代码
-  md.renderer.rules.code_inline = function (...args) {
-    // const [tokens, idx, options, env, self] = args;
-    const [tokens, idx] = args
-    // console.log(tokens, idx, options, env, self);
-    const token = tokens[idx]
-    const code = token.content
-    return '<code class="code_inline">' + code + '</code>'
-    // const highlighted = hljs.highlightAuto(code).value
-    // return '<code class="code_inline">' + highlighted + '</code>';
-  }
-}
 // 渲染markdown
 function renderMarkdown(text: string) {
   return md && md.render(text)
 }
 // 发送消息时的处理
 function hookBeforeSendMessage() {
-  const userMessage: Message = setRoleMessage('user', questionMessage.value, userNick.value)
-  const waitMessage: Message = setRoleMessage('assistant', '正在绞尽脑汁...', roleNick.value)
-  const questionMsg: Message = setRoleMessage('user', questionMessage.value)
+  const userMessage: Message = setChatMessage('user', questionText.value, userNick.value)
+  // FIXME: 消息传输状态待优化
+  const waitMessage: Message = setChatMessage('assistant', waitText, roleNick.value)
+  const questionMessage: Message = setRequestMessage('user', questionText.value)
 
   messageList.value.push(userMessage, waitMessage)
-  requestMessageList.push(questionMsg)
-  questionMessage.value = ''
+  requestMessageList.push(questionMessage)
+  questionText.value = ''
 
   nextTick(() => {
     scrollToBottom('message_list')
@@ -193,7 +94,7 @@ function hookBeforeSendMessage() {
 // 接收消息时的处理
 function hookAfterReceiveMessage(done: boolean, messageTextList: any[], currentMessage: Message) {
   if (done) {
-    const message: Message = setRoleMessage('assistant', currentMessage.content)
+    const message: Message = setRequestMessage('assistant', currentMessage.content)
     requestMessageList.push(message)
     // FIXME: 消息传输状态待优化
     msgStatus.value = 'requesting'
@@ -270,7 +171,7 @@ function transformSSEMessage(
 function sendMessage() {
   // TODO: 需要添加节流控制
   // 若用户未输入内容（包括换行和空格），则不发送请求
-  if (!questionMessage.value.trim()) {
+  if (!questionText.value.trim()) {
     console.log('请输入内容或合法内容')
     return
   }
@@ -335,36 +236,6 @@ function handleClearMessage() {
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
 }
-// 代码高亮
-// function translateCodeToHighlight(str, lang) {
-//   // 此处判断是否有添加代码语言
-//   if (lang && hljs.getLanguage(lang)) {
-//     try {
-//       // 得到经过highlight.js之后的html代码
-//       const preCode = hljs.highlight(lang, str, true).value
-//       // 以换行进行分割
-//       const lines = preCode.split(/\n/).slice(0, -1)
-//       // 添加自定义行号
-//       let html = lines.map((item, index) => {
-//         return '<li><span class="line-num" data-line="' + (index + 1) + '"></span>' + item + '</li>'
-//       }).join('')
-//       html = '<ol>' + html + '</ol>'
-//       // 添加代码语言
-//       if (lines.length) {
-//         html += '<b class="name">' + lang + '</b>'
-//       }
-//       return `<pre class="hljs"><code>${html}</code></pre>`
-//     } catch (__) { }
-//   }
-//   // 未添加代码语言，此处与上面同理
-//   const preCode = md.utils.escapeHtml(str)
-//   const lines = preCode.split(/\n/).slice(0, -1)
-//   let html = lines.map((item, index) => {
-//     return '<li><span class="line-num" data-line="' + (index + 1) + '"></span>' + item + '</li>'
-//   }).join('')
-//   html = '<ol>' + html + '</ol>'
-//   return `<pre class="hljs"><code>${html}</code></pre>`
-// }
 
 const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 // 设置
@@ -418,7 +289,7 @@ function handleChangeSettingsDisplay() {
           name="user"
           id="user"
           class="scroll textarea_scroll"
-          v-model="questionMessage"
+          v-model="questionText"
           cols="60"
           placeholder="请入内容后，按Enter键发送"
           rows="3"
