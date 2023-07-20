@@ -1,6 +1,7 @@
 import { ref, nextTick, watch } from 'vue'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { transformSSEMessage } from '@/utils/transform'
+import { scrollToBottom } from '@/utils/operationElement'
 
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
@@ -140,21 +141,6 @@ export function useChat() {
    */
   const setChatMessage = (role: string, content: string, name: string): Message => {
     return { role, content, name, time: new Date().toLocaleString() }
-  }
-
-  /**
-   * 滚动到底部
-   * @param elementId 元素id
-   */
-  const scrollToBottom = (elementId: string) => {
-    const container = document.getElementById(elementId)
-    if (container && container.scrollTop + container.clientHeight < container.scrollHeight) {
-      // console.log('滚动到底部');
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
   }
 
   /**
