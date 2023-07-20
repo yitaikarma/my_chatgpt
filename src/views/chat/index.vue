@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
-import { ref, toRef, onBeforeMount, onBeforeUnmount } from 'vue'
+import { ref, toRef, onBeforeMount } from 'vue'
 import { useSettings } from './hooks/useSettingsStore'
 import { useChat } from './hooks/useChat'
+import { useEventListener } from './hooks/useEventListener'
 import { createMarkdownIt } from './hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 
@@ -15,16 +16,12 @@ const roleNick = toRef(() => getSettingsAttr('role_nick'))
 const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 let md: MarkdownIt | null = null
 
+useEventListener(document, 'keydown', handleEnter as EventListener)
+
 onBeforeMount(() => {
   // createGPT()
   md = createMarkdownIt()
   initMessage()
-  // 监听enter键
-  document.addEventListener('keydown', handleEnter)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleEnter)
 })
 
 // 渲染markdown
@@ -53,7 +50,6 @@ function handleChangeSettingsDisplay() {
   settingsRef.value?.openSettings()
 }
 </script>
-``
 
 <template>
   <div class="chat_view">
