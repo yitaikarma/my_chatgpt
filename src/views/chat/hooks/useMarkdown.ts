@@ -30,7 +30,7 @@ export const useClipboard = (selector: string | Element | NodeListOf<Element>) =
 }
 
 // 创建markdown-it实例,并处理代码块
-export const createMarkdownIt = () => {
+export const useMarkdown = () => {
   // 创建 markdown-it 实例
   const md = new MarkdownIt({
     highlight: null

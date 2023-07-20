@@ -4,7 +4,7 @@ import { ref, toRef, onBeforeMount } from 'vue'
 import { useSettings } from './hooks/useSettingsStore'
 import { useChat } from './hooks/useChat'
 import { useEventListener } from './hooks/useEventListener'
-import { createMarkdownIt } from './hooks/useMarkdown'
+import { useMarkdown } from './hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 
 const { getSettingsAttr } = useSettings()
@@ -20,7 +20,7 @@ useEventListener(document, 'keydown', handleEnter as EventListener)
 
 onBeforeMount(() => {
   // createGPT()
-  md = createMarkdownIt()
+  md = useMarkdown()
   initMessage()
 })
 
