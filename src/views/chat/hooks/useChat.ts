@@ -40,9 +40,6 @@ export function useChat() {
    */
   const initMessage = () => {
     questionText.value = ''
-    // FIXME: 清空数组可以使用 arr.length = 0
-    // messageList.value = [setChatMessage('assistant', greetingsText, roleNick.value)]
-    // requestMessageList = [setRequestMessage('user', roleDirective.value)]
     messageList.value = [
       setChatMessage('assistant', greetingsText, settingsStore.getConfigAttr('role_nick'))
     ]
