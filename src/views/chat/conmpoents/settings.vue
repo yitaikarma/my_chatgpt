@@ -149,8 +149,11 @@ function cancelCallback() {
           <NFormItemGi span="24" path="model" label="模型">
             <NSelect v-model:value="model.model" :options="options" clearable placeholder="必填" />
           </NFormItemGi>
-          <NFormItemGi span="24" path="role_nick_name" label="角色昵称">
-            <NInput v-model:value="model.role_nick_name" clearable placeholder="必填" />
+          <NFormItemGi span="24" path="user_nick" label="用户昵称">
+            <NInput v-model:value="model.user_nick" clearable placeholder="必填" />
+          </NFormItemGi>
+          <NFormItemGi span="24" path="role_nick" label="角色昵称">
+            <NInput v-model:value="model.role_nick" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="role_remarks" label="角色备注">
             <NInput v-model:value="model.role_remarks" clearable placeholder="必填" />

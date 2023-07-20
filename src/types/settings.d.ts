@@ -2,12 +2,13 @@ declare namespace Settings {
   type base_url = string
   interface Option {
     theme: string
+    api_url?: string
     api_base_url: string
     api_path: string
     api_key: string
     model: string
-    user_nick_name: string
-    role_nick_name: string
+    user_nick: string
+    role_nick: string
     role_remarks: string
     role_directive: string
   }

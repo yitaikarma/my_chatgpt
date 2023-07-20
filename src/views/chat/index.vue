@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import Settings from './conmpoents/settings.vue'
-
 import { ref, toRef, onBeforeMount, onBeforeUnmount, nextTick, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useSettings } from './hooks/useSettingsStore'
+
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
@@ -12,34 +11,21 @@ import Clipboard from 'clipboard'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/tokyo-night-dark.css'
 
-const settingsStore = useSettingsStore()
-const { config } = storeToRefs(settingsStore)
+const { getSettingsAttr } = useSettings()
 
-const apiURL = toRef(() => config.value.api_base_url + config.value.api_path)
-const apiKey = toRef(() => config.value.api_key)
-const model = toRef(() => config.value.model)
-const userNick = toRef(() => config.value.user_nick_name)
-const roleNick = toRef(() => config.value.role_nick_name)
-const roleDirective = toRef(() => config.value.role_directive)
+const apiURL = toRef(() => getSettingsAttr('api_url'))
+const apiKey = toRef(() => getSettingsAttr('api_key'))
+const model = toRef(() => getSettingsAttr('model'))
+const userNick = toRef(() => getSettingsAttr('user_nick'))
+const roleNick = toRef(() => getSettingsAttr('role_nick'))
+const roleDirective = toRef(() => getSettingsAttr('role_directive'))
 // let openai = null
 
-// type Content<T> = T
-// interface RequestMessage {
-//   role: string
-//   content: Content<string>
-// }
-// interface Message {
-//   role: string
-//   name?: string
-//   content: Content<string>
-//   time?: string
-// }
-
-const requesting = ref<boolean>(false)
 // FIXME: 状态管理，需要重新设计
+const requesting = ref<boolean>(false)
 const msgStatus = ref<string>('requesting')
-const content = '任何问题都可以问我，我会尽力回答的。'
 
+const content = '任何问题都可以问我，我会尽力回答的。'
 // 用户输入的消息
 const questionMessage = ref<string>('')
 // 请求消息
@@ -64,8 +50,10 @@ watch(roleDirective, () => {
 
 // 更新角色指令
 function updateRoleDirective() {
+  console.log('updateRoleDirective', roleDirective.value)
+
   if (requestMessageList?.[0]) {
-    requestMessageList[0].content = config.value.role_directive
+    requestMessageList[0].content = getSettingsAttr('role_directive')
   }
 }
 

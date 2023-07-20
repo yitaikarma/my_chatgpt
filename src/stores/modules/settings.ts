@@ -8,15 +8,28 @@ export const useSettingsStore = defineStore('settings', {
       api_path: '/v1/chat/completions',
       api_key: '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',
       model: 'gpt-3.5-turbo-16k',
-      user_nick_name: 'You',
-      role_nick_name: 'ChatGPT',
+      user_nick: 'You',
+      role_nick: 'ChatGPT',
       role_remarks: '小明是一个小学生',
       role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
     }
   }),
+  getters: {
+    getConfigAttr(state) {
+      return (name: keyof Settings.Option | string) => {
+        if (name === 'api_url') {
+          return state.config.api_base_url + state.config.api_path
+        }
+        return state.config[name as keyof Settings.Option]
+      }
+    }
+  },
   actions: {
     setConfig(config: Settings.Option) {
       this.config = config
+    },
+    setConfigAttr(name: keyof Settings.Option, value: keyof Settings.Option) {
+      this.config[name] = value
     },
     setTheme(theme: string) {
       this.config.theme = theme
@@ -33,11 +46,11 @@ export const useSettingsStore = defineStore('settings', {
     setModel(model: string) {
       this.config.model = model
     },
-    setUserNickName(user_nick_name: string) {
-      this.config.user_nick_name = user_nick_name
+    setUserNick(user_nick: string) {
+      this.config.user_nick = user_nick
     },
-    setRoleNickName(role_nick_name: string) {
-      this.config.role_nick_name = role_nick_name
+    setRoleNick(role_nick: string) {
+      this.config.role_nick = role_nick
     },
     setRoleRemarks(role_remarks: string) {
       this.config.role_remarks = role_remarks
