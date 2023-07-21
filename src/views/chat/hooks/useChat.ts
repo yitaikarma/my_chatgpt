@@ -6,35 +6,35 @@ import { scrollToBottom } from '@/utils/operationElement'
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
-export function useChat() {
-  const settingsStore = useSettingsStore()
-  // let openai = null
+const settingsStore = useSettingsStore()
 
-  // FIXME: 状态管理，需要重新设计
-  const requesting = ref<boolean>(false)
-  const msgStatus = ref<string>('requesting')
+// let openai = null
 
-  const greetingsText = '任何问题都可以问我，我会尽力回答的。'
-  const waitText = '正在绞尽脑汁...'
-  // 用户输入的消息
-  const questionText = ref<string>('')
-  // 请求消息
-  let requestMessageList: RequestMessage[] = []
-  // 客户端消息
-  const messageList = ref<Message[]>([])
+// FIXME: 状态管理，需要重新设计
+const requesting = ref<boolean>(false)
+const msgStatus = ref<string>('requesting')
+// 提示语
+const greetingsText = '任何问题都可以问我，我会尽力回答的。'
+const waitText = '正在绞尽脑汁...'
+// 用户问题
+const questionText = ref<string>('')
+// 请求消息队列
+let requestMessageList: RequestMessage[] = []
+// 消息队列
+const messageList = ref<Message[]>([])
 
-  // 监听前缀指令变化
-  watch(
-    () => settingsStore.getConfigAttr('role_directive'),
-    (value) => {
-      console.log('updateRoleDirective', value)
-      // 更新角色指令
-      if (requestMessageList?.[0]) {
-        requestMessageList[0].content = value
-      }
+// 监听前缀指令变化
+watch(
+  () => settingsStore.getConfigAttr('role_directive'),
+  (value) => {
+    // console.log('updateRoleDirective', value)
+    if (requestMessageList?.[0]) {
+      requestMessageList[0].content = value
     }
-  )
+  }
+)
 
+export function useChat() {
   /**
    * 初始化消息
    */
@@ -129,6 +129,7 @@ export function useChat() {
   const setRequestMessage = (role: string, content: string): Message => {
     return { role, content }
   }
+
   /**
    * 设置聊天消息
    * @param role 角色
