@@ -14,7 +14,7 @@ const { theme, themeOverrides } = useTheme()
     :theme-overrides="themeOverrides"
   >
     <div class="mian">
-      <div class="header"></div>
+      <!-- <div class="header"></div> -->
       <!-- <div class="side_nav">
         <nav>
           <div class="menu_nav">
@@ -40,8 +40,10 @@ const { theme, themeOverrides } = useTheme()
   height: 100vh;
   width: 100vw;
   display: grid;
-  grid-auto-columns: auto 1fr;
-  grid-auto-rows: 60px minmax(100px, auto);
+  // grid-auto-columns: auto 1fr;
+  // grid-auto-rows: 60px minmax(100px, auto);
+  grid-auto-columns: auto;
+  grid-auto-rows: minmax(100px, auto);
 
   .header {
     grid-column: 1/3;
@@ -128,8 +130,8 @@ const { theme, themeOverrides } = useTheme()
   }
 
   .view_content {
-    grid-column: 2/3;
-    grid-row: 2/3;
+    // grid-column: 2/3;
+    // grid-row: 2/3;
     flex: 1;
     width: 100%;
     display: flex;
