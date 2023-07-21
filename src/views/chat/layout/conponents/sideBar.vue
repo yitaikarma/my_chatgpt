@@ -27,12 +27,6 @@ function handleChangeSettingsDisplay() {
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'FiraCode';
-  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
-    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
-    url('@/assets/fonts/FiraCode-Regular.woff2');
-}
 .chat_list_wrapper {
   width: 300px;
   height: 100%;

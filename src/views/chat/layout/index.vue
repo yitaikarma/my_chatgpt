@@ -17,21 +17,21 @@ import SideBar from './conponents/sideBar.vue'
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'FiraCode';
-  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
-    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
-    url('@/assets/fonts/FiraCode-Regular.woff2');
-}
+// @font-face {
+//   font-family: 'FiraCode';
+//   src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
+//     url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
+//     url('@/assets/fonts/FiraCode-Regular.woff2');
+// }
 
-:deep(.scroll)::-webkit-scrollbar-thumb {
-  background: #555;
-  border: 6px solid #232425;
-}
+// :deep(.scroll)::-webkit-scrollbar-thumb {
+//   background: #555;
+//   border: 6px solid #232425;
+// }
 
-:deep(.scroll)::-webkit-scrollbar-track {
-  background: #232425;
-}
+// :deep(.scroll)::-webkit-scrollbar-track {
+//   background: #232425;
+// }
 
 .chat_view {
   display: flex;
@@ -51,6 +51,6 @@ import SideBar from './conponents/sideBar.vue'
   border-radius: 6px;
   background-color: #232425;
   box-shadow: 0 0 10px #0000001a;
-  font-family: 'FiraCode';
+  // font-family: 'FiraCode';
 }
 </style>
