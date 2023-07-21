@@ -144,7 +144,7 @@ function cancelCallback() {
             <NInput v-model:value="model.api_path" clearable placeholder="/v1/chat/completions" />
           </NFormItemGi>
           <NFormItemGi span="24" path="api_key" label="API秘钥">
-            <NInput v-model:value="model.api_key" clearable placeholder="必填" />
+            <NInput type="password" v-model:value="model.api_key" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="model" label="模型">
             <NSelect v-model:value="model.model" :options="options" clearable placeholder="必填" />
@@ -169,6 +169,7 @@ function cancelCallback() {
               type="textarea"
               clearable
               placeholder="必填"
+              :autosize="{ minRows: 4, maxRows: 8 }"
             />
           </NFormItemGridItem>
         </NGrid>
