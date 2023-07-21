@@ -30,8 +30,8 @@ function handleClearMessage() {
   min-height: 30px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 10px 10px 0;
+  justify-content: flex-start;
+  padding: 14px 14px 0;
   border-top: 1px solid #3c3f45;
 }
 </style>
