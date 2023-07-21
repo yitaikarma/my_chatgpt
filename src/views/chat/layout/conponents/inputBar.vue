@@ -28,14 +28,18 @@ function handleEnter(event: KeyboardEvent) {
       type="textarea"
       v-model:value="questionText"
       show-count
-      :placeholder="placeholder"
-      :autosize="{ minRows: 4, maxRows: 6 }"
       autofocus
-    />
-    <!-- FIXME: 视觉待优化，用icon代替文本，加载和发送icon-->
-    <NButton size="medium" type="primary" @click="sendMessage">
-      {{ requesting ? '发送中' : '发送' }}
-    </NButton>
+      bordered
+      :autosize="{ minRows: 4, maxRows: 6 }"
+      :placeholder="placeholder"
+    >
+      <template #suffix>
+        <!-- FIXME: 视觉待优化，用icon代替文本，加载和发送icon-->
+        <NButton size="medium" type="primary" style="margin-bottom: 12px" @click="sendMessage">
+          {{ requesting ? '发送中' : '发送' }}
+        </NButton></template
+      >
+    </NInput>
   </div>
 </template>
 
@@ -47,5 +51,13 @@ function handleEnter(event: KeyboardEvent) {
   align-items: flex-end;
   column-gap: 10px;
   padding: 14px;
+}
+
+:deep(.n-input__suffix) {
+  align-items: flex-end;
+}
+:deep(.n-input) .n-input-word-count {
+  bottom: 48px;
+  margin-right: 6px;
 }
 </style>
