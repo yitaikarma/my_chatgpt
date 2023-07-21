@@ -1,35 +1,14 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import {
-  NConfigProvider,
-  GlobalThemeOverrides,
-  darkTheme,
-  zhCN,
-  dateZhCN,
-  NMessageProvider
-} from 'naive-ui'
+import { RouterView } from 'vue-router'
+import { NConfigProvider, NMessageProvider, zhCN, dateZhCN } from 'naive-ui'
+import { useTheme } from '@/hooks/useTheme'
 
-// 自定义 NaiveUI 主题
-const themeOverrides: GlobalThemeOverrides = {
-  common: {
-    borderRadius: '10px'
-  },
-  Button: {
-    borderRadiusSmall: '6px'
-  },
-  Select: {
-    peers: {
-      InternalSelection: {
-        // textColor: '#FF0000'
-      }
-    }
-  }
-}
+const { theme, themeOverrides } = useTheme()
 </script>
 
 <template>
   <NConfigProvider
-    :theme="darkTheme"
+    :theme="theme"
     :locale="zhCN"
     :date-locale="dateZhCN"
     :theme-overrides="themeOverrides"
