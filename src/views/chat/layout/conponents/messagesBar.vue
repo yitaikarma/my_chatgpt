@@ -60,6 +60,23 @@ function renderMarkdown(text: string) {
     url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
     url('@/assets/fonts/FiraCode-Regular.woff2');
 }
+.scroll::-webkit-scrollbar {
+  height: 16px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  border: 6px solid #232425;
+  border-radius: 50px;
+  background-color: #6d6d6d;
+  transition: 1s ease-in-out;
+}
+// .scroll::-webkit-scrollbar-track {
+//   background-color: #232425;
+// }
+.scroll::-webkit-scrollbar-thumb:hover {
+  border: 4px solid #232425;
+  background-color: #7b7b7b;
+}
 
 .chat_history_container {
   overflow-y: auto;
@@ -85,16 +102,16 @@ function renderMarkdown(text: string) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background-color: #ffffff;
   margin-right: 10px;
 }
 
 .avatar img {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
 }
 
@@ -102,8 +119,8 @@ function renderMarkdown(text: string) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background-color: #16a160;
   line-height: 1;
@@ -122,35 +139,34 @@ function renderMarkdown(text: string) {
   justify-content: flex-start;
   width: 100%;
   margin-bottom: 4px;
-}
-
-.message_role {
-  margin: 0 6px;
-  font-size: 14px;
-  color: #fff;
-}
-.message_time {
-  margin: 0 6px;
-  letter-spacing: -1px;
-  font-size: 12px;
-  color: #b9b9b9;
+  .message_role {
+    margin: 0 6px;
+    font-size: 14px;
+    color: #fff;
+  }
+  .message_time {
+    margin: 0 6px;
+    // letter-spacing: -1px;
+    font-size: 12px;
+    color: #b9b9b9;
+  }
 }
 
 .message_content {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 14px 20px;
+  padding: 8px 14px;
   max-width: 100%;
   border-radius: 10px;
   background: #2c2c2c;
   color: #b9b9b9;
   box-shadow: 0 0 10px #0000001a;
+  .message_text {
+    width: 100%;
+  }
 }
 
-.message_text {
-  width: 100%;
-}
 // FIXME: 优化CSS格式
 .message_item[user='true'] {
   justify-items: end;
@@ -178,7 +194,7 @@ function renderMarkdown(text: string) {
 }
 
 .message_item[user='true'] .message_content {
-  background-color: #2a2b78;
+  background-color: #275683;
 }
 .message_item[user='true'] .message_role {
   order: 1;
