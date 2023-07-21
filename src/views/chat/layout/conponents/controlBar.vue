@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useChat } from '@/views/chat/hooks/useChat'
+import { NButton, NSpace } from 'naive-ui'
 
 const { initMessage } = useChat()
 
@@ -12,38 +13,25 @@ function handleClearMessage() {
 
 <template>
   <div class="toolbar">
-    <div class="clear_msg" @click="handleClearMessage">
-      <span>重新开始</span>
-    </div>
+    <NSpace>
+      <NButton ghost size="tiny" type="error" round @click="handleClearMessage"> 清空 </NButton>
+      <!-- <NButton quaternary size="small" type="error" round>
+        <template #icon>
+          <n-icon><cash-icon /></n-icon>
+        </template>
+      </NButton> -->
+    </NSpace>
   </div>
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'FiraCode';
-  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
-    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
-    url('@/assets/fonts/FiraCode-Regular.woff2');
-}
-
 .toolbar {
+  width: 100%;
+  min-height: 30px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 100%;
-  min-height: 30px;
-  background-color: #2c2c2c;
-}
-
-.clear_msg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 20px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #2c2c2c;
-  color: #dd5050;
-  cursor: pointer;
+  padding: 10px 10px 0;
+  border-top: 1px solid #3c3f45;
 }
 </style>

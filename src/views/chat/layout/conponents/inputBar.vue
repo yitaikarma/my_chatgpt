@@ -1,109 +1,51 @@
 <script setup lang="ts">
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useEventListener } from '@/views/chat/hooks/useEventListener'
+import { NButton, NInput } from 'naive-ui'
 
 const { sendMessage, requesting, questionText } = useChat()
 
 useEventListener(document, 'keydown', handleEnter as EventListener)
 
+const placeholder = `请入内容后，按Enter键发送`
+
 // Enter键发送消息与换行
 function handleEnter(event: KeyboardEvent) {
   if (event.code === 'Enter') {
     if (event.shiftKey) return // shift + enter 换行
+
     event.preventDefault()
+
+    console.log('requesting.value', requesting)
     if (!requesting.value) sendMessage()
-    // console.log('enter', event);
   }
 }
 </script>
 
 <template>
   <div class="user_wrapper">
-    <textarea
-      name="user"
-      id="user"
-      class="scroll textarea_scroll"
-      v-model="questionText"
-      cols="60"
-      placeholder="请入内容后，按Enter键发送"
-      rows="3"
-    ></textarea>
-    <button v-show="!requesting" @click="sendMessage">send</button>
-    <button v-show="requesting">sending</button>
+    <NInput
+      type="textarea"
+      v-model:value="questionText"
+      show-count
+      :placeholder="placeholder"
+      :autosize="{ minRows: 4, maxRows: 6 }"
+      autofocus
+    />
+    <!-- FIXME: 视觉待优化，用icon代替文本，加载和发送icon-->
+    <NButton size="medium" type="primary" @click="sendMessage">
+      {{ requesting ? '发送中' : '发送' }}
+    </NButton>
   </div>
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'FiraCode';
-  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
-    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
-    url('@/assets/fonts/FiraCode-Regular.woff2');
-}
-
-:deep(.scroll)::-webkit-scrollbar-thumb {
-  background: #555;
-  border: 6px solid #232425;
-}
-
-:deep(.scroll)::-webkit-scrollbar-track {
-  background: #232425;
-}
-
 .user_wrapper {
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-end;
-  width: 100%;
-}
-
-textarea {
-  position: relative;
-  width: 100%;
-  height: 100px;
-  resize: none;
-  border: none;
-  outline: none;
-  background: #2c2c2c00;
-  padding: 20px 20px;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #b9b9b9;
-}
-
-:deep(.textarea_scroll)::-webkit-scrollbar-thumb {
-  background: #555;
-  border: 6px solid #2c2c2c;
-}
-
-:deep(.textarea_scroll)::-webkit-scrollbar-track {
-  background: #2c2c2c;
-}
-
-textarea::placeholder {
-  /* font-style: italic; */
-  font-size: 14px;
-  color: #555;
-}
-
-// textarea:focus {
-//   /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
-// }
-
-button {
-  /* position: absolute; */
-  /* bottom: 10px; */
-  right: 10px;
-  margin: 10px;
-  padding: 6px 14px;
-  border: none;
-  outline: none;
-  background: #3e3e3e;
-  border-radius: 10px;
-  color: #b9b9b9;
-  font-size: 16px;
-  line-height: 1.5;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  column-gap: 10px;
+  padding: 14px;
 }
 </style>
