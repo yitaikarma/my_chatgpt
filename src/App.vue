@@ -36,7 +36,7 @@ const themeOverrides: GlobalThemeOverrides = {
   >
     <div class="mian">
       <div class="header"></div>
-      <div class="side_nav">
+      <!-- <div class="side_nav">
         <nav>
           <div class="menu_nav">
             <RouterLink to="/">Chat</RouterLink>
@@ -46,7 +46,7 @@ const themeOverrides: GlobalThemeOverrides = {
             <div class="settings_btn">设置</div>
           </div>
         </nav>
-      </div>
+      </div> -->
       <div class="view_content">
         <NMessageProvider>
           <RouterView />
