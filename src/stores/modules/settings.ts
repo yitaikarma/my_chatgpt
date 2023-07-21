@@ -11,7 +11,7 @@ export const useSettingsStore = defineStore('settings', {
       user_nick: 'You',
       role_nick: 'ChatGPT',
       role_remarks: '小明是一个小学生',
-      role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
+      role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
     }
   }),
   getters: {
