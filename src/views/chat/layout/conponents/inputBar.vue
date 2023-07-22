@@ -13,7 +13,8 @@ const placeholder = `请入内容后，按Enter键发送`
 // Enter键发送消息与换行
 function handleEnter(event: KeyboardEvent) {
   if (event.code === 'Enter') {
-    if (event.shiftKey) return // shift + enter 换行
+    // shift + enter 换行
+    if (event.shiftKey) return
 
     event.preventDefault()
 
