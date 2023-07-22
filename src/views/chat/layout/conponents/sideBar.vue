@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Settings from '@/views/chat/conmpoents/settings.vue'
 import { ref } from 'vue'
+import { Settings24Regular } from '@vicons/fluent'
 // import { ref, toRef } from 'vue'
 // import { useSettings } from '@/views/chat/hooks/useSettingsStore'
 
@@ -20,7 +21,20 @@ function handleChangeSettingsDisplay() {
   <div class="chat_list_wrapper">
     <div class="chat_list"></div>
     <div class="utils_nav">
-      <div class="settings_btn" @click="handleChangeSettingsDisplay">设置</div>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton
+            size="large"
+            quaternary
+            circle
+            style="font-size: 28px"
+            @click="handleChangeSettingsDisplay"
+          >
+            <NIcon> <Settings24Regular /> </NIcon>
+          </NButton>
+        </template>
+        设置
+      </NTooltip>
     </div>
   </div>
   <Settings ref="settingsRef" />
@@ -51,25 +65,6 @@ function handleChangeSettingsDisplay() {
     justify-content: flex-end;
     padding: 10px;
     border-top: 1px solid #2e3035;
-
-    .settings_btn {
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background-color: #353535;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 12px;
-      color: #c3c3c3;
-
-      &:hover {
-        color: #1890ff;
-      }
-    }
   }
 }
 </style>

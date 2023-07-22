@@ -1,11 +1,61 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useChat } from '@/views/chat/hooks/useChat'
-import { NButton, NSpace } from 'naive-ui'
+import { NButton, NIcon, NSelect, NSpace, NTooltip, SelectOption } from 'naive-ui'
+import {
+  ChatSettings24Regular,
+  StyleGuide24Regular,
+  DarkTheme24Regular,
+  DocumentBulletListClock24Regular,
+  FormNew24Regular
+} from '@vicons/fluent'
 
 const { initMessage } = useChat()
 
-// 清空历史消息
-function handleClearMessage() {
+const value = ref('gpt-3.5-turbo-0613')
+const options: SelectOption[] = [
+  {
+    label: 'GPT-3.5-Turbo',
+    value: 'gpt-3.5-turbo'
+  },
+  {
+    label: 'GPT-3.5-Turbo-0613',
+    value: 'gpt-3.5-turbo-0613'
+  },
+  {
+    label: 'GPT-3.5-Turbo-16k',
+    value: 'gpt-3.5-turbo-16k'
+  },
+  {
+    label: 'GPT-4',
+    value: 'gpt-4',
+    disabled: true
+  }
+]
+
+// 打开角色设置
+function handleOpenRoleSettings() {
+  // TODO
+}
+
+// 风格切换
+function handleStyleChange() {
+  // TODO
+}
+
+// 主题切换
+function handleThemeChange() {
+  // TODO
+}
+
+// 历史记录
+function handleOpenHistoryMessage() {
+  // FIXME 在一个消息请求正在进行时执行历史记录操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
+  initMessage()
+}
+
+// 新对话
+function handleNewMessage() {
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
 }
@@ -14,12 +64,70 @@ function handleClearMessage() {
 <template>
   <div class="toolbar">
     <NSpace>
-      <NButton ghost size="tiny" type="error" round @click="handleClearMessage"> 清空 </NButton>
-      <!-- <NButton quaternary size="small" type="error" round>
-        <template #icon>
-          <n-icon><cash-icon /></n-icon>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton ghost size="small" type="default" round @click="handleOpenRoleSettings">
+            <template #icon>
+              <NIcon> <ChatSettings24Regular /> </NIcon>
+            </template>
+          </NButton>
         </template>
-      </NButton> -->
+        设置
+      </NTooltip>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton ghost size="small" type="default" round @click="handleStyleChange">
+            <template #icon>
+              <NIcon> <StyleGuide24Regular /> </NIcon>
+            </template>
+          </NButton>
+        </template>
+        风格
+      </NTooltip>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton ghost size="small" type="default" round @click="handleThemeChange">
+            <template #icon>
+              <NIcon> <DarkTheme24Regular /> </NIcon>
+            </template>
+          </NButton>
+        </template>
+        主题
+      </NTooltip>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton ghost size="small" type="default" round @click="handleOpenHistoryMessage">
+            <template #icon>
+              <NIcon> <DocumentBulletListClock24Regular /> </NIcon>
+            </template>
+          </NButton>
+        </template>
+        对话记录
+      </NTooltip>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NButton ghost size="small" type="primary" round @click="handleNewMessage">
+            <template #icon>
+              <NIcon> <FormNew24Regular /> </NIcon>
+            </template>
+          </NButton>
+        </template>
+        新对话
+      </NTooltip>
+    </NSpace>
+    <NSpace>
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NSelect
+            size="small"
+            v-model:value="value"
+            :options="options"
+            :consistent-menu-width="false"
+            style="border-radius: 100px"
+          />
+        </template>
+        模型
+      </NTooltip>
     </NSpace>
   </div>
 </template>
@@ -30,7 +138,7 @@ function handleClearMessage() {
   min-height: 30px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 14px 14px 0;
   border-top: 1px solid #3c3f45;
 }

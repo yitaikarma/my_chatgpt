@@ -2,6 +2,7 @@
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useEventListener } from '@/views/chat/hooks/useEventListener'
 import { NButton, NInput } from 'naive-ui'
+import { Send } from '@vicons/tabler'
 
 const { sendMessage, requesting, questionText } = useChat()
 
@@ -34,11 +35,20 @@ function handleEnter(event: KeyboardEvent) {
       :placeholder="placeholder"
     >
       <template #suffix>
-        <!-- FIXME: 视觉待优化，用icon代替文本，加载和发送icon-->
-        <NButton size="medium" type="primary" style="margin-bottom: 12px" @click="sendMessage">
-          {{ requesting ? '发送中' : '发送' }}
-        </NButton></template
-      >
+        <NButton
+          size="medium"
+          type="primary"
+          ghost
+          :loading="requesting"
+          style="margin-bottom: 12px"
+          @click="sendMessage"
+        >
+          <template #icon>
+            <NIcon> <Send /> </NIcon>
+          </template>
+          发送
+        </NButton>
+      </template>
     </NInput>
   </div>
 </template>
