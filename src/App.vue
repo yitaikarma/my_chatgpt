@@ -12,6 +12,7 @@ const { theme, themeOverrides } = useTheme()
     :locale="zhCN"
     :date-locale="dateZhCN"
     :theme-overrides="themeOverrides"
+    inline-theme-disabled
   >
     <div class="mian">
       <!-- <div class="header"></div> -->

@@ -30,7 +30,6 @@ function handleEnter(event: KeyboardEvent) {
       type="textarea"
       v-model:value="questionText"
       show-count
-      autofocus
       bordered
       :autosize="{ minRows: 4, maxRows: 6 }"
       :placeholder="placeholder"
