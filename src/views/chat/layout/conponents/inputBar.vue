@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useEventListener } from '@/views/chat/hooks/useEventListener'
-import { NButton, NInput } from 'naive-ui'
+import { NButton, NIcon, NInput } from 'naive-ui'
 import { Send } from '@vicons/tabler'
 
 const { sendMessage, requesting, questionText } = useChat()

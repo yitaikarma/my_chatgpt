@@ -2,6 +2,7 @@
 import Settings from '@/views/chat/conmpoents/settings.vue'
 import { ref } from 'vue'
 import { Settings24Regular } from '@vicons/fluent'
+import { NIcon, NTooltip } from 'naive-ui'
 // import { ref, toRef } from 'vue'
 // import { useSettings } from '@/views/chat/hooks/useSettingsStore'
 
