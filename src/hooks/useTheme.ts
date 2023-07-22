@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { darkTheme, lightTheme } from 'naive-ui'
+import { darkTheme, useOsTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { useConfig } from '@/hooks/core/useConfig'
 
@@ -23,12 +23,20 @@ const themeOverrides: GlobalThemeOverrides = {
 export function useTheme() {
   const { getSettingsAttr } = useConfig()
 
+  /**
+   * 获取主题
+   * @returns 主题
+   */
   const theme = computed(() => {
     const theme = getSettingsAttr('theme')
-    if (theme === 'light') {
-      return lightTheme
+    switch (theme) {
+      case 'light':
+        return null
+      case 'dark':
+        return darkTheme
+      default:
+        return useOsTheme().value === 'dark' ? darkTheme : null
     }
-    return darkTheme
   })
 
   return {
