@@ -27,3 +27,15 @@ interface Message {
   content: Content<string>
   time?: string
 }
+
+/**
+ * @description 历史消息
+ * @param {title} string 标题
+ * @param {date} string 日期
+ * @param {messageList} Message[] 消息列表
+ */
+interface HistoryMessage {
+  title: string
+  date: string
+  messageList: Message[]
+}

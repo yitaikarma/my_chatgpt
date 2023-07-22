@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { NButton, NIcon, NSelect, NSpace, NTooltip, SelectOption } from 'naive-ui'
@@ -10,7 +11,9 @@ import {
   FormNew24Regular
 } from '@vicons/fluent'
 
-const { initMessage } = useChat()
+const { initMessage, seveMessage } = useChat()
+
+const historyMsgRef = ref<InstanceType<typeof HistoryMessage>>()
 
 const value = ref('gpt-3.5-turbo-0613')
 const options: SelectOption[] = [
@@ -50,12 +53,12 @@ function handleThemeChange() {
 
 // 历史记录
 function handleOpenHistoryMessage() {
-  // FIXME 在一个消息请求正在进行时执行历史记录操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
-  initMessage()
+  historyMsgRef.value?.toggleActive(true)
 }
 
 // 新对话
 function handleNewMessage() {
+  seveMessage()
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
 }
@@ -129,6 +132,7 @@ function handleNewMessage() {
         模型
       </NTooltip>
     </NSpace>
+    <HistoryMessage ref="historyMsgRef" />
   </div>
 </template>
 

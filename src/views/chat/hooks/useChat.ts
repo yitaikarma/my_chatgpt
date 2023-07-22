@@ -22,6 +22,8 @@ const questionText = ref<string>('')
 let requestMessageList: RequestMessage[] = []
 // 消息队列
 const messageList = ref<Message[]>([])
+// 历史消息队列
+const historyMessageList = ref<HistoryMessage[]>([])
 
 // 监听前缀指令变化
 watch(
@@ -46,6 +48,19 @@ export function useChat() {
     requestMessageList = [setRequestMessage('user', settingsStore.getConfigAttr('role_directive'))]
 
     requesting.value = false
+  }
+
+  /**
+   * 保存消息
+   */
+  const seveMessage = () => {
+    // FIXME: 消息保存逻辑待优化,需要生成唯一标识，否则，会出现重复保存
+    if (messageList.value.length < 2) return
+    historyMessageList.value.push({
+      title: messageList.value[1].content,
+      date: new Date().toLocaleString(),
+      messageList: messageList.value
+    })
   }
 
   // 创建 Node-GPT
@@ -206,9 +221,11 @@ export function useChat() {
     setRequestMessage,
     setChatMessage,
     initMessage,
+    seveMessage,
     sendMessage,
     questionText,
     messageList,
+    historyMessageList,
     requesting,
     msgStatus
   }
