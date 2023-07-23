@@ -6,6 +6,7 @@ declare namespace Settings {
     api_path: string
     api_key: string
     model: string
+    chat_theme: string
     user_nick: string
     role_nick: string
     role_remarks: string

@@ -47,7 +47,8 @@ function handleOpenRoleSettings() {
 
 // 风格切换
 function handleStyleChange() {
-  // TODO
+  const chatTheme = getSettingsAttr('chat_theme')
+  settingsStore.setChatTheme(chatTheme === 'card' ? 'official' : 'card')
 }
 
 // 主题切换

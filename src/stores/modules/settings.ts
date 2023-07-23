@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore('settings', {
       api_path: '/v1/chat/completions',
       api_key: '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',
       model: 'gpt-3.5-turbo-16k',
+      chat_theme: 'card',
       user_nick: 'You',
       role_nick: 'ChatGPT',
       role_remarks: '小明是一个小学生',
@@ -45,6 +46,9 @@ export const useSettingsStore = defineStore('settings', {
     },
     setModel(model: string) {
       this.config.model = model
+    },
+    setChatTheme(chat_theme: string) {
+      this.config.chat_theme = chat_theme
     },
     setUserNick(user_nick: string) {
       this.config.user_nick = user_nick
