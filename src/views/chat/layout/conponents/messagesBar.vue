@@ -62,6 +62,7 @@ function renderMarkdown(text: string) {
     url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
     url('@/assets/fonts/FiraCode-Regular.woff2');
 }
+// FIXME: 对话容器滚动条样式，未适配主题切换
 .scroll::-webkit-scrollbar {
   height: 16px;
 }
@@ -96,7 +97,6 @@ function renderMarkdown(text: string) {
   display: grid;
   /* grid-template-columns: 60px 700px 60px; */
   grid-template-columns: 60px 1fr 60px;
-  margin-bottom: 20px;
   padding: 10px 20px;
 }
 
@@ -188,9 +188,7 @@ function renderMarkdown(text: string) {
     margin-left: 20px;
     margin-right: 0;
     border: 1px solid var(--color-msg-ctn-border-2);
-    // background-color: #2a2b78;
     .fake_avatar_img {
-      // background-color: #2a2b78;
       background-color: var(--color-msg-ctn-bg-2);
     }
   }
@@ -207,13 +205,12 @@ function renderMarkdown(text: string) {
   }
   .message_content {
     border: 1px solid var(--color-msg-ctn-border-2);
-    // background-color: #275683;
     background-color: var(--color-msg-ctn-bg-2);
   }
 }
 
 .message_item[chatTheme='official'] {
-  padding: 10px 20px;
+  border-bottom: 1px solid var(--color-msg-ctn-border-1);
   .message_role {
     display: none;
   }
@@ -224,9 +221,10 @@ function renderMarkdown(text: string) {
     background-color: initial;
     box-shadow: none;
   }
+
   &[role='user'] {
     justify-items: initial;
-    border-top: 1px solid var(--color-msg-ctn-border-1);
+    border-bottom: 1px solid var(--color-msg-ctn-border-1);
     background-color: var(--color-msg-ctn-bg-1);
     .avatar {
       grid-column: 1;
@@ -244,6 +242,7 @@ function renderMarkdown(text: string) {
   }
 }
 
+// FIXME: 代码块样式，未适配主题切换
 :deep(.code-block) {
   overflow: hidden;
   margin: 1rem 0;
