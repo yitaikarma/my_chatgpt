@@ -26,8 +26,8 @@
   --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
   --vt-c-divider-shallow-dark-1: rgba(84, 84, 84, 0.65);
   --vt-c-divider-shallow-dark-2: rgba(84, 84, 84, 0.48);
-  --vt-c-divider-blur-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-blur-dark-2: rgba(84, 84, 84, 0.48);
+  --vt-c-divider-blue-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-blue-dark-2: rgba(84, 84, 84, 0.48);
 
   // 消息文本容器背景色
   --vt-c-msg-ctn-light-1: #ffffff;
@@ -36,8 +36,8 @@
   --vt-c-msg-ctn-dark-2: #275683;
   --vt-c-msg-ctn-shallow-dark-1: #2c2e35;
   --vt-c-msg-ctn-shallow-dark-2: #275683;
-  --vt-c-msg-ctn-blur-dark-1: #2c2e35;
-  --vt-c-msg-ctn-blur-dark-2: #275683;
+  --vt-c-msg-ctn-blue-dark-1: #2c2e35;
+  --vt-c-msg-ctn-blue-dark-2: #275683;
 
   // 消息文本容器边框色
   --vt-c-msg-ctn-border-light-1: #e0e0e0;
@@ -46,8 +46,8 @@
   --vt-c-msg-ctn-border-dark-2: #555;
   --vt-c-msg-ctn-border-shallow-dark-1: #444444;
   --vt-c-msg-ctn-border-shallow-dark-2: #555;
-  --vt-c-msg-ctn-border-blur-dark-1: #444444;
-  --vt-c-msg-ctn-border-blur-dark-2: #555;
+  --vt-c-msg-ctn-border-blue-dark-1: #444444;
+  --vt-c-msg-ctn-border-blue-dark-2: #555;
 
   // 文字颜色
   --vt-c-text-light-1: var(--vt-c-indigo);
@@ -56,12 +56,13 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
   --vt-c-text-shallow-dark-1: var(--vt-c-white);
   --vt-c-text-shallow-dark-2: rgba(235, 235, 235, 0.64);
-  --vt-c-text-blur-dark-1: var(--vt-c-white);
-  --vt-c-text-blur-dark-2: rgba(235, 235, 235, 0.64);
+  --vt-c-text-blue-dark-1: var(--vt-c-white);
+  --vt-c-text-blue-dark-2: rgba(235, 235, 235, 0.64);
 }
 
 /* semantic color variables for this project */
-:root {
+:root,
+[data-theme='light'] {
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
@@ -78,7 +79,8 @@
   --color-text: var(--vt-c-text-light-1);
 }
 
-.dark {
+.dark,
+[data-theme='dark'] {
   color-scheme: dark;
 
   --color-background: var(--vt-c-black);
@@ -97,7 +99,8 @@
   --color-text: var(--vt-c-text-dark-1);
 }
 
-.shallow_dark {
+.shallow_dark,
+[data-theme='shallow_dark'] {
   color-scheme: dark;
 
   --color-background: var(--vt-c-shallow-black);
@@ -116,23 +119,24 @@
   --color-text: var(--vt-c-text-shallow-dark-1);
 }
 
-.blur_dark {
+.blue_dark,
+[data-theme='blue_dark'] {
   color-scheme: dark;
 
   --color-background: var(--vt-c-blur-black);
   --color-background-soft: var(--vt-c-blur-black-soft);
   --color-background-mute: var(--vt-c-blur-black-mute);
 
-  --color-border: var(--vt-c-divider-blur-dark-2);
-  --color-border-hover: var(--vt-c-divider-blur-dark-1);
+  --color-border: var(--vt-c-divider-blue-dark-2);
+  --color-border-hover: var(--vt-c-divider-blue-dark-1);
 
-  --color-msg-ctn-bg-1: var(--vt-c-msg-ctn-blur-dark-1);
-  --color-msg-ctn-bg-2: var(--vt-c-msg-ctn-blur-dark-2);
-  --color-msg-ctn-border-1: var(--vt-c-msg-ctn-border-blur-dark-1);
-  --color-msg-ctn-border-2: var(--vt-c-msg-ctn-border-blur-dark-2);
+  --color-msg-ctn-bg-1: var(--vt-c-msg-ctn-blue-dark-1);
+  --color-msg-ctn-bg-2: var(--vt-c-msg-ctn-blue-dark-2);
+  --color-msg-ctn-border-1: var(--vt-c-msg-ctn-border-blue-dark-1);
+  --color-msg-ctn-border-2: var(--vt-c-msg-ctn-border-blue-dark-2);
 
-  --color-heading: var(--vt-c-text-blur-dark-1);
-  --color-text: var(--vt-c-text-blur-dark-1);
+  --color-heading: var(--vt-c-text-blue-dark-1);
+  --color-text: var(--vt-c-text-blue-dark-1);
 
   --color-text-user-msg-ctn-background: var(--vt-c-indigo);
 }

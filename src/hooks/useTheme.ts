@@ -22,9 +22,6 @@ const themeOverrides: GlobalThemeOverrides = {
 
 export function useTheme() {
   const { getSettingsAttr } = useConfig()
-  // const darkThemeName = 'shallow_dark'
-  const darkThemeName = 'blur_dark'
-  // const darkThemeName = 'dark'
 
   /**
    * 获取主题
@@ -32,23 +29,17 @@ export function useTheme() {
    */
   const theme = computed(() => {
     const theme = getSettingsAttr('theme')
-    const osTheme = useOsTheme().value
+    const osTheme = useOsTheme().value || 'light'
 
-    switch (theme) {
-      case 'light':
-        document.body.classList.remove(darkThemeName)
+    document.body.setAttribute('data-theme', theme === 'auto' ? osTheme : theme)
+    switch (true) {
+      case theme.includes('light'):
         return null
 
-      case 'dark':
-        document.body.classList.add(darkThemeName)
+      case theme.includes('dark'):
         return darkTheme
 
       default:
-        if (osTheme === 'dark') {
-          document.body.classList.add(darkThemeName)
-        } else {
-          document.body.classList.remove(darkThemeName)
-        }
         return osTheme === 'dark' ? darkTheme : null
     }
   })

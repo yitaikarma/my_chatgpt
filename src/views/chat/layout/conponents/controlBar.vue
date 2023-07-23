@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
+import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { NButton, NIcon, NSelect, NSpace, NTooltip, SelectOption } from 'naive-ui'
 import {
@@ -11,7 +13,9 @@ import {
   FormNew24Regular
 } from '@vicons/fluent'
 
+const { getSettingsAttr } = useConfig()
 const { initMessage, seveMessage } = useChat()
+const settingsStore = useSettingsStore()
 
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage>>()
 
@@ -48,7 +52,29 @@ function handleStyleChange() {
 
 // 主题切换
 function handleThemeChange() {
-  // TODO
+  const theme = getSettingsAttr('theme')
+
+  switch (theme) {
+    case 'light':
+      settingsStore.setTheme('dark')
+      break
+
+    case 'dark':
+      settingsStore.setTheme('shallow_dark')
+      break
+
+    case 'shallow_dark':
+      settingsStore.setTheme('blue_dark')
+      break
+
+    case 'blue_dark':
+      settingsStore.setTheme('auto')
+      break
+
+    default:
+      settingsStore.setTheme('light')
+      break
+  }
 }
 
 // 历史记录
@@ -95,7 +121,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        主题
+        主题：{{ getSettingsAttr('theme').toLocaleUpperCase() }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>

@@ -1,4 +1,5 @@
 import { ref, toRef, watch } from 'vue'
+import type { _DeepPartial } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 
 export function useConfig() {
@@ -15,13 +16,21 @@ export function useConfig() {
     return settingsStore.config[optionName]
   }
 
+  // BUG: 更新方法不生效
   /**
    * 更新设置属性
    * @param config 配置
    */
-  const updateSettingsAttr = (config: Record<string, keyof Settings.Option>) => {
+  const updateSettingsAttr = (config: _DeepPartial<{}> = { theme: 'dark' }) => {
+    console.log(config)
+
     settingsStore.$patch(config)
   }
+  // const updateSettingsAttr = (
+  //   config: Record<string, keyof Settings.Option> = { theme: 'dark' }
+  // ) => {
+  //   settingsStore.$patch(config)
+  // }
 
   return {
     getSettingsAttr,

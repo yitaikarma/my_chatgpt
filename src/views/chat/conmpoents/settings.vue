@@ -46,6 +46,14 @@ const themeOptions: ThemeRadio[] = [
   {
     value: 'dark',
     label: '深色'
+  },
+  {
+    value: 'shallow_dark',
+    label: '深灰色'
+  },
+  {
+    value: 'blue_dark',
+    label: '深蓝色'
   }
 ]
 const options: SelectOption[] = [
