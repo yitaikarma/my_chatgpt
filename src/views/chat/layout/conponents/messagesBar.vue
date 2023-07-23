@@ -140,7 +140,7 @@ function renderMarkdown(text: string) {
   align-items: flex-start;
   .message_header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: flex-start;
     width: 100%;
     margin-bottom: 4px;
