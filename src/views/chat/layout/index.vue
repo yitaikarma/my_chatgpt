@@ -39,18 +39,21 @@ import SideBar from './conponents/sideBar.vue'
   width: 100%;
   height: 100%;
   background-color: #232425;
+  background-color: var(--color-background);
 }
 
 .chat_container {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  height: 100%;
   border-radius: 6px;
   background-color: #232425;
+  background-color: var(--color-background);
   box-shadow: 0 0 10px #0000001a;
   // font-family: 'FiraCode';
+  transition: background-color 0.5s;
 }
 </style>

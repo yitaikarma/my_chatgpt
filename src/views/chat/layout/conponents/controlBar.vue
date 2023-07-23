@@ -145,5 +145,7 @@ function handleNewMessage() {
   justify-content: space-between;
   padding: 14px 14px 0;
   border-top: 1px solid #3c3f45;
+  border-top: 1px solid var(--color-border);
+  transition: border-top 0.5s;
 }
 </style>
