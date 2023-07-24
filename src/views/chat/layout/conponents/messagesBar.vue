@@ -48,6 +48,7 @@ function renderMarkdown(text: string) {
         </div>
         <div class="message_content">
           <div v-if="item.role === 'user'" class="message_text">{{ item.content }}</div>
+          <!-- BUG: 渲染HTML语言时，会被解析成html标签而不是字符串 -->
           <div v-else class="message_text" v-html="`${renderMarkdown(item.content)}`"></div>
         </div>
       </div>
@@ -256,7 +257,8 @@ function renderMarkdown(text: string) {
   padding: 4px 14px;
   color: #6565ff;
   font-size: 0.75rem;
-  background-color: #1d2636;
+  background-color: var(--color-code-bg-header);
+  transition: background-color 0.5s ease-out;
 }
 
 :deep(.hljs) {
@@ -277,13 +279,11 @@ function renderMarkdown(text: string) {
 }
 
 :deep(.code_inline) {
-  /* padding: .1em .2em; */
-  margin: 0.2em;
-  border-radius: 4px;
+  margin: 0.1em;
+  // border-radius: 4px;
   // background: #262631;
-  font-family: 'FiraCode';
-  color: #8f68cd;
   white-space: nowrap;
+  color: #8f68cd;
 }
 
 /* Copy */

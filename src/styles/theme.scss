@@ -58,6 +58,12 @@
   --vt-c-text-shallow-dark-2: rgba(235, 235, 235, 0.64);
   --vt-c-text-blue-dark-1: var(--vt-c-white);
   --vt-c-text-blue-dark-2: rgba(235, 235, 235, 0.64);
+
+  // 代码块
+  --vt-c-code-bg-header-light: #e6e8ea;
+  --vt-c-code-bg-header-dark: #1d2636;
+  --vt-c-code-border-light: #f8f8f8;
+  --vt-c-code-border-dark: #f8f8f8;
 }
 
 /* semantic color variables for this project */
@@ -77,6 +83,9 @@
 
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
+
+  --color-code-bg-header: var(--vt-c-code-bg-header-light);
+  --color-code-border: var(--vt-c-code-border-light);
 }
 
 .dark,
@@ -97,6 +106,9 @@
 
   --color-heading: var(--vt-c-text-dark-1);
   --color-text: var(--vt-c-text-dark-1);
+
+  --color-code-bg-header: var(--vt-c-code-bg-header-dark);
+  --color-code-border: var(--vt-c-code-border-dark);
 }
 
 .shallow_dark,
@@ -117,6 +129,9 @@
 
   --color-heading: var(--vt-c-text-shallow-dark-1);
   --color-text: var(--vt-c-text-shallow-dark-1);
+
+  --color-code-bg-header: var(--vt-c-code-bg-header-dark);
+  --color-code-border: var(--vt-c-code-border-dark);
 }
 
 .blue_dark,
@@ -138,7 +153,8 @@
   --color-heading: var(--vt-c-text-blue-dark-1);
   --color-text: var(--vt-c-text-blue-dark-1);
 
-  --color-text-user-msg-ctn-background: var(--vt-c-indigo);
+  --color-code-bg-header: var(--vt-c-code-bg-header-dark);
+  --color-code-border: var(--vt-c-code-border-dark);
 }
 
 // @media (prefers-color-scheme: dark) {
