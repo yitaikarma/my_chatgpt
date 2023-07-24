@@ -6,7 +6,8 @@ import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
-import { NButton, NIcon, NSelect, NSpace, NTooltip, SelectOption } from 'naive-ui'
+import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
+import type { SelectOption } from 'naive-ui'
 import {
   ChatSettings24Regular,
   StyleGuide24Regular,

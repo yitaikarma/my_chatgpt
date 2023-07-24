@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { DrawerPlacement, NDrawer, NDrawerContent } from 'naive-ui'
+import { NDrawer, NDrawerContent } from 'naive-ui'
+import type { DrawerPlacement } from 'naive-ui'
 import { ref } from 'vue'
 import { useChat } from '@/views/chat/hooks/useChat'
 
