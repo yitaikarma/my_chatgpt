@@ -9,17 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
-    NForm: typeof import('naive-ui')['NForm']
-    NFormItemGi: typeof import('naive-ui')['NFormItemGi']
     NFormItemGridItem: typeof import('naive-ui')['NFormItemGridItem']
-    NGrid: typeof import('naive-ui')['NGrid']
-    NIcon: typeof import('naive-ui')['NIcon']
-    NInput: typeof import('naive-ui')['NInput']
-    NModal: typeof import('naive-ui')['NModal']
-    NRadio: typeof import('naive-ui')['NRadio']
-    NRadioGroup: typeof import('naive-ui')['NRadioGroup']
-    NSpace: typeof import('naive-ui')['NSpace']
-    NTooltip: typeof import('naive-ui')['NTooltip']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
