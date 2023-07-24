@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UserSettings from '@/views/chat/conmpoents/userSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -19,7 +20,8 @@ const { initMessage, seveMessage } = useChat()
 const settingsStore = useSettingsStore()
 const { config } = storeToRefs(settingsStore)
 
-const historyMsgRef = ref<InstanceType<typeof HistoryMessage>>()
+const userSettingsModalRef = ref<InstanceType<typeof UserSettings> | null>()
+const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
 
 const options: SelectOption[] = [
   {
@@ -67,6 +69,7 @@ const options: SelectOption[] = [
 // 打开角色设置
 function handleOpenRoleSettings() {
   // TODO
+  userSettingsModalRef.value?.openSettings()
 }
 
 // 风格切换
@@ -185,6 +188,7 @@ function handleNewMessage() {
     </NSpace>
     <HistoryMessage ref="historyMsgRef" />
   </div>
+  <UserSettings ref="userSettingsModalRef" />
 </template>
 
 <style scoped lang="scss">
