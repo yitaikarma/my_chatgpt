@@ -4,24 +4,26 @@ import { defineConfig, loadEnv } from 'vite'
 import type { ConfigEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import AutoImport from 'unplugin-auto-import/vite';
+import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver, NaiveUiResolver } from 'unplugin-vue-components/resolvers'
-import viteCompression from 'vite-plugin-compression';
+import viteCompression from 'vite-plugin-compression'
+import VueDevtools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv) => {
-  console.log('mode', mode, loadEnv(mode, process.cwd()).VITE_BASE_URL); //127.0.0.1:8080
+  console.log('mode', mode, loadEnv(mode, process.cwd()).VITE_BASE_URL) //127.0.0.1:8080
 
   return defineConfig({
     plugins: [
+      VueDevtools(),
       vue(),
       vueJsx(),
       AutoImport({
-        resolvers: [ElementPlusResolver(), NaiveUiResolver()],
+        resolvers: [ElementPlusResolver(), NaiveUiResolver()]
       }),
       Components({
-        resolvers: [ElementPlusResolver(), NaiveUiResolver()],
+        resolvers: [ElementPlusResolver(), NaiveUiResolver()]
       }),
       {
         ...viteCompression({
@@ -29,11 +31,10 @@ export default ({ mode }: ConfigEnv) => {
           disable: false,
           threshold: 10240,
           algorithm: 'gzip',
-          ext: '.gz',
+          ext: '.gz'
         }),
-        apply: 'build',
+        apply: 'build'
       }
-
     ],
 
     resolve: {
@@ -62,9 +63,9 @@ export default ({ mode }: ConfigEnv) => {
           target: '要代理的地址',
           changeOrigin: true,
           ws: true,
-          rewrite: (path: string) => path.replace(/^\/api/, ''),
-        },
-      },
+          rewrite: (path: string) => path.replace(/^\/api/, '')
+        }
+      }
     },
 
     build: {
@@ -81,16 +82,15 @@ export default ({ mode }: ConfigEnv) => {
       // chunkSizeWarningLimit: 2000,
       rollupOptions: {
         output: {
-          chunkFileNames: "static/js/[name]-[hash].js",
-          entryFileNames: "static/js/[name]-[hash].js",
-          assetFileNames: "static/[ext]/[name]-[hash].[ext]",
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
           manualChunks: {
             vue: ['vue', 'vue-router', 'pinia'],
-            elemetIcons: ['@element-plus/icons-vue'],
-          },
-        },
-      },
-    },
+            elemetIcons: ['@element-plus/icons-vue']
+          }
+        }
+      }
+    }
   })
 }
-
