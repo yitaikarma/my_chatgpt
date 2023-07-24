@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
@@ -16,11 +17,15 @@ import {
 const { getSettingsAttr } = useConfig()
 const { initMessage, seveMessage } = useChat()
 const settingsStore = useSettingsStore()
+const { config } = storeToRefs(settingsStore)
 
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage>>()
 
-const value = ref('gpt-3.5-turbo-0613')
 const options: SelectOption[] = [
+  {
+    label: 'GPT-3.5',
+    value: 'gpt-3.5'
+  },
   {
     label: 'GPT-3.5-Turbo',
     value: 'gpt-3.5-turbo'
@@ -34,8 +39,27 @@ const options: SelectOption[] = [
     value: 'gpt-3.5-turbo-16k'
   },
   {
+    label: 'GPT-3.5-Turbo-16k-0613',
+    value: 'gpt-3.5-turbo-16k-0613'
+  },
+  {
     label: 'GPT-4',
     value: 'gpt-4',
+    disabled: true
+  },
+  {
+    label: 'GPT-4-0613',
+    value: 'gpt-4-0613',
+    disabled: true
+  },
+  {
+    label: 'GPT-4-32k',
+    value: 'gpt-4-32k',
+    disabled: true
+  },
+  {
+    label: 'GPT-4-32k-0613',
+    value: 'gpt-4-32k-0613',
     disabled: true
   }
 ]
@@ -150,7 +174,7 @@ function handleNewMessage() {
         <template #trigger>
           <NSelect
             size="small"
-            v-model:value="value"
+            v-model:value="config.model"
             :options="options"
             :consistent-menu-width="false"
             style="border-radius: 100px"
@@ -174,5 +198,8 @@ function handleNewMessage() {
   border-top: 1px solid #3c3f45;
   border-top: 1px solid var(--color-border);
   transition: border-top 0.5s;
+}
+:deep(.n-base-selection) {
+  border-radius: 100px;
 }
 </style>
