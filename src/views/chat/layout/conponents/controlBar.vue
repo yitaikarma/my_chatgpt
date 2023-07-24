@@ -130,7 +130,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        设置
+        角色设置
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
