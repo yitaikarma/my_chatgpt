@@ -63,7 +63,7 @@ export const useMarkdown = () => {
     const selectorClassName = 'copy-button'
     const buttonId = `copyButton${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`
 
-    useClipboard(selectorClassName)
+    useClipboard(`.${selectorClassName}`)
 
     if (lang && hljs.getLanguage(lang)) {
       const code = hljs.highlight(lang, token.content).value
@@ -74,7 +74,9 @@ export const useMarkdown = () => {
                   <button
                     id="${buttonId}"
                     class="${selectorClassName}"
-                    data-clipboard-text="${token.content}">
+                    data-clipboard-text="${token.content
+                      .replace(/\"/g, '&quot;')
+                      .replace(/\'/g, '&#039;')}">
                     Copy
                   </button>
                 </div>
