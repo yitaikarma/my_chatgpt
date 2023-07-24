@@ -247,52 +247,49 @@ function renderMarkdown(text: string) {
   overflow: hidden;
   margin: 1rem 0;
   border-radius: 6px;
-}
+  .code-block-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 14px;
+    color: #6565ff;
+    font-size: 0.75rem;
+    background-color: var(--color-code-bg-header);
+    transition: background-color 0.5s ease-out;
+  }
+  .code_scroll::-webkit-scrollbar {
+    height: 16px;
+  }
 
-:deep(.code-block-info) {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 14px;
-  color: #6565ff;
-  font-size: 0.75rem;
-  background-color: var(--color-code-bg-header);
-  transition: background-color 0.5s ease-out;
-}
+  .code_scroll::-webkit-scrollbar-thumb {
+    background: #29356f;
+    border: 6px solid #1d2636;
+  }
 
-:deep(.hljs) {
-  font-family: 'FiraCode';
-}
+  .code_scroll::-webkit-scrollbar-track {
+    background: #1d2636;
+  }
+  .hljs {
+    font-family: 'FiraCode';
+  }
 
-:deep(.code_scroll)::-webkit-scrollbar {
-  height: 16px;
-}
+  .code_inline {
+    margin: 0.1em;
+    // border-radius: 4px;
+    // background: #262631;
+    white-space: nowrap;
+    color: #8f68cd;
+  }
 
-:deep(.code_scroll)::-webkit-scrollbar-thumb {
-  background: #29356f;
-  border: 6px solid #1d2636;
-}
-
-:deep(.code_scroll)::-webkit-scrollbar-track {
-  background: #1d2636;
-}
-
-:deep(.code_inline) {
-  margin: 0.1em;
-  // border-radius: 4px;
-  // background: #262631;
-  white-space: nowrap;
-  color: #8f68cd;
-}
-
-/* Copy */
-:deep(.copy-button) {
-  margin-left: 10px;
-  padding: 2px 6px;
-  border: none;
-  border-radius: 4px;
-  background-color: #6565ff;
-  color: #fff;
-  cursor: pointer;
+  /* Copy */
+  .copy-button {
+    margin-left: 10px;
+    padding: 2px 6px;
+    border: none;
+    border-radius: 4px;
+    background-color: #6565ff;
+    color: #fff;
+    cursor: pointer;
+  }
 }
 </style>
