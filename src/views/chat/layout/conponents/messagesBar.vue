@@ -149,6 +149,7 @@ function renderMarkdown(text: string) {
     .message_role {
       margin: 0 6px;
       font-size: 14px;
+      font-weight: 600;
       color: #fff;
       color: var(--color-text);
       transition: color 0.5s;
