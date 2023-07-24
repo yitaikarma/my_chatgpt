@@ -8,7 +8,7 @@ import hljs from 'highlight.js'
 
 // import 'highlight.js/styles/atom-one-dark.css'
 // import 'highlight.js/styles/github-dark.css'
-import 'highlight.js/styles/tokyo-night-dark.css'
+// import 'highlight.js/styles/tokyo-night-dark.css'
 
 // hljs.registerLanguage('javascript', javascript);
 
@@ -33,6 +33,22 @@ export const useClipboard = (selector: string | Element | NodeListOf<Element>) =
 export const useMarkdown = () => {
   // 创建 markdown-it 实例
   const md = new MarkdownIt({
+    // html: true, // 在源码中启用 HTML 标签
+    // xhtmlOut: true, // 使用 '/' 来闭合单标签 （比如 <br />）。
+    // // 这个选项只对完全的 CommonMark 模式兼容。
+    // breaks: true, // 转换段落里的 '\n' 到 <br>。
+    // langPrefix: 'language-', // 给围栏代码块的 CSS 语言前缀。对于额外的高亮代码非常有用。
+    // linkify: true, // 将类似 URL 的文本自动转换为链接。
+
+    // // 启用一些语言中立的替换 + 引号美化
+    // typographer: true,
+
+    // // 双 + 单引号替换对，当 typographer 启用时。
+    // // 或者智能引号等，可以是 String 或 Array。
+    // //
+    // // 比方说，你可以支持 '«»„“' 给俄罗斯人使用， '„“‚‘'  给德国人使用。
+    // // 还有 ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] 给法国人使用（包括 nbsp）。
+    // quotes: '“”‘’',
     highlight: null
   })
 
