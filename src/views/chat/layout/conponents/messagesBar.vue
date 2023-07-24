@@ -63,24 +63,24 @@ function renderMarkdown(text: string) {
     url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
     url('@/assets/fonts/FiraCode-Regular.woff2');
 }
-// FIXME: 对话容器滚动条样式，未适配主题切换
+// FIXME: 对话容器滚动条样式，主题切换的过渡效果无法实现
 .scroll::-webkit-scrollbar {
   height: 16px;
 }
 
 .scroll::-webkit-scrollbar-thumb {
-  border: 6px solid #232425;
+  border: 6px solid var(--color-bg);
   border-radius: 50px;
-  background-color: #6d6d6d;
-  transition: 1s ease-in-out;
+  background-color: var(--color-scroll-thumb-bg);
+  // transition: border-color 0.5s ease-out, background-color 0.5s ease-out;
 }
 // .scroll::-webkit-scrollbar-track {
 //   background-color: #232425;
 // }
 
 .scroll::-webkit-scrollbar-thumb:hover {
-  border: 4px solid #232425;
-  background-color: #7b7b7b;
+  border: 4px solid var(--color-bg);
+  background-color: var(--color-scroll-thumb-bg);
 }
 
 .chat_history_container {
@@ -90,7 +90,7 @@ function renderMarkdown(text: string) {
   height: 100%;
   border-radius: 6px;
   background-color: #232425;
-  background-color: var(--color-background);
+  background-color: var(--color-bg);
   transition: background-color 0.5s;
 }
 
@@ -243,7 +243,6 @@ function renderMarkdown(text: string) {
   }
 }
 
-// FIXME: 代码块样式，未适配主题切换
 :deep(.code-block) {
   overflow: hidden;
   margin: 1rem 0;
