@@ -140,10 +140,11 @@ function renderMarkdown(text: string) {
   flex-direction: column;
   align-items: flex-start;
   .message_header {
+    width: 100%;
+    min-height: 24px;
     display: flex;
     align-items: baseline;
     justify-content: flex-start;
-    width: 100%;
     margin-bottom: 4px;
     .message_role {
       margin: 0 6px;
