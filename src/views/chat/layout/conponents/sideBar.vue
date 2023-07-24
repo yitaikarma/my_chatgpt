@@ -52,7 +52,7 @@ function handleChangeSettingsDisplay() {
   border-right: 1px solid #3c3f45;
   border-right: 1px solid var(--color-msg-ctn-border-1);
   background-color: #23252b;
-  background-color: var(--color-background);
+  background-color: var(--color-bg);
   transition: background-color 0.5s;
 
   .chat_list {
