@@ -15,22 +15,22 @@ export const useUserSettingsStore = defineStore('userSettings', {
   }),
   getters: {
     getConfig(state) {
-      return (index: string, name: keyof typeof state.chat.a) => {
-        return state.chat[index][name]
+      return (key: string, prop: keyof RoleConfigOption) => {
+        return state.chat[key][prop]
       }
     }
   },
   actions: {
-    setConfigForAttr(index: string, name: RoleConfigOptionKey, value: RoleConfigOptionValue) {
-      this.chat[index][name] = value
+    setConfigForAttr(key: string, prop: RoleConfigOptionKey, value: RoleConfigOptionValue) {
+      this.chat[key][prop] = value
     },
-    setConfigForRole(index: string, role_config: RoleConfigOption) {
-      this.chat[index] = role_config
+    setConfigForRole(key: string, role_config: RoleConfigOption) {
+      this.chat[key] = role_config
     }
   },
   persist: {
     key: 'user-settings',
-    storage: localStorage
-    // paths: ['configure.model']
+    storage: localStorage,
+    paths: ['chat']
   }
 })
