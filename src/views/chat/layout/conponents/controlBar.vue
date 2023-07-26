@@ -18,7 +18,7 @@ import {
 } from '@vicons/fluent'
 
 const { getSettingsAttr } = useConfig()
-const { initMessage, seveMessage } = useChat()
+const { initMessage, clearMessage, seveMessage } = useChat()
 
 const settingsStore = useSettingsStore()
 
@@ -123,6 +123,7 @@ function handleNewMessage() {
   seveMessage()
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
   initMessage()
+  clearMessage()
 }
 </script>
 
