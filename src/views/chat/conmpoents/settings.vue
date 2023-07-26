@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import {
   NForm,
   NFormItemGi,
@@ -19,20 +19,19 @@ const settingsStore = useSettingsStore()
 
 const message = useMessage()
 
+interface ThemeRadio {
+  value: string
+  label: string
+}
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const model = ref<Settings.Option>({ ...settingsStore.config })
-
+const configForm = ref({ ...settingsStore.config })
 const rules: FormRules = {
   api_key: {
     required: true,
     trigger: ['blur', 'input'],
     message: '请输入 API 秘钥'
   }
-}
-interface ThemeRadio {
-  value: string
-  label: string
 }
 const themeOptions: ThemeRadio[] = [
   {
@@ -99,18 +98,11 @@ const options: SelectOption[] = [
   }
 ]
 
-onMounted(() => {
-  console.log('mounted')
-})
-
-defineExpose({
-  openSettings,
-  closeSettings
-})
+defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
   showModal.value = true
-  model.value = { ...settingsStore.config }
+  configForm.value = { ...settingsStore.config }
 }
 
 function closeSettings() {
@@ -120,7 +112,7 @@ function closeSettings() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      model.value && settingsStore.setConfig(model.value)
+      configForm.value && settingsStore.setConfig(configForm.value)
       message.success('已保存')
     } else {
       console.log(errors)
@@ -150,7 +142,7 @@ function cancelCallback() {
     >
       <NForm
         ref="formRef"
-        :model="model"
+        :model="configForm"
         :rules="rules"
         label-width="auto"
         label-align="left"
@@ -160,7 +152,7 @@ function cancelCallback() {
       >
         <NGrid cols="24" y-gap="10">
           <NFormItemGi span="24" path="theme" label="主题模式">
-            <NRadioGroup v-model:value="model.theme" name="radiogroup">
+            <NRadioGroup v-model:value="configForm.theme" name="radiogroup">
               <NSpace>
                 <NRadio v-for="theme in themeOptions" :key="theme.value" :value="theme.value">
                   {{ theme.label }}
@@ -170,28 +162,42 @@ function cancelCallback() {
           </NFormItemGi>
           <NFormItemGi span="24" path="api_base_url" label="API地址">
             <NInput
-              v-model:value="model.api_base_url"
+              v-model:value="configForm.api_base_url"
               clearable
               placeholder="https://api.openai.com"
             />
           </NFormItemGi>
           <NFormItemGi span="24" path="api_path" label="API路径">
-            <NInput v-model:value="model.api_path" clearable placeholder="/v1/chat/completions" />
+            <NInput
+              v-model:value="configForm.api_path"
+              clearable
+              placeholder="/v1/chat/completions"
+            />
           </NFormItemGi>
           <NFormItemGi span="24" path="api_key" label="API秘钥">
-            <NInput type="password" v-model:value="model.api_key" clearable placeholder="必填" />
+            <NInput
+              type="password"
+              v-model:value="configForm.api_key"
+              clearable
+              placeholder="必填"
+            />
           </NFormItemGi>
           <NFormItemGi span="24" path="model" label="模型">
-            <NSelect v-model:value="model.model" :options="options" clearable placeholder="必填" />
+            <NSelect
+              v-model:value="configForm.model"
+              :options="options"
+              clearable
+              placeholder="必填"
+            />
           </NFormItemGi>
           <NFormItemGi span="24" path="user_nick" label="用户昵称">
-            <NInput v-model:value="model.user_nick" clearable placeholder="必填" />
+            <NInput v-model:value="configForm.user_nick" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="role_nick" label="角色昵称">
-            <NInput v-model:value="model.role_nick" clearable placeholder="必填" />
+            <NInput v-model:value="configForm.role_nick" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="role_remarks" label="角色备注">
-            <NInput v-model:value="model.role_remarks" clearable placeholder="必填" />
+            <NInput v-model:value="configForm.role_remarks" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGridItem
             span="24"
@@ -200,7 +206,7 @@ function cancelCallback() {
             feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全"
           >
             <NInput
-              v-model:value="model.role_directive"
+              v-model:value="configForm.role_directive"
               type="textarea"
               clearable
               placeholder="必填"
