@@ -4,6 +4,7 @@ import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
+import { useUserSettingsStore } from '@/stores/modules/userSettings'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
@@ -18,8 +19,11 @@ import {
 
 const { getSettingsAttr } = useConfig()
 const { initMessage, seveMessage } = useChat()
+
 const settingsStore = useSettingsStore()
-const { config } = storeToRefs(settingsStore)
+
+const userSettingsStore = useUserSettingsStore()
+const { chat } = storeToRefs(userSettingsStore)
 
 const userSettingsModalRef = ref<InstanceType<typeof UserSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
@@ -75,8 +79,11 @@ function handleOpenRoleSettings() {
 
 // 风格切换
 function handleStyleChange() {
-  const chatTheme = getSettingsAttr('chat_theme')
-  settingsStore.setChatTheme(chatTheme === 'card' ? 'official' : 'card')
+  userSettingsStore.setConfigForAttr(
+    'a',
+    'chat_theme',
+    chat.value.a.chat_theme === 'card' ? 'official' : 'card'
+  )
 }
 
 // 主题切换
@@ -178,7 +185,7 @@ function handleNewMessage() {
         <template #trigger>
           <NSelect
             size="small"
-            v-model:value="config.model"
+            v-model:value="chat['a'].model"
             :options="options"
             :consistent-menu-width="false"
             style="border-radius: 100px"
@@ -187,8 +194,8 @@ function handleNewMessage() {
         模型
       </NTooltip>
     </NSpace>
-    <HistoryMessage ref="historyMsgRef" />
   </div>
+  <HistoryMessage ref="historyMsgRef" />
   <UserSettings ref="userSettingsModalRef" />
 </template>
 

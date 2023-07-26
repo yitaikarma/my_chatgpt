@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { toRef, onBeforeMount } from 'vue'
-import { useSettings } from '@/views/chat/hooks/useSettingsStore'
+import { storeToRefs } from 'pinia'
+import { useUserSettingsStore } from '@/stores/modules/userSettings'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 
-const { getSettingsAttr } = useSettings()
+const userSettingsStore = useUserSettingsStore()
+const { chat } = storeToRefs(userSettingsStore)
+
 const { initMessage, messageList } = useChat()
 
-const userNick = toRef(() => getSettingsAttr('user_nick'))
-const roleNick = toRef(() => getSettingsAttr('role_nick'))
-
 let md: MarkdownIt | null = null
-const chatTheme = toRef(() => getSettingsAttr('chat_theme'))
+const chatTheme = toRef(() => chat.value.a.chat_theme)
+const userNick = toRef(() => userSettingsStore.getConfig('a', 'user_nick'))
+const roleNick = toRef(() => userSettingsStore.getConfig('a', 'role_nick'))
 
 onBeforeMount(() => {
   // createGPT()

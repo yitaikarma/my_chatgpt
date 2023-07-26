@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst, SelectOption } from 'naive-ui'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useUserSettingsStore } from '@/stores/modules/userSettings'
 
-const settingsStore = useSettingsStore()
+const userSettingsStore = useUserSettingsStore()
+const { chat } = storeToRefs(userSettingsStore)
 
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const model = ref<Settings.Option>({ ...settingsStore.config })
-
+const userConfigForm = ref({ ...chat.value.a })
 const rules: FormRules = {}
-
 const options: SelectOption[] = [
   {
     label: 'GPT-3.5',
@@ -57,18 +57,10 @@ const options: SelectOption[] = [
   }
 ]
 
-onMounted(() => {
-  console.log('mounted')
-})
-
-defineExpose({
-  openSettings,
-  closeSettings
-})
+defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
   showModal.value = true
-  model.value = { ...settingsStore.config }
 }
 
 function closeSettings() {
@@ -78,7 +70,9 @@ function closeSettings() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      model.value && settingsStore.setConfig(model.value)
+      userSettingsStore.$patch({
+        chat: { a: userConfigForm.value }
+      })
       message.success('已保存')
     } else {
       console.log(errors)
@@ -108,7 +102,7 @@ function cancelCallback() {
     >
       <NForm
         ref="formRef"
-        :model="model"
+        :model="userConfigForm"
         :rules="rules"
         label-width="auto"
         label-align="left"
@@ -118,16 +112,21 @@ function cancelCallback() {
       >
         <NGrid cols="24" y-gap="10">
           <NFormItemGi span="24" path="model" label="模型">
-            <NSelect v-model:value="model.model" :options="options" clearable placeholder="必填" />
+            <NSelect
+              v-model:value="userConfigForm.model"
+              :options="options"
+              clearable
+              placeholder="必填"
+            />
           </NFormItemGi>
           <NFormItemGi span="24" path="user_nick" label="用户昵称">
-            <NInput v-model:value="model.user_nick" clearable placeholder="必填" />
+            <NInput v-model:value="userConfigForm.user_nick" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="role_nick" label="角色昵称">
-            <NInput v-model:value="model.role_nick" clearable placeholder="必填" />
+            <NInput v-model:value="userConfigForm.role_nick" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGi span="24" path="role_remarks" label="角色备注">
-            <NInput v-model:value="model.role_remarks" clearable placeholder="必填" />
+            <NInput v-model:value="userConfigForm.role_remarks" clearable placeholder="必填" />
           </NFormItemGi>
           <NFormItemGridItem
             span="24"
@@ -136,7 +135,7 @@ function cancelCallback() {
             feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全"
           >
             <NInput
-              v-model:value="model.role_directive"
+              v-model:value="userConfigForm.role_directive"
               type="textarea"
               clearable
               placeholder="必填"
