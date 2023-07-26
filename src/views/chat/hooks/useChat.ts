@@ -1,12 +1,19 @@
 import { ref, nextTick, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
+import { useChatStore } from '@/stores/modules/chat/index'
 import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
+import { Message } from '@vicons/tabler'
+import { useMessage } from 'naive-ui'
 
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
 const settingsStore = useSettingsStore()
+const chatStore = useChatStore()
+const { role_collection, currentRole } = storeToRefs(chatStore)
+const message = useMessage()
 
 // let openai = null
 
@@ -18,21 +25,16 @@ const greetingsText = '任何问题都可以问我，我会尽力回答的。'
 const waitText = '正在绞尽脑汁...'
 // 用户问题
 const questionText = ref<string>('')
-// 请求消息队列
-let requestMessageList: RequestMessage[] = []
-// 消息队列
-const messageList = ref<Message[]>([])
-// 历史消息队列
-const historyMessageList = ref<HistoryMessage[]>([])
 
 // 监听前缀指令变化
 watch(
   () => settingsStore.getConfigAttr('role_directive'),
   (value) => {
+    // FIXME: 指令更新逻辑待重构
     // console.log('updateRoleDirective', value)
-    if (requestMessageList?.[0]) {
-      requestMessageList[0].content = value
-    }
+    // if (requestMessageList?.[0]) {
+    //   requestMessageList[0].content = value
+    // }
   }
 )
 
@@ -42,25 +44,47 @@ export function useChat() {
    */
   const initMessage = () => {
     questionText.value = ''
-    messageList.value = [
-      setChatMessage('assistant', greetingsText, settingsStore.getConfigAttr('role_nick'))
-    ]
-    requestMessageList = [setRequestMessage('user', settingsStore.getConfigAttr('role_directive'))]
+    // FIXME: 是否初始化消息的逻辑待优化
+    if (!chatStore.getCurrentForAttr(currentRole.value, 'title')) {
+      clearMessage()
+    }
 
     requesting.value = false
+  }
+
+  /**
+   * 重置消息
+   */
+  const clearMessage = () => {
+    const greetingsMessage = setChatMessage(
+      'assistant',
+      greetingsText,
+      settingsStore.getConfigAttr('role_nick')
+    )
+    const requestMessageList = setRequestMessage(
+      'user',
+      settingsStore.getConfigAttr('role_directive')
+    )
+
+    chatStore.setCurrentForRole(currentRole.value, {
+      title: greetingsMessage.content,
+      date: new Date().toLocaleString(),
+      message_list: [greetingsMessage],
+      request_message_list: [requestMessageList]
+    })
   }
 
   /**
    * 保存消息
    */
   const seveMessage = () => {
+    const messageList = chatStore.getCurrentForAttr(currentRole.value, 'message_list')
     // FIXME: 消息保存逻辑待优化,需要生成唯一标识，否则，会出现重复保存
-    if (messageList.value.length < 2) return
-    historyMessageList.value.push({
-      title: messageList.value[1].content,
-      date: new Date().toLocaleString(),
-      messageList: messageList.value
-    })
+    if (messageList.length < 2) return
+    // 设置第一个提问消息为标题
+    chatStore.setCurrentForAttr(currentRole.value, 'title', messageList[1].content)
+
+    chatStore.setCurrentToHistory(currentRole.value)
   }
 
   // 创建 Node-GPT
@@ -96,6 +120,7 @@ export function useChat() {
     // 若用户未输入内容（包括换行和空格），则不发送请求
     if (!questionText.value.trim()) {
       console.log('请输入内容或合法内容')
+      message.warning('请输入内容或合法内容')
       return
     }
 
@@ -110,7 +135,7 @@ export function useChat() {
         Authorization: `Bearer ${settingsStore.getConfigAttr('api_key')}`
       },
       body: JSON.stringify({
-        messages: requestMessageList,
+        messages: chatStore.getCurrentForAttr(currentRole.value, 'request_message_list'),
         model: settingsStore.getConfigAttr('model') || 'gpt-3.5-turbo',
         temperature: 0.5,
         max_tokens: 1000,
@@ -122,10 +147,13 @@ export function useChat() {
     fetch(settingsStore.getConfigAttr('api_url'), requestOptions)
       .then((response: Response) => {
         // FIXME: 当前消息赋值类型待优化
-        const currentMessage: Message = messageList.value.at(-1) || {
+        const currentMessage = chatStore
+          .getCurrentForAttr(currentRole.value, 'message_list')
+          .at(-1) || {
           role: 'assistant',
           content: ''
         }
+
         transformSSEMessage(response, (done, textDataList) => {
           hookAfterReceiveMessage(done, textDataList, currentMessage)
         })
@@ -142,7 +170,10 @@ export function useChat() {
    * @returns Message 消息
    */
   const setRequestMessage = (role: string, content: string): Message => {
-    return { role, content }
+    return {
+      role,
+      content
+    }
   }
 
   /**
@@ -153,14 +184,19 @@ export function useChat() {
    * @returns Message 消息
    */
   const setChatMessage = (role: string, content: string, name: string): Message => {
-    return { role, content, name, time: new Date().toLocaleString() }
+    return {
+      role,
+      content,
+      name,
+      time: new Date().toLocaleString()
+    }
   }
 
   /**
    * 发送消息前的处理
    */
   const hookBeforeSendMessage = () => {
-    const userMessage: Message = setChatMessage(
+    const userMessage = setChatMessage(
       'user',
       questionText.value,
       settingsStore.getConfigAttr('user_nick')
@@ -173,8 +209,8 @@ export function useChat() {
     )
     const questionMessage: Message = setRequestMessage('user', questionText.value)
 
-    messageList.value.push(userMessage, waitMessage)
-    requestMessageList.push(questionMessage)
+    chatStore.setCurrentForAttr(currentRole.value, 'message_list', [userMessage, waitMessage])
+    chatStore.setCurrentForAttr(currentRole.value, 'request_message_list', [questionMessage])
     questionText.value = ''
 
     nextTick(() => {
@@ -191,7 +227,7 @@ export function useChat() {
   const hookAfterReceiveMessage = (done: boolean, textDataList: any[], currentMessage: Message) => {
     if (done) {
       const message: Message = setRequestMessage('assistant', currentMessage.content)
-      requestMessageList.push(message)
+      chatStore.setCurrentForAttr(currentRole.value, 'request_message_list', [message])
       // FIXME: 消息传输状态待优化
       msgStatus.value = 'requesting'
       requesting.value = false
@@ -221,11 +257,10 @@ export function useChat() {
     setRequestMessage,
     setChatMessage,
     initMessage,
+    clearMessage,
     seveMessage,
     sendMessage,
     questionText,
-    messageList,
-    historyMessageList,
     requesting,
     msgStatus
   }

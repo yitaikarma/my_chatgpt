@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useChatStore } from '@/stores/modules/chat'
 import { NDrawer, NDrawerContent } from 'naive-ui'
 import type { DrawerPlacement } from 'naive-ui'
-import { ref } from 'vue'
-import { useChat } from '@/views/chat/hooks/useChat'
+import { storeToRefs } from 'pinia'
 
-const { messageList, historyMessageList } = useChat()
+const chatStore = useChatStore()
+const { role_collection, currentRole } = storeToRefs(chatStore)
 
+const roleData = role_collection.value[currentRole.value].history_list
 const active = ref(false)
 const placement = ref<DrawerPlacement>('right')
 
@@ -18,7 +21,8 @@ function toggleActive(flag = false) {
 
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
-  messageList.value = historyMessageList.value[index].messageList
+  const messageList = chatStore.getHistoryForRole(currentRole.value, index)
+  chatStore.setCurrentForRole(currentRole.value, messageList)
   active.value = false
 }
 </script>
@@ -30,7 +34,7 @@ function handleRestoreTopic(index: number) {
         <div class="history-message__list">
           <div
             class="history-message__list-item"
-            v-for="(item, i) in historyMessageList"
+            v-for="(item, i) in roleData"
             :key="i"
             @click="handleRestoreTopic(i)"
           >
