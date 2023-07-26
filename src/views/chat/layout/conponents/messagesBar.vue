@@ -282,14 +282,6 @@ function renderMarkdown(text: string) {
     font-family: 'FiraCode';
   }
 
-  .code_inline {
-    margin: 0.1em;
-    // border-radius: 4px;
-    // background: #262631;
-    white-space: nowrap;
-    color: #8f68cd;
-  }
-
   /* Copy */
   .copy-button {
     margin-left: 10px;
@@ -300,5 +292,13 @@ function renderMarkdown(text: string) {
     color: #fff;
     cursor: pointer;
   }
+}
+
+:deep(.code_inline) {
+  margin: 0.1em;
+  // border-radius: 4px;
+  // background: #262631;
+  white-space: nowrap;
+  color: #8f68cd;
 }
 </style>
