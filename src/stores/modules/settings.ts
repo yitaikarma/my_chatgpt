@@ -62,5 +62,21 @@ export const useSettingsStore = defineStore('settings', {
     setRoleDirective(role_directive: string) {
       this.config.role_directive = role_directive
     }
+  },
+  persist: {
+    key: 'settings',
+    storage: localStorage,
+    paths: [
+      'config.theme',
+      'config.api_base_url',
+      'config.api_path',
+      'config.api_key',
+      'config.model',
+      'config.chat_theme',
+      'config.user_nick',
+      'config.role_nick',
+      'config.role_remarks',
+      'config.role_directive'
+    ]
   }
 })
