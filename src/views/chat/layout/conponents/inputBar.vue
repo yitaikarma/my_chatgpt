@@ -18,7 +18,7 @@ function handleEnter(event: KeyboardEvent) {
 
     event.preventDefault()
 
-    console.log('requesting.value', requesting)
+    // console.log('requesting.value', requesting)
     if (!requesting.value) sendMessage()
   }
 }
