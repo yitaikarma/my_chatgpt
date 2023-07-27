@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { toRef, onBeforeMount } from 'vue'
+import { toRef, nextTick, onBeforeMount } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUserSettingsStore } from '@/stores/modules/userSettings'
 import { useChatStore } from '@/stores/modules/chat'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
+import { scrollToBottom } from '@/utils/operationElement'
 
 const userSettingsStore = useUserSettingsStore()
 const { chat } = storeToRefs(userSettingsStore)
@@ -25,6 +26,9 @@ onBeforeMount(() => {
   // createGPT()
   md = useMarkdown()
   initMessage()
+  nextTick(() => {
+    scrollToBottom('message_list', true)
+  })
 })
 
 // 渲染markdown
