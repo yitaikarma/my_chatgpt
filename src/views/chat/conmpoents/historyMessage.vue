@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { ref, toRef, nextTick } from 'vue'
+import { ref, toRef, nextTick, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useMessage, NButton, NDrawer, NDrawerContent, NIcon, NSpace, NTooltip } from 'naive-ui'
+import {
+  useMessage,
+  NButton,
+  NDrawer,
+  NDrawerContent,
+  NIcon,
+  NSpace,
+  NTooltip,
+  NInput
+} from 'naive-ui'
 import type { DrawerPlacement } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useChatStore } from '@/stores/modules/chat'
@@ -14,8 +23,17 @@ const { currentRole } = storeToRefs(chatStore)
 const historyList = toRef(() => chatStore.getHistoryList(currentRole.value))
 const active = ref(false)
 const placement = ref<DrawerPlacement>('right')
+const editableIndex = ref(-1)
 
 defineExpose({ toggleActive })
+
+watch(editableIndex, (value) => {
+  if (value !== -1) {
+    document.addEventListener('click', inputCallback as EventListener)
+  } else {
+    document.removeEventListener('click', inputCallback as EventListener)
+  }
+})
 
 // 切换抽屉显示状态
 function toggleActive(flag = false) {
@@ -32,11 +50,15 @@ function handleRestoreTopic(index: number) {
   })
 }
 
+const inputCallback = () => {
+  if (editableIndex.value !== -1) {
+    editableIndex.value = -1
+  }
+}
 // 编辑历史话题
 function handleEditHistoryItem(index: number) {
-  // TODO: 编辑历史话题
-  console.log('编辑历史话题', index)
-  message.warning('暂未开放')
+  editableIndex.value = editableIndex.value === -1 ? index : -1
+  // message.warning('暂未开放')
 }
 
 // 删除历史话题
@@ -84,7 +106,18 @@ function handleClearHistory() {
             <div class="content">
               <div class="title">
                 <NIcon size="20"> <Chat24Regular /> </NIcon>
-                <span> {{ item.title }} </span>
+                <span v-show="i !== editableIndex"> {{ item.title }} </span>
+                <NInput
+                  v-if="i === editableIndex"
+                  size="small"
+                  type="text"
+                  autofocus
+                  placeholder="请输入话题标题"
+                  :value="item.title"
+                  @update:value="chatStore.setHistoryForAttr(currentRole, i, 'title', $event)"
+                  @blur="editableIndex = -1"
+                  @click.stop
+                />
               </div>
               <div class="date">{{ item.date }}</div>
             </div>
