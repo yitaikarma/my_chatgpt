@@ -2,6 +2,7 @@ import { ref, nextTick, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { useChatStore } from '@/stores/modules/chat/index'
+import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
 import { Message } from '@vicons/tabler'
@@ -67,6 +68,7 @@ export function useChat() {
     )
 
     chatStore.setCurrentForRole(currentRole.value, {
+      uuid: generateUUIDUsingMathRandom(),
       title: greetingsMessage.content,
       date: new Date().toLocaleString(),
       message_list: [greetingsMessage],
@@ -79,12 +81,31 @@ export function useChat() {
    */
   const seveMessage = () => {
     const messageList = chatStore.getCurrentForAttr(currentRole.value, 'message_list')
-    // FIXME: 消息保存逻辑待优化,需要生成唯一标识，否则，会出现重复保存
-    if (messageList.length < 2) return
-    // 设置第一个提问消息为标题
-    chatStore.setCurrentForAttr(currentRole.value, 'title', messageList[1].content)
+    const currentUuid = chatStore.getCurrentForRole(currentRole.value).uuid
+    const historyList = chatStore.getHistoryList(currentRole.value)
+    let historyIndex = 0
+    const isExist = historyList.some((item, index) => {
+      historyIndex = index
+      return item.uuid === currentUuid
+    })
 
-    chatStore.setCurrentToHistory(currentRole.value)
+    // 未进行过对话，不保存
+    if (messageList.length < 2) return
+
+    // 保存未记录的对话，否则只更新历史记录
+    if (!isExist) {
+      // 设置第一个提问消息为标题
+      chatStore.setCurrentForAttr(currentRole.value, 'title', messageList[1].content)
+
+      chatStore.setCurrentToHistory(currentRole.value)
+    } else {
+      chatStore.setHistoryForAttr(
+        currentRole.value,
+        historyIndex,
+        'date',
+        new Date().toLocaleString()
+      )
+    }
   }
 
   // 创建 Node-GPT
