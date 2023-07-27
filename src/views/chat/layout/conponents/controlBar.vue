@@ -73,7 +73,6 @@ const options: SelectOption[] = [
 
 // 打开角色设置
 function handleOpenRoleSettings() {
-  // TODO
   userSettingsModalRef.value?.openSettings()
 }
 
@@ -132,7 +131,14 @@ function handleNewMessage() {
     <NSpace>
       <NTooltip trigger="hover">
         <template #trigger>
-          <NButton ghost size="small" type="default" round @click="handleOpenRoleSettings">
+          <NButton
+            ghost
+            size="small"
+            type="default"
+            round
+            :focusable="false"
+            @click="handleOpenRoleSettings"
+          >
             <template #icon>
               <NIcon> <ChatSettings24Regular /> </NIcon>
             </template>
@@ -142,7 +148,14 @@ function handleNewMessage() {
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
-          <NButton ghost size="small" type="default" round @click="handleStyleChange">
+          <NButton
+            ghost
+            size="small"
+            type="default"
+            round
+            :focusable="false"
+            @click="handleStyleChange"
+          >
             <template #icon>
               <NIcon> <StyleGuide24Regular /> </NIcon>
             </template>
@@ -152,7 +165,14 @@ function handleNewMessage() {
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
-          <NButton ghost size="small" type="default" round @click="handleThemeChange">
+          <NButton
+            ghost
+            size="small"
+            type="default"
+            round
+            :focusable="false"
+            @click="handleThemeChange"
+          >
             <template #icon>
               <NIcon> <DarkTheme24Regular /> </NIcon>
             </template>
@@ -162,7 +182,14 @@ function handleNewMessage() {
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
-          <NButton ghost size="small" type="default" round @click="handleOpenHistoryMessage">
+          <NButton
+            ghost
+            size="small"
+            type="default"
+            round
+            :focusable="false"
+            @click="handleOpenHistoryMessage"
+          >
             <template #icon>
               <NIcon> <DocumentBulletListClock24Regular /> </NIcon>
             </template>
@@ -172,7 +199,14 @@ function handleNewMessage() {
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
-          <NButton ghost size="small" type="primary" round @click="handleNewMessage">
+          <NButton
+            ghost
+            size="small"
+            type="primary"
+            round
+            :focusable="false"
+            @click="handleNewMessage"
+          >
             <template #icon>
               <NIcon> <FormNew24Regular /> </NIcon>
             </template>
