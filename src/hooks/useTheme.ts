@@ -1,7 +1,8 @@
-import { computed } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { darkTheme, useOsTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { useConfig } from '@/hooks/core/useConfig'
+import { before } from 'node:test'
 
 // 自定义 NaiveUI 主题
 const themeOverrides: GlobalThemeOverrides = {
@@ -22,6 +23,11 @@ const themeOverrides: GlobalThemeOverrides = {
 
 export function useTheme() {
   const { getSettingsAttr } = useConfig()
+  let osTheme = 'light'
+
+  onBeforeMount(() => {
+    osTheme = useOsTheme().value || 'light'
+  })
 
   /**
    * 获取主题
@@ -29,7 +35,7 @@ export function useTheme() {
    */
   const theme = computed(() => {
     const theme = getSettingsAttr('theme')
-    const osTheme = useOsTheme().value || 'light'
+    // const osTheme = useOsTheme().value || 'light'
 
     document.body.setAttribute('data-theme', theme === 'auto' ? osTheme : theme)
     switch (true) {
