@@ -70,6 +70,15 @@ export const useChatStore = defineStore('chat', {
     pushHistoryForRole(role: string, history: ChatHistory) {
       this.role_collection[role].history_list.push(history)
     },
+    // 删除历史
+    deleteHistoryItem(role: string, uuid: string) {
+      const index = this.role_collection[role].history_list.findIndex((item) => item.uuid === uuid)
+      this.role_collection[role].history_list.splice(index, 1)
+    },
+    // 清空历史
+    clearHistory(role: string) {
+      this.role_collection[role].history_list = []
+    },
     // 设置当前的某个属性
     setCurrentForAttr<T extends keyof ChatHistory>(
       role: string,
