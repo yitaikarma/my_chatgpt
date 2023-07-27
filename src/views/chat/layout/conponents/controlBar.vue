@@ -78,11 +78,14 @@ function handleOpenRoleSettings() {
 
 // 风格切换
 function handleStyleChange() {
-  userSettingsStore.setConfigForAttr(
-    'a',
-    'chat_theme',
-    chat.value.a.chat_theme === 'card' ? 'official' : 'card'
-  )
+  // 角色切换
+  // userSettingsStore.setConfigForAttr(
+  //   'a',
+  //   'chat_theme',
+  //   chat.value.a.chat_theme === 'chat' ? 'Q&A' : 'chat'
+  // )
+  // 全局切换
+  settingsStore.switchChatTheme()
 }
 
 // 主题切换

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toRef, nextTick, onBeforeMount } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/modules/settings'
 import { useUserSettingsStore } from '@/stores/modules/userSettings'
 import { useChatStore } from '@/stores/modules/chat'
 import { useChat } from '@/views/chat/hooks/useChat'
@@ -9,7 +10,9 @@ import type MarkdownIt from 'markdown-it'
 import { scrollToBottom } from '@/utils/operationElement'
 
 const userSettingsStore = useUserSettingsStore()
-const { chat } = storeToRefs(userSettingsStore)
+// const { chat } = storeToRefs(userSettingsStore)
+
+const settingsStore = useSettingsStore()
 
 const chatStore = useChatStore()
 const { role_collection, currentRole } = storeToRefs(chatStore)
@@ -18,7 +21,7 @@ const { initMessage } = useChat()
 
 let md: MarkdownIt | null = null
 const messageList = toRef(() => role_collection.value[currentRole.value].current.message_list)
-const chatTheme = toRef(() => chat.value.a.chat_theme)
+const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => userSettingsStore.getConfig('a', 'user_nick'))
 const roleNick = toRef(() => userSettingsStore.getConfig('a', 'role_nick'))
 
@@ -223,7 +226,7 @@ function renderMarkdown(text: string) {
   }
 }
 
-.message_item[chatTheme='official'] {
+.message_item[chatTheme='Q&A'] {
   border-bottom: 1px solid var(--color-msg-ctn-border-1);
   .message_role {
     display: none;
