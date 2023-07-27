@@ -1,6 +1,8 @@
 import { ref, nextTick, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
+// import { useUserSettingsStore } from '@/stores/modules/userSettings'
+import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { useChatStore } from '@/stores/modules/chat/index'
 import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 import { transformSSEMessage } from '@/utils/transform'
@@ -13,8 +15,9 @@ import { useMessage } from 'naive-ui'
 
 const settingsStore = useSettingsStore()
 const chatStore = useChatStore()
-const { role_collection, currentRole } = storeToRefs(chatStore)
-const message = useMessage()
+const { currentRole } = storeToRefs(chatStore)
+const roleConfigStore = useRoleConfigStore()
+// const message = useMessage()
 
 // let openai = null
 
@@ -27,17 +30,20 @@ const waitText = '正在绞尽脑汁...'
 // 用户问题
 const questionText = ref<string>('')
 
+// FIXME: 指令更新逻辑待重构, 改为统一管理状态后，更加需要重构。
+// 思路是：从请求聊天数据里分离出指令，每次请求都从同一配置里获取指令，否则指令更新后，需要需要处理所有的历史消息。
+
 // 监听前缀指令变化
-watch(
-  () => settingsStore.getConfigAttr('role_directive'),
-  (value) => {
-    // FIXME: 指令更新逻辑待重构
-    // console.log('updateRoleDirective', value)
-    // if (requestMessageList?.[0]) {
-    //   requestMessageList[0].content = value
-    // }
-  }
-)
+// watch(
+//   // () => settingsStore.getConfigAttr('role_directive'),
+//   () => userSettingsStore.getConfig('a', 'role_directive'),
+//   (value) => {
+//     // console.log('updateRoleDirective', value)
+//     // if (requestMessageList?.[0]) {
+//     //   requestMessageList[0].content = value
+//     // }
+//   }
+// )
 
 export function useChat() {
   /**
@@ -60,11 +66,11 @@ export function useChat() {
     const greetingsMessage = setChatMessage(
       'assistant',
       greetingsText,
-      settingsStore.getConfigAttr('role_nick')
+      roleConfigStore.getRoleConfigForAttr('role_nick')
     )
     const requestMessageList = setRequestMessage(
       'user',
-      settingsStore.getConfigAttr('role_directive')
+      roleConfigStore.getRoleConfigForAttr('role_directive')
     )
 
     chatStore.setCurrentForRole(currentRole.value, {
@@ -141,7 +147,7 @@ export function useChat() {
     // 若用户未输入内容（包括换行和空格），则不发送请求
     if (!questionText.value.trim()) {
       console.log('请输入内容或合法内容')
-      message.warning('请输入内容或合法内容')
+      // message.warning('请输入内容或合法内容')
       return
     }
 
@@ -157,7 +163,7 @@ export function useChat() {
       },
       body: JSON.stringify({
         messages: chatStore.getCurrentForAttr(currentRole.value, 'request_message_list'),
-        model: settingsStore.getConfigAttr('model') || 'gpt-3.5-turbo',
+        model: roleConfigStore.getRoleConfigForAttr('model') || 'gpt-3.5-turbo',
         temperature: 0.5,
         max_tokens: 1000,
         stream: true
@@ -220,13 +226,13 @@ export function useChat() {
     const userMessage = setChatMessage(
       'user',
       questionText.value,
-      settingsStore.getConfigAttr('user_nick')
+      roleConfigStore.getRoleConfigForAttr('user_nick')
     )
     // FIXME: 消息传输状态待优化
     const waitMessage: Message = setChatMessage(
       'assistant',
       waitText,
-      settingsStore.getConfigAttr('role_nick')
+      roleConfigStore.getRoleConfigForAttr('role_nick')
     )
     const questionMessage: Message = setRequestMessage('user', questionText.value)
 

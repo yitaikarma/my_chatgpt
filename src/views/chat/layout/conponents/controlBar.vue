@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import UserSettings from '@/views/chat/conmpoents/userSettings.vue'
+import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
-import { useUserSettingsStore } from '@/stores/modules/userSettings'
+import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
@@ -22,10 +22,10 @@ const { initMessage, clearMessage, seveMessage } = useChat()
 
 const settingsStore = useSettingsStore()
 
-const userSettingsStore = useUserSettingsStore()
-const { chat } = storeToRefs(userSettingsStore)
+const roleConfigStore = useRoleConfigStore()
+const { role_list, current_role } = storeToRefs(roleConfigStore)
 
-const userSettingsModalRef = ref<InstanceType<typeof UserSettings> | null>()
+const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
 
 const options: SelectOption[] = [
@@ -223,7 +223,7 @@ function handleNewMessage() {
         <template #trigger>
           <NSelect
             size="small"
-            v-model:value="chat['a'].model"
+            v-model:value="role_list[current_role].chat_config.model"
             :options="options"
             :consistent-menu-width="false"
             style="border-radius: 100px"
@@ -234,7 +234,7 @@ function handleNewMessage() {
     </NSpace>
   </div>
   <HistoryMessage ref="historyMsgRef" />
-  <UserSettings ref="userSettingsModalRef" />
+  <RoleSettings ref="userSettingsModalRef" />
 </template>
 
 <style scoped lang="scss">

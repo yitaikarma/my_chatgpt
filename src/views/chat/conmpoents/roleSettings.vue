@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst, SelectOption } from 'naive-ui'
-import { useUserSettingsStore } from '@/stores/modules/userSettings'
+import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 
-const userSettingsStore = useUserSettingsStore()
-const { chat } = storeToRefs(userSettingsStore)
-
+const roleConfigStore = useRoleConfigStore()
+const { role_list, current_role } = roleConfigStore
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const userConfigForm = ref({ ...chat.value.a })
+const userConfigForm = ref({ ...role_list[current_role].chat_config })
 const rules: FormRules = {}
 const options: SelectOption[] = [
   {
@@ -70,9 +68,7 @@ function closeSettings() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      userSettingsStore.$patch({
-        chat: { a: userConfigForm.value }
-      })
+      roleConfigStore.updateRoleConfig('chat_config', { ...userConfigForm.value })
       message.success('已保存')
     } else {
       console.log(errors)

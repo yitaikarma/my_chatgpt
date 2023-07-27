@@ -2,17 +2,15 @@
 import { toRef, nextTick, onBeforeMount } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
-import { useUserSettingsStore } from '@/stores/modules/userSettings'
+import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { useChatStore } from '@/stores/modules/chat'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 import { scrollToBottom } from '@/utils/operationElement'
 
-const userSettingsStore = useUserSettingsStore()
-// const { chat } = storeToRefs(userSettingsStore)
-
 const settingsStore = useSettingsStore()
+const roleConfigStore = useRoleConfigStore()
 
 const chatStore = useChatStore()
 const { role_collection, currentRole } = storeToRefs(chatStore)
@@ -22,8 +20,8 @@ const { initMessage } = useChat()
 let md: MarkdownIt | null = null
 const messageList = toRef(() => role_collection.value[currentRole.value].current.message_list)
 const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
-const userNick = toRef(() => userSettingsStore.getConfig('a', 'user_nick'))
-const roleNick = toRef(() => userSettingsStore.getConfig('a', 'role_nick'))
+const userNick = toRef(() => roleConfigStore.getRoleConfigForAttr('user_nick'))
+const roleNick = toRef(() => roleConfigStore.getRoleConfigForAttr('role_nick'))
 
 onBeforeMount(() => {
   // createGPT()
