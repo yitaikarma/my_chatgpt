@@ -72,7 +72,7 @@ export const useSettingsStore = defineStore('settings', {
     }
   },
   persist: {
-    key: 'settings',
+    key: 'global_config',
     storage: localStorage,
     paths: [
       'config.theme',
