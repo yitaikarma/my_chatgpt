@@ -2,15 +2,16 @@
 /**
  * 滚动到底部
  * @param elementId 元素id
+ * @param isTransition 是否使用过渡动画
  */
-export const scrollToBottom = (elementId: string) => {
+export const scrollToBottom = (elementId: string, isTransition: boolean = true): void => {
   try {
     const container = document.getElementById(elementId)
     if (container && container.scrollTop + container.clientHeight < container.scrollHeight) {
-      // console.log('滚动到底部');
+      // console.log('滚动到底部')
       container.scrollTo({
         top: container.scrollHeight,
-        behavior: 'smooth'
+        behavior: isTransition ? 'smooth' : 'auto'
       })
     }
   } catch (e) {
