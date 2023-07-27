@@ -9,15 +9,17 @@ export const useChatStore = defineStore('chat', {
           title: '',
           date: '',
           message_list: [],
-          request_message_list: []
+          request_message_list: [],
+          uuid: ''
         },
         history_list: [
-          {
-            title: '',
-            date: '',
-            message_list: [],
-            request_message_list: []
-          }
+          // {
+          //   title: '',
+          //   date: '',
+          //   message_list: [],
+          //   request_message_list: [],
+          //   uuid: ''
+          // }
         ]
       }
     },
@@ -32,6 +34,11 @@ export const useChatStore = defineStore('chat', {
     getHistoryForRole({ role_collection }) {
       return (role: string, index: number) => {
         return role_collection[role].history_list[index]
+      }
+    },
+    getHistoryList({ role_collection }) {
+      return (role: string) => {
+        return role_collection[role].history_list
       }
     },
     getCurrentForAttr({ role_collection }) {
