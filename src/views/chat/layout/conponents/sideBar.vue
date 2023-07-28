@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import Settings from '@/views/chat/conmpoents/settings.vue'
+import RoleList from '@/views/chat/conmpoents/roleList.vue'
 import { ref } from 'vue'
 import { Settings24Regular } from '@vicons/fluent'
 import { NIcon, NTooltip } from 'naive-ui'
-// import { ref, toRef } from 'vue'
-// import { useSettings } from '@/views/chat/hooks/useSettingsStore'
-
-// const { getSettingsAttr } = useSettings()
-
-// const roleNick = toRef(() => getSettingsAttr('role_nick'))
 
 const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 
@@ -20,7 +15,9 @@ function handleChangeSettingsDisplay() {
 
 <template>
   <div class="chat_list_wrapper">
-    <div class="chat_list"></div>
+    <div class="chat_list">
+      <RoleList />
+    </div>
     <div class="utils_nav">
       <NTooltip trigger="hover">
         <template #trigger>

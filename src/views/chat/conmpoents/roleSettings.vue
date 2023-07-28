@@ -5,12 +5,12 @@ import type { FormRules, FormInst, SelectOption } from 'naive-ui'
 import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 
 const roleConfigStore = useRoleConfigStore()
-const { role_list, current_role } = roleConfigStore
+const { role_list, current_role_name } = roleConfigStore
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const userConfigForm = ref({ ...role_list[current_role].chat_config })
+const userConfigForm = ref({ ...role_list[current_role_name].chat_config })
 const rules: FormRules = {}
 const options: SelectOption[] = [
   {

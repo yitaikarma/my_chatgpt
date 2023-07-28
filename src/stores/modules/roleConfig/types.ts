@@ -17,5 +17,6 @@ export interface RoleConfigStore {
   role_list: {
     [role: string]: RoleConfig
   }
-  current_role: string
+  preset_role: RoleConfig
+  current_role_name: string
 }
