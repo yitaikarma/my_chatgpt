@@ -120,9 +120,7 @@ function handledeleteRole(uuid: string) {
               autofocus
               placeholder="请输入话题标题"
               :value="item.session_config.role_nick"
-              @update:value="
-                roleConfigStore.updateRoleConfigForAttr('role_nick', $event, item.uuid)
-              "
+              @update:value="roleConfigStore.updateRoleAttrAttr('role_nick', $event, item.uuid)"
               @blur="editableIndex = -1"
               @click.stop
             />

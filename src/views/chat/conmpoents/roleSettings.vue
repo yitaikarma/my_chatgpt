@@ -68,7 +68,7 @@ function closeSettings() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      roleConfigStore.updateRoleConfig('session_config', { ...userConfigForm.value })
+      roleConfigStore.updateRoleAttr('session_config', { ...userConfigForm.value })
       message.success('已保存')
     } else {
       console.log(errors)

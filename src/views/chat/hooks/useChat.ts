@@ -57,12 +57,12 @@ export function useChat() {
   const clearMessage = () => {
     const greetingsMessage = setChatMessage(
       'assistant',
-      roleConfigStore.getRoleConfigForAttr('greetings_text'),
-      roleConfigStore.getRoleConfigForAttr('role_nick')
+      roleConfigStore.getRoleConfigAttr('greetings_text'),
+      roleConfigStore.getRoleConfigAttr('role_nick')
     )
     const requestMessageList = setRequestMessage(
       'user',
-      roleConfigStore.getRoleConfigForAttr('role_directive')
+      roleConfigStore.getRoleConfigAttr('role_directive')
     )
 
     sessionStore.updateCurrentRoleSession({
@@ -150,7 +150,7 @@ export function useChat() {
       },
       body: JSON.stringify({
         messages: sessionStore.getCurrentSessionAttr('request_message_list'),
-        model: roleConfigStore.getRoleConfigForAttr('model') || 'gpt-3.5-turbo',
+        model: roleConfigStore.getRoleConfigAttr('model') || 'gpt-3.5-turbo',
         temperature: 0.5,
         max_tokens: 1000,
         stream: true
@@ -211,13 +211,13 @@ export function useChat() {
     const userMessage = setChatMessage(
       'user',
       questionText.value,
-      roleConfigStore.getRoleConfigForAttr('user_nick')
+      roleConfigStore.getRoleConfigAttr('user_nick')
     )
     // FIXME: 消息传输状态待优化
     const waitMessage: Message = setChatMessage(
       'assistant',
-      roleConfigStore.getRoleConfigForAttr('wait_text'),
-      roleConfigStore.getRoleConfigForAttr('role_nick')
+      roleConfigStore.getRoleConfigAttr('wait_text'),
+      roleConfigStore.getRoleConfigAttr('role_nick')
     )
     const questionMessage: Message = setRequestMessage('user', questionText.value)
 

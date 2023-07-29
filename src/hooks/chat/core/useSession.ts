@@ -14,13 +14,13 @@ export function useSession() {
   const initRoleSession = (role_uuid: string) => {
     const greetingsMessage = {
       role: 'assistant',
-      content: roleConfigStore.getRoleConfigForAttr('greetings_text'),
-      name: roleConfigStore.getRoleConfigForAttr('role_nick'),
+      content: roleConfigStore.getRoleConfigAttr('greetings_text'),
+      name: roleConfigStore.getRoleConfigAttr('role_nick'),
       date: new Date().toLocaleString()
     }
     const requestMessageList = {
       role: 'user',
-      content: roleConfigStore.getRoleConfigForAttr('role_directive')
+      content: roleConfigStore.getRoleConfigAttr('role_directive')
     }
 
     // 更新角色当前会话

@@ -22,17 +22,17 @@ export const useRoleConfigStore = defineStore('role_config', {
   }),
 
   getters: {
-    // 获取角色的某个属性
-    getRoleConfigForAttr({ role_list, current_role_uuid }) {
-      return (configProp: keyof RoleChatConfig) => {
-        return role_list[current_role_uuid].session_config[configProp]
+    // 获取角色配置的某个属性
+    getRoleConfigAttr({ role_list, current_role_uuid }) {
+      return (configProp: keyof RoleChatConfig, uuid?: string) => {
+        return role_list[uuid || current_role_uuid].session_config[configProp]
       }
     },
 
-    // 获取角色配置
-    getRoleForAttr({ role_list, current_role_uuid }) {
-      return (prop: keyof RoleConfig) => {
-        return role_list[current_role_uuid][prop]
+    // 获取角色的某个属性
+    getRoleAttr({ role_list, current_role_uuid }) {
+      return (prop: keyof RoleConfig, uuid?: string) => {
+        return role_list[uuid || current_role_uuid][prop]
       }
     },
 
@@ -59,7 +59,7 @@ export const useRoleConfigStore = defineStore('role_config', {
 
   actions: {
     // 更新角色配置的某个属性
-    updateRoleConfigForAttr<T extends keyof RoleChatConfig>(
+    updateRoleAttrAttr<T extends keyof RoleChatConfig>(
       config_prop: T,
       value: RoleChatConfig[T],
       uuid?: string
@@ -68,13 +68,13 @@ export const useRoleConfigStore = defineStore('role_config', {
     },
 
     // 更新角色的某个属性
-    updateRoleConfig<T extends keyof RoleConfig>(prop: T, data: RoleConfig[T]) {
-      this.role_list[this.current_role_uuid][prop] = data
+    updateRoleAttr<T extends keyof RoleConfig>(prop: T, data: RoleConfig[T], uuid?: string) {
+      this.role_list[uuid || this.current_role_uuid][prop] = data
     },
 
     // 更新角色
-    updateRole(config: RoleConfig) {
-      this.role_list[this.current_role_uuid] = config
+    updateRole(config: RoleConfig, uuid?: string) {
+      this.role_list[uuid || this.current_role_uuid] = config
     },
 
     // 添加角色

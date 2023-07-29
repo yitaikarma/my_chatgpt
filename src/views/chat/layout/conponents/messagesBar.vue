@@ -20,8 +20,8 @@ let md: MarkdownIt | null = null
 // const messageList = toRef(() => role_collection.value[current_role_uuid.value].current.message_list)
 const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
 const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
-const userNick = toRef(() => roleConfigStore.getRoleConfigForAttr('user_nick'))
-const roleNick = toRef(() => roleConfigStore.getRoleConfigForAttr('role_nick'))
+const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
+const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
 
 onBeforeMount(() => {
   // createGPT()
