@@ -1,9 +1,10 @@
 export interface SessionHistory {
   title: string
-  date: string
   message_list: Message[]
   request_message_list?: RequestMessage[]
+  date: string
   uuid: string
+  is_history: boolean
 }
 
 export interface RoleSession {

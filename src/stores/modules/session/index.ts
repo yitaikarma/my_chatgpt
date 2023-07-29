@@ -8,10 +8,11 @@ export const useSessionStore = defineStore('session', {
       uuid: '',
       current: {
         title: '',
-        date: '',
         message_list: [],
         request_message_list: [],
-        uuid: ''
+        uuid: '',
+        date: '',
+        is_history: false
       },
       history_list: []
     },
@@ -122,7 +123,8 @@ export const useSessionStore = defineStore('session', {
         ...this.role_collection[role_uuid].current,
         title: this.role_collection[role_uuid].current.message_list[1].content,
         // 以结束话题的时间作为日期
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        is_history: true
       })
     },
 

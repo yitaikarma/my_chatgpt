@@ -40,13 +40,18 @@ function toggleActive(flag = false) {
 
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
-  const sessions = sessionStore.getHistory(index)
-  const currentSession = sessionStore.getCurrentSession
-  const isExist = sessionStore.getHistoryList().some((item) => item.uuid === currentSession.uuid)
-  if (!isExist) {
-    sessionStore.updateCurrentSessionToHistory()
+  const messageList = sessionStore.getCurrentSessionAttr('message_list')
+  if (messageList.length > 2) {
+    // 未进行过对话，不保存
+    const currentSession = sessionStore.getCurrentSession
+    if (!currentSession.is_history) {
+      sessionStore.updateCurrentSessionToHistory()
+    }
   }
+
+  const sessions = sessionStore.getHistory(index)
   sessionStore.updateCurrentRoleSession(sessions)
+
   nextTick(() => {
     scrollToBottom('message_list', false)
   })
