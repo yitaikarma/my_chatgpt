@@ -72,7 +72,11 @@ function handleRoleRename(index: number) {
 
 // 删除角色
 function handledeleteRole(uuid: string) {
-  sessionStore.deleteHistory(uuid)
+  // TODO:删除角色相关场景问题，和删除历史话题类似，需要考虑
+  // TODO:删除当前角色，需要切换到上一个角色
+  // TODO:删除最后一个角色，需要做相关处理
+  roleConfigStore.deleteRole(uuid)
+  sessionStore.deleteRole(uuid)
   message.success('删除成功')
 }
 </script>

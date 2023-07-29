@@ -137,6 +137,11 @@ export const useSessionStore = defineStore('session', {
     updateCurrentRole(uuid: string, role: RoleSession) {
       this.updateCurrentRoleUUID(uuid)
       this.role_collection[this.current_role_uuid] = role
+    },
+
+    // 删除角色
+    deleteRole(uuid?: string) {
+      delete this.role_collection[uuid || this.current_role_uuid]
     }
   },
 
