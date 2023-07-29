@@ -61,12 +61,13 @@ export const useRoleConfigStore = defineStore('role_config', {
     // 更新角色配置的某个属性
     updateRoleConfigForAttr<T extends keyof RoleChatConfig>(
       config_prop: T,
-      value: RoleChatConfig[T]
+      value: RoleChatConfig[T],
+      uuid?: string
     ) {
-      this.role_list[this.current_role_uuid].session_config[config_prop] = value
+      this.role_list[uuid || this.current_role_uuid].session_config[config_prop] = value
     },
 
-    // 更新角色配置的某个属性
+    // 更新角色的某个属性
     updateRoleConfig<T extends keyof RoleConfig>(prop: T, data: RoleConfig[T]) {
       this.role_list[this.current_role_uuid][prop] = data
     },

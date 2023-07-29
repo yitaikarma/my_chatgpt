@@ -10,7 +10,6 @@ const message = useMessage()
 const { roleConfigStore, addNewRole } = useRoleConfig()
 const { sessionStore, initRoleSession } = useSession()
 
-// const historyList = toRef(() => sessionStore.getHistoryList)
 const roleList = toRef(() => Object.values(roleConfigStore.getRoleList))
 const active = ref(false)
 const editableIndex = ref(-1)
@@ -24,6 +23,12 @@ watch(editableIndex, (value) => {
     document.removeEventListener('click', inputCallback as EventListener)
   }
 })
+
+const inputCallback = () => {
+  if (editableIndex.value !== -1) {
+    editableIndex.value = -1
+  }
+}
 
 onBeforeMount(() => {
   if (roleList.value.length === 0) {
@@ -59,41 +64,16 @@ function handleChangeRole(uuid: string) {
   })
 }
 
-// // 恢复历史话题
-// function handleRestoreTopic(index: number) {
-//   const messageList = sessionConfigStore.getHistory(index)
-//   sessionConfigStore.updateCurrentRoleSession(messageList)
-//   active.value = false
-//   nextTick(() => {
-//     scrollToBottom('message_list', false)
-//   })
-// }
-
-const inputCallback = () => {
-  if (editableIndex.value !== -1) {
-    editableIndex.value = -1
-  }
-}
-
-// 编辑历史话题
-function handleEditHistoryItem(index: number) {
+// 角色重命名
+function handleRoleRename(index: number) {
   editableIndex.value = editableIndex.value === -1 ? index : -1
   message.warning('暂未开放')
 }
 
-// 删除历史话题
-function handledeleteHistory(uuid: string) {
+// 删除角色
+function handledeleteRole(uuid: string) {
   sessionStore.deleteHistory(uuid)
   message.success('删除成功')
-}
-
-// 鼠标移入
-function handleHover(event: MouseEvent, uuid: string) {
-  console.log(event)
-  console.log(uuid)
-  if (event.target instanceof HTMLElement && event.target.parentElement) {
-    event.target.parentElement.style.setProperty('--y', `${event.target.offsetTop}px`)
-  }
 }
 </script>
 
@@ -125,7 +105,6 @@ function handleHover(event: MouseEvent, uuid: string) {
         v-for="(item, i) in roleList"
         :key="i"
         @click="handleChangeRole(item.uuid)"
-        @mouseenter="handleHover($event, item.uuid)"
       >
         <div class="avatar">
           <img src="@/assets/svg/chatgpt.svg" alt="" />
@@ -133,6 +112,7 @@ function handleHover(event: MouseEvent, uuid: string) {
         <div class="content">
           <div class="title">
             <span v-show="i !== editableIndex"> {{ item.session_config.role_nick }} </span>
+            <!-- FIXME:清空名字后，失去占位问题，应预设默认名字 -->
             <NInput
               v-if="i === editableIndex"
               size="small"
@@ -140,7 +120,9 @@ function handleHover(event: MouseEvent, uuid: string) {
               autofocus
               placeholder="请输入话题标题"
               :value="item.session_config.role_nick"
-              @update:value="sessionStore.updateHistoryAttr(i, 'title', $event)"
+              @update:value="
+                roleConfigStore.updateRoleConfigForAttr('role_nick', $event, item.uuid)
+              "
               @blur="editableIndex = -1"
               @click.stop
             />
@@ -157,7 +139,6 @@ function handleHover(event: MouseEvent, uuid: string) {
             <div class="date">{{ item.date }}</div>
           </div>
         </div>
-        <!-- TODO:调整为hover显示 -->
         <div class="control">
           <NSpace :size="4">
             <NTooltip trigger="hover">
@@ -168,7 +149,7 @@ function handleHover(event: MouseEvent, uuid: string) {
                   quaternary
                   circle
                   :focusable="false"
-                  @click.self.stop="handleEditHistoryItem(i)"
+                  @click.stop="handleRoleRename(i)"
                 >
                   <template #icon>
                     <NIcon> <DocumentEdit24Regular /> </NIcon>
@@ -185,7 +166,7 @@ function handleHover(event: MouseEvent, uuid: string) {
                   quaternary
                   circle
                   :focusable="false"
-                  @click.stop="handledeleteHistory(item.uuid)"
+                  @click.stop="handledeleteRole(item.uuid)"
                 >
                   <template #icon>
                     <NIcon> <Delete24Regular /> </NIcon>
@@ -274,7 +255,7 @@ function handleHover(event: MouseEvent, uuid: string) {
       width: 80%;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      // gap: 5px;
       .title {
         display: flex;
         flex-direction: row;
@@ -291,17 +272,18 @@ function handleHover(event: MouseEvent, uuid: string) {
       }
       .info {
         position: relative;
+        height: min-content;
         .desc {
           position: absolute;
           font-size: 12px;
-          color: #9990;
+          color: #999;
           transition: color 0.1s;
         }
         .date {
-          position: absolute;
+          // position: absolute;
           text-align: right;
           font-size: 12px;
-          color: #999;
+          color: #9990;
           transition: color 0.1s;
         }
       }
@@ -319,10 +301,10 @@ function handleHover(event: MouseEvent, uuid: string) {
     &:hover {
       .content .info {
         .desc {
-          color: #999;
+          color: #9990;
         }
         .date {
-          color: #9990;
+          color: #999;
         }
       }
       .control {
