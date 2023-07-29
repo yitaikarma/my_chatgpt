@@ -92,9 +92,6 @@ export function useChat() {
 
     // 保存未记录的对话，否则只更新历史记录
     if (!isExist) {
-      // 设置第一个提问消息为标题
-      sessionStore.updateCurrentSessionAttr('title', messageList[1].content)
-
       sessionStore.updateCurrentSessionToHistory()
     } else {
       sessionStore.updateHistoryAttr(historyIndex, 'date', new Date().toLocaleString())

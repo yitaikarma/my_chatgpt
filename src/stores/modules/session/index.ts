@@ -117,8 +117,10 @@ export const useSessionStore = defineStore('session', {
 
     // 把当前对话增加到历史列表
     updateCurrentSessionToHistory(uuid?: string) {
-      this.role_collection[uuid || this.current_role_uuid].history_list.push({
-        ...this.role_collection[uuid || this.current_role_uuid].current,
+      const role_uuid = uuid || this.current_role_uuid
+      this.role_collection[role_uuid].history_list.push({
+        ...this.role_collection[role_uuid].current,
+        title: this.role_collection[role_uuid].current.message_list[1].content,
         // 以结束话题的时间作为日期
         date: new Date().toLocaleString()
       })
