@@ -1,5 +1,5 @@
 import { ref, toRef, watch } from 'vue'
-import { useSessionStore } from '@/stores/modules/chat'
+import { useSessionStore } from '@/stores/modules/session'
 import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 
