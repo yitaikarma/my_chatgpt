@@ -40,9 +40,13 @@ function toggleActive(flag = false) {
 
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
-  const messageList = sessionStore.getHistory(index)
-  sessionStore.updateCurrentRoleSession(messageList)
-  active.value = false
+  const sessions = sessionStore.getHistory(index)
+  const currentSession = sessionStore.getCurrentSession
+  const isExist = sessionStore.getHistoryList().some((item) => item.uuid === currentSession.uuid)
+  if (!isExist) {
+    sessionStore.updateCurrentSessionToHistory()
+  }
+  sessionStore.updateCurrentRoleSession(sessions)
   nextTick(() => {
     scrollToBottom('message_list', false)
   })
@@ -61,6 +65,7 @@ function handleEditHistoryItem(index: number) {
 
 // 删除历史话题
 function handledeleteHistory(uuid: string) {
+  // FIXME: 删除当前话题的历史时，切换话题会把当前话题当做新话题保存到历史中
   sessionStore.deleteHistory(uuid)
   message.success('删除成功')
 }
