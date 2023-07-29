@@ -80,7 +80,7 @@ export function useChat() {
   const seveMessage = () => {
     const messageList = sessionStore.getCurrentSessionAttr('message_list')
     const currentUuid = sessionStore.getCurrentSession.uuid
-    const historyList = sessionStore.getHistoryList
+    const historyList = sessionStore.getHistoryList()
     let historyIndex = 0
     const isExist = historyList.some((item, index) => {
       historyIndex = index

@@ -18,7 +18,7 @@ import { scrollToBottom } from '@/utils/operationElement'
 const message = useMessage()
 const { sessionStore } = useSession()
 
-const historyList = toRef(() => sessionStore.getHistoryList)
+const historyList = toRef(() => sessionStore.getHistoryList())
 const active = ref(false)
 const placement = ref<DrawerPlacement>('right')
 const editableIndex = ref(-1)
