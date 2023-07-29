@@ -5,12 +5,12 @@ import type { FormRules, FormInst, SelectOption } from 'naive-ui'
 import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 
 const roleConfigStore = useRoleConfigStore()
-const { role_list, current_role_name } = roleConfigStore
+const { role_list, current_role_uuid } = roleConfigStore
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const userConfigForm = ref({ ...role_list[current_role_name].chat_config })
+const userConfigForm = ref({ ...role_list[current_role_uuid].session_config })
 const rules: FormRules = {}
 const options: SelectOption[] = [
   {
@@ -68,7 +68,7 @@ function closeSettings() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      roleConfigStore.updateRoleConfig('chat_config', { ...userConfigForm.value })
+      roleConfigStore.updateRoleConfig('session_config', { ...userConfigForm.value })
       message.success('已保存')
     } else {
       console.log(errors)

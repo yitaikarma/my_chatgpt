@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { toRef, nextTick, onBeforeMount } from 'vue'
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
-import { useRoleConfigStore } from '@/stores/modules/roleConfig'
-import { useChatStore } from '@/stores/modules/chat'
+import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
+import { useSession } from '@/hooks/chat/core/useSession'
 import { useChat } from '@/views/chat/hooks/useChat'
+import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
-import { scrollToBottom } from '@/utils/operationElement'
 
 const settingsStore = useSettingsStore()
-const roleConfigStore = useRoleConfigStore()
-
-const chatStore = useChatStore()
-const { role_collection, currentRole } = storeToRefs(chatStore)
-
+const { roleConfigStore } = useRoleConfig()
+const { sessionStore } = useSession()
 const { initMessage } = useChat()
 
+// const { role_collection, current_role_uuid } = storeToRefs(sessionStore)
+
 let md: MarkdownIt | null = null
-const messageList = toRef(() => role_collection.value[currentRole.value].current.message_list)
+// const messageList = toRef(() => role_collection.value[current_role_uuid.value].current.message_list)
+const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
 const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigForAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigForAttr('role_nick'))
@@ -56,7 +56,7 @@ function renderMarkdown(text: string) {
       <div class="message" :user="item.role === 'user'">
         <div class="message_header">
           <div class="message_role">{{ item.role === 'user' ? userNick : roleNick }}</div>
-          <div class="message_time">{{ item.time }}</div>
+          <div class="message_time">{{ item.date }}</div>
         </div>
         <div class="message_content">
           <div v-if="item.role === 'user'" class="message_text">{{ item.content }}</div>
@@ -307,3 +307,4 @@ function renderMarkdown(text: string) {
   color: #8f68cd;
 }
 </style>
+@/hooks/chat/core/useSession

@@ -19,13 +19,13 @@ interface RequestMessage {
  * @param {role} string 角色
  * @param {name} string 昵称
  * @param {content} Content<string> 内容
- * @param {time} string 时间
+ * @param {date} string 时间
  */
 interface Message {
   role: string
   name?: string
   content: Content<string>
-  time?: string
+  date?: string
 }
 
 /**

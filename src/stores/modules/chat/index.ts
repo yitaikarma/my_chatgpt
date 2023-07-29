@@ -1,114 +1,138 @@
 import { defineStore } from 'pinia'
-import type { ChatStore, ChatHistory } from './types'
+import type { SessionStore, SessionHistory, RoleSession } from './types'
 
-export const useChatStore = defineStore('chat', {
-  state: (): ChatStore => ({
-    role_collection: {
-      role: {
-        current: {
-          title: '',
-          date: '',
-          message_list: [],
-          request_message_list: [],
-          uuid: ''
-        },
-        history_list: [
-          // {
-          //   title: '',
-          //   date: '',
-          //   message_list: [],
-          //   request_message_list: [],
-          //   uuid: ''
-          // }
-        ]
-      }
+export const useSessionStore = defineStore('session', {
+  state: (): SessionStore => ({
+    role_collection: {},
+    preset_role: {
+      uuid: '',
+      current: {
+        title: '',
+        date: '',
+        message_list: [],
+        request_message_list: [],
+        uuid: ''
+      },
+      history_list: []
     },
-    currentRole: 'role'
+    current_role_uuid: 'role'
   }),
+
   getters: {
-    getHistoryForAttr({ role_collection }) {
-      return <T extends keyof ChatHistory>(role: string, index: number, prop: T) => {
-        return role_collection[role].history_list[index][prop]
+    // 获取历史的某个属性
+    getHistoryAttr({ role_collection, current_role_uuid }) {
+      return <T extends keyof SessionHistory>(index: number, prop: T) => {
+        return role_collection[current_role_uuid].history_list[index][prop]
       }
     },
-    getHistoryForRole({ role_collection }) {
-      return (role: string, index: number) => {
-        return role_collection[role].history_list[index]
+
+    // 获取某个历史
+    getHistory({ role_collection, current_role_uuid }) {
+      return (index: number) => {
+        return role_collection[current_role_uuid].history_list[index]
       }
     },
-    getHistoryList({ role_collection }) {
-      return (role: string) => {
-        return role_collection[role].history_list
+
+    // 获取历史列表
+    getHistoryList({ role_collection, current_role_uuid }) {
+      return role_collection[current_role_uuid].history_list
+    },
+
+    // 获取当前会话属性
+    getCurrentSessionAttr({ role_collection, current_role_uuid }) {
+      return <T extends keyof SessionHistory>(prop: T) => {
+        return role_collection[current_role_uuid].current[prop]
       }
     },
-    getCurrentForAttr({ role_collection }) {
-      return <T extends keyof ChatHistory>(role: string, prop: T) => {
-        return role_collection[role].current[prop]
-      }
+
+    // 获取当前角色的当前会话
+    getCurrentSession({ role_collection, current_role_uuid }) {
+      return role_collection[current_role_uuid].current
     },
-    getCurrentForRole({ role_collection }) {
-      return (role: string) => {
-        return role_collection[role].current
-      }
+
+    // 获取某个角色会话
+    getRoleSession({ role_collection }) {
+      return (role_uuid: string) => role_collection[role_uuid]
     }
   },
+
   actions: {
-    // 设置历史的某个属性
-    setHistoryForAttr<T extends keyof ChatHistory>(
-      role: string,
+    // 更新历史的属性
+    updateHistoryAttr<T extends keyof SessionHistory>(
       index: number,
       prop: T,
-      data: ChatHistory[T]
+      data: SessionHistory[T]
     ) {
-      this.role_collection[role].history_list[index][prop] = data
+      this.role_collection[this.current_role_uuid].history_list[index][prop] = data
     },
-    // 设置历史
-    setHistoryForRole(role: string, index: number, history: ChatHistory) {
-      this.role_collection[role].history_list[index] = history
+
+    // 更新历史
+    updateHistory(index: number, history: SessionHistory) {
+      this.role_collection[this.current_role_uuid].history_list[index] = history
     },
+
     // 增加历史
-    pushHistoryForRole(role: string, history: ChatHistory) {
-      this.role_collection[role].history_list.push(history)
+    pushHistory(history: SessionHistory) {
+      this.role_collection[this.current_role_uuid].history_list.push(history)
     },
+
     // 删除历史
-    deleteHistoryItem(role: string, uuid: string) {
-      const index = this.role_collection[role].history_list.findIndex((item) => item.uuid === uuid)
-      this.role_collection[role].history_list.splice(index, 1)
+    deleteHistory(session_uuid: string) {
+      const index = this.role_collection[this.current_role_uuid].history_list.findIndex(
+        (item) => item.uuid === session_uuid
+      )
+
+      this.role_collection[this.current_role_uuid].history_list.splice(index, 1)
     },
-    // 清空历史
-    clearHistory(role: string) {
-      this.role_collection[role].history_list = []
+
+    // 清空角色的历史
+    clearRoleHistory() {
+      this.role_collection[this.current_role_uuid].history_list = []
     },
-    // 设置当前的某个属性
-    setCurrentForAttr<T extends keyof ChatHistory>(
-      role: string,
+
+    // 更新当前的某个属性
+    updateCurrentSessionAttr<T extends keyof SessionHistory>(
       prop: T,
-      data: ChatHistory[T] | ChatHistory[T][]
+      data: SessionHistory[T] | SessionHistory[T][]
     ) {
       if (Array.isArray(data)) {
-        // this[role].current[prop].push(data)
-        ;(this.role_collection[role].current[prop] as (Message | RequestMessage)[]).push(
-          ...(data as (Message | RequestMessage)[])
-        )
+        // this[uuid].current[prop].push(data)
+        ;(
+          this.role_collection[this.current_role_uuid].current[prop] as (Message | RequestMessage)[]
+        ).push(...(data as (Message | RequestMessage)[]))
       } else {
-        this.role_collection[role].current[prop] = data
+        this.role_collection[this.current_role_uuid].current[prop] = data
       }
     },
-    // 设置当前
-    setCurrentForRole(role: string, role_chat: ChatHistory) {
-      this.role_collection[role].current = role_chat
+
+    // 更新角色的当前会话
+    updateCurrentRoleSession(session: SessionHistory) {
+      this.role_collection[this.current_role_uuid].current = session
     },
+
     // 把当前对话增加到历史列表
-    setCurrentToHistory(role: string) {
-      this.role_collection[role].history_list.push({
-        ...this.role_collection[role].current,
+    updateCurrentSessionToHistory() {
+      this.role_collection[this.current_role_uuid].history_list.push({
+        ...this.role_collection[this.current_role_uuid].current,
         // 以结束话题的时间作为日期
         date: new Date().toLocaleString()
       })
+    },
+
+    // 更新当前角色UUID
+    updateCurrentRoleUUID(uuid: string) {
+      this.current_role_uuid = uuid
+    },
+
+    // 更新当前角色
+    updateCurrentRole(uuid: string, role: RoleSession) {
+      this.updateCurrentRoleUUID(uuid)
+      this.role_collection[this.current_role_uuid] = role
     }
   },
+
   persist: {
-    key: 'chat_list',
+    key: 'session_list',
     storage: localStorage
     // paths: ['history', 'current']
   }

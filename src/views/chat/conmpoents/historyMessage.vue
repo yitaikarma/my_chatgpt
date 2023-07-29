@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, toRef, nextTick, watch } from 'vue'
-import { storeToRefs } from 'pinia'
 import {
   useMessage,
   NButton,
@@ -13,14 +12,13 @@ import {
 } from 'naive-ui'
 import type { DrawerPlacement } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
-import { useChatStore } from '@/stores/modules/chat'
+import { useSession } from '@/hooks/chat/core/useSession'
 import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
-const chatStore = useChatStore()
-const { currentRole } = storeToRefs(chatStore)
+const { sessionStore } = useSession()
 
-const historyList = toRef(() => chatStore.getHistoryList(currentRole.value))
+const historyList = toRef(() => sessionStore.getHistoryList)
 const active = ref(false)
 const placement = ref<DrawerPlacement>('right')
 const editableIndex = ref(-1)
@@ -42,8 +40,8 @@ function toggleActive(flag = false) {
 
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
-  const messageList = chatStore.getHistoryForRole(currentRole.value, index)
-  chatStore.setCurrentForRole(currentRole.value, messageList)
+  const messageList = sessionStore.getHistory(index)
+  sessionStore.updateCurrentRoleSession(messageList)
   active.value = false
   nextTick(() => {
     scrollToBottom('message_list', false)
@@ -62,14 +60,14 @@ function handleEditHistoryItem(index: number) {
 }
 
 // 删除历史话题
-function handleDeleteHistoryItem(uuid: string) {
-  chatStore.deleteHistoryItem(currentRole.value, uuid)
+function handledeleteHistory(uuid: string) {
+  sessionStore.deleteHistory(uuid)
   message.success('删除成功')
 }
 
 // 清空历史话题
-function handleClearHistory() {
-  chatStore.clearHistory(currentRole.value)
+function handleclearRoleHistory() {
+  sessionStore.clearRoleHistory()
   message.success('清空成功')
 }
 </script>
@@ -89,7 +87,7 @@ function handleClearHistory() {
             secondary
             round
             :focusable="false"
-            @click.stop="handleClearHistory()"
+            @click.stop="handleclearRoleHistory()"
           >
             清空历史
           </NButton>
@@ -114,7 +112,7 @@ function handleClearHistory() {
                   autofocus
                   placeholder="请输入话题标题"
                   :value="item.title"
-                  @update:value="chatStore.setHistoryForAttr(currentRole, i, 'title', $event)"
+                  @update:value="sessionStore.updateHistoryAttr(i, 'title', $event)"
                   @blur="editableIndex = -1"
                   @click.stop
                 />
@@ -149,7 +147,7 @@ function handleClearHistory() {
                       quaternary
                       circle
                       :focusable="false"
-                      @click.stop="handleDeleteHistoryItem(item.uuid)"
+                      @click.stop="handledeleteHistory(item.uuid)"
                     >
                       <template #icon>
                         <NIcon> <Delete24Regular /> </NIcon>

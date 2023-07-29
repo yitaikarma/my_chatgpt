@@ -23,7 +23,7 @@ const { initMessage, clearMessage, seveMessage } = useChat()
 const settingsStore = useSettingsStore()
 
 const roleConfigStore = useRoleConfigStore()
-const { role_list, current_role } = storeToRefs(roleConfigStore)
+const { role_list, current_role_uuid } = storeToRefs(roleConfigStore)
 
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
@@ -223,7 +223,7 @@ function handleNewMessage() {
         <template #trigger>
           <NSelect
             size="small"
-            v-model:value="role_list[current_role].chat_config.model"
+            v-model:value="role_list[current_role_uuid].session_config.model"
             :options="options"
             :consistent-menu-width="false"
             style="border-radius: 100px"

@@ -1,4 +1,4 @@
-export interface ChatHistory {
+export interface SessionHistory {
   title: string
   date: string
   message_list: Message[]
@@ -6,14 +6,16 @@ export interface ChatHistory {
   uuid: string
 }
 
-export interface RoleOptions {
-  current: ChatHistory
-  history_list: ChatHistory[] | any[]
+export interface RoleSession {
+  uuid: string
+  current: SessionHistory
+  history_list: SessionHistory[] | any[]
 }
 
-export interface ChatStore {
+export interface SessionStore {
   role_collection: {
-    [role: string]: RoleOptions
+    [role: string]: RoleSession
   }
-  currentRole: string
+  preset_role: RoleSession
+  current_role_uuid: string
 }

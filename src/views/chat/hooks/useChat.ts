@@ -1,32 +1,24 @@
 import { ref, nextTick, watch } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
-// import { useUserSettingsStore } from '@/stores/modules/userSettings'
-import { useRoleConfigStore } from '@/stores/modules/roleConfig'
-import { useChatStore } from '@/stores/modules/chat/index'
+import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
+import { useSession } from '@/hooks/chat/core/useSession'
 import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
 import { Message } from '@vicons/tabler'
-import { useMessage } from 'naive-ui'
 
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
 const settingsStore = useSettingsStore()
-const chatStore = useChatStore()
-const { currentRole } = storeToRefs(chatStore)
-const roleConfigStore = useRoleConfigStore()
-// const message = useMessage()
+const { roleConfigStore } = useRoleConfig()
+const { sessionStore } = useSession()
 
 // let openai = null
 
 // FIXME: 状态管理，需要重新设计
 const requesting = ref<boolean>(false)
 const msgStatus = ref<string>('requesting')
-// 提示语
-const greetingsText = '任何问题都可以问我，我会尽力回答的。'
-const waitText = '正在绞尽脑汁...'
 // 用户问题
 const questionText = ref<string>('')
 
@@ -52,7 +44,7 @@ export function useChat() {
   const initMessage = () => {
     questionText.value = ''
     // FIXME: 是否初始化消息的逻辑待优化
-    if (!chatStore.getCurrentForAttr(currentRole.value, 'title')) {
+    if (!sessionStore.getCurrentSessionAttr('title')) {
       clearMessage()
     }
 
@@ -65,7 +57,7 @@ export function useChat() {
   const clearMessage = () => {
     const greetingsMessage = setChatMessage(
       'assistant',
-      greetingsText,
+      roleConfigStore.getRoleConfigForAttr('greetings_text'),
       roleConfigStore.getRoleConfigForAttr('role_nick')
     )
     const requestMessageList = setRequestMessage(
@@ -73,7 +65,7 @@ export function useChat() {
       roleConfigStore.getRoleConfigForAttr('role_directive')
     )
 
-    chatStore.setCurrentForRole(currentRole.value, {
+    sessionStore.updateCurrentRoleSession({
       uuid: generateUUIDUsingMathRandom(),
       title: greetingsMessage.content,
       date: new Date().toLocaleString(),
@@ -86,9 +78,9 @@ export function useChat() {
    * 保存消息
    */
   const seveMessage = () => {
-    const messageList = chatStore.getCurrentForAttr(currentRole.value, 'message_list')
-    const currentUuid = chatStore.getCurrentForRole(currentRole.value).uuid
-    const historyList = chatStore.getHistoryList(currentRole.value)
+    const messageList = sessionStore.getCurrentSessionAttr('message_list')
+    const currentUuid = sessionStore.getCurrentSession.uuid
+    const historyList = sessionStore.getHistoryList
     let historyIndex = 0
     const isExist = historyList.some((item, index) => {
       historyIndex = index
@@ -101,16 +93,11 @@ export function useChat() {
     // 保存未记录的对话，否则只更新历史记录
     if (!isExist) {
       // 设置第一个提问消息为标题
-      chatStore.setCurrentForAttr(currentRole.value, 'title', messageList[1].content)
+      sessionStore.updateCurrentSessionAttr('title', messageList[1].content)
 
-      chatStore.setCurrentToHistory(currentRole.value)
+      sessionStore.updateCurrentSessionToHistory()
     } else {
-      chatStore.setHistoryForAttr(
-        currentRole.value,
-        historyIndex,
-        'date',
-        new Date().toLocaleString()
-      )
+      sessionStore.updateHistoryAttr(historyIndex, 'date', new Date().toLocaleString())
     }
   }
 
@@ -162,7 +149,7 @@ export function useChat() {
         Authorization: `Bearer ${settingsStore.getConfigAttr('api_key')}`
       },
       body: JSON.stringify({
-        messages: chatStore.getCurrentForAttr(currentRole.value, 'request_message_list'),
+        messages: sessionStore.getCurrentSessionAttr('request_message_list'),
         model: roleConfigStore.getRoleConfigForAttr('model') || 'gpt-3.5-turbo',
         temperature: 0.5,
         max_tokens: 1000,
@@ -174,9 +161,7 @@ export function useChat() {
     fetch(settingsStore.getConfigAttr('api_url'), requestOptions)
       .then((response: Response) => {
         // FIXME: 当前消息赋值类型待优化
-        const currentMessage = chatStore
-          .getCurrentForAttr(currentRole.value, 'message_list')
-          .at(-1) || {
+        const currentMessage = sessionStore.getCurrentSessionAttr('message_list').at(-1) || {
           role: 'assistant',
           content: ''
         }
@@ -215,7 +200,7 @@ export function useChat() {
       role,
       content,
       name,
-      time: new Date().toLocaleString()
+      date: new Date().toLocaleString()
     }
   }
 
@@ -231,13 +216,13 @@ export function useChat() {
     // FIXME: 消息传输状态待优化
     const waitMessage: Message = setChatMessage(
       'assistant',
-      waitText,
+      roleConfigStore.getRoleConfigForAttr('wait_text'),
       roleConfigStore.getRoleConfigForAttr('role_nick')
     )
     const questionMessage: Message = setRequestMessage('user', questionText.value)
 
-    chatStore.setCurrentForAttr(currentRole.value, 'message_list', [userMessage, waitMessage])
-    chatStore.setCurrentForAttr(currentRole.value, 'request_message_list', [questionMessage])
+    sessionStore.updateCurrentSessionAttr('message_list', [userMessage, waitMessage])
+    sessionStore.updateCurrentSessionAttr('request_message_list', [questionMessage])
     questionText.value = ''
 
     nextTick(() => {
@@ -254,7 +239,7 @@ export function useChat() {
   const hookAfterReceiveMessage = (done: boolean, textDataList: any[], currentMessage: Message) => {
     if (done) {
       const message: Message = setRequestMessage('assistant', currentMessage.content)
-      chatStore.setCurrentForAttr(currentRole.value, 'request_message_list', [message])
+      sessionStore.updateCurrentSessionAttr('request_message_list', [message])
       // FIXME: 消息传输状态待优化
       msgStatus.value = 'requesting'
       requesting.value = false
