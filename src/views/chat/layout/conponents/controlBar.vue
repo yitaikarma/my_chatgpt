@@ -240,7 +240,7 @@ function handleNewMessage() {
 <style scoped lang="scss">
 .toolbar {
   width: 100%;
-  min-height: 30px;
+  // min-height: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
