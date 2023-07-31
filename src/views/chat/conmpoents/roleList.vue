@@ -195,10 +195,11 @@ function handledeleteRole(uuid: string) {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px;
   .content {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    // gap: 5px;
     .title {
       font-size: 16px;
       font-weight: 600;
