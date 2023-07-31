@@ -115,12 +115,12 @@ function handleThemeChange() {
   }
 }
 
-// 历史记录
+// 历史话题
 function handleOpenHistoryMessage() {
   historyMsgRef.value?.toggleActive(true)
 }
 
-// 新对话
+// 新话题
 function handleNewMessage() {
   seveMessage()
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
@@ -198,7 +198,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        对话记录
+        历史话题
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -215,7 +215,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        新对话
+        新话题
       </NTooltip>
     </NSpace>
     <NSpace>
