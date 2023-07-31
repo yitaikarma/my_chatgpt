@@ -5,6 +5,9 @@ export const useRoleConfigStore = defineStore('role_config', {
   state: (): RoleConfigStore => ({
     role_list: {},
     preset_role: {
+      sort: 0,
+      prev_role_uuid: '',
+      next_role_uuid: '',
       uuid: '',
       date: '',
       session_config: {
@@ -18,6 +21,8 @@ export const useRoleConfigStore = defineStore('role_config', {
         role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
       }
     },
+    first_role_uuid: '',
+    last_role_uuid: '',
     current_role_uuid: 'role'
   }),
 
@@ -78,14 +83,13 @@ export const useRoleConfigStore = defineStore('role_config', {
     },
 
     // 添加角色
-    addRole(role_name: string, config: RoleConfig) {
-      this.updateCurrentRoleUUID(role_name)
-      this.role_list[role_name] = config
+    addRole(uuid: string, config: RoleConfig) {
+      this.role_list[uuid] = config
     },
 
     // 删除角色
-    deleteRole(role_name: string) {
-      delete this.role_list[role_name]
+    deleteRole(uuid: string) {
+      delete this.role_list[uuid]
     },
 
     // 更新预设角色
@@ -96,6 +100,21 @@ export const useRoleConfigStore = defineStore('role_config', {
     // 更新当前角色UUID
     updateCurrentRoleUUID(uuid: string) {
       this.current_role_uuid = uuid
+    },
+
+    // 更新全局属性
+    updateGlobalAttr<T extends keyof RoleConfigStore>(prop: T, data: RoleConfigStore[T]) {
+      ;(this as any)[prop] = data
+    },
+
+    // 更新角色上一个角色UUID
+    updateRolePrevUUID(uuid: string, prev_uuid: string) {
+      this.role_list[uuid].prev_role_uuid = prev_uuid
+    },
+
+    // 更新角色下一个角色UUID
+    updateRoleNextUUID(uuid: string, next_uuid: string) {
+      this.role_list[uuid].next_role_uuid = next_uuid
     }
   },
 

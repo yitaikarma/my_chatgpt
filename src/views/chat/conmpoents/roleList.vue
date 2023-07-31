@@ -71,13 +71,32 @@ function handleRoleRename(index: number) {
 }
 
 // 删除角色
-function handledeleteRole(uuid: string) {
+function handledeleteRole(target_uuid: string) {
   // TODO:删除角色相关场景问题，和删除历史话题类似，需要考虑
   // TODO:删除当前角色，需要切换到上一个角色
   // TODO:删除最后一个角色，需要做相关处理
-  roleConfigStore.deleteRole(uuid)
-  sessionStore.deleteRole(uuid)
-  message.success('删除成功')
+  if (roleList.value.length >= 2) {
+    const { prev_role_uuid, next_role_uuid } = roleConfigStore.getRole(target_uuid)
+
+    // 如果删除当前角色，需要切换到下一个角色，如果没有下一个角色，切换到上一个角色
+    if (roleConfigStore.current_role_uuid === target_uuid) {
+      const toRoleUuid = next_role_uuid ? next_role_uuid : prev_role_uuid
+      handleChangeRole(toRoleUuid)
+    }
+
+    // 重新关联前后角色的uuid
+    prev_role_uuid && roleConfigStore.updateRoleNextUUID(prev_role_uuid, next_role_uuid)
+    next_role_uuid && roleConfigStore.updateRoleNextUUID(next_role_uuid, prev_role_uuid)
+    // 更新第一个角色和最后一个角色的uuid
+    prev_role_uuid || roleConfigStore.updateGlobalAttr('first_role_uuid', next_role_uuid)
+    next_role_uuid || roleConfigStore.updateGlobalAttr('last_role_uuid', prev_role_uuid)
+
+    roleConfigStore.deleteRole(target_uuid)
+    sessionStore.deleteRole(target_uuid)
+    message.success('删除成功')
+  } else {
+    message.warning('至少保留一个角色')
+  }
 }
 </script>
 
