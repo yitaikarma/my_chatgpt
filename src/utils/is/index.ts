@@ -55,3 +55,23 @@ export function isMap<T extends Map<any, any>>(value: T | unknown): value is T {
 export function isFile<T extends File>(value: T | unknown): value is T {
   return Object.prototype.toString.call(value) === '[object File]'
 }
+
+export function isBlob<T extends Blob>(value: T | unknown): value is T {
+  return Object.prototype.toString.call(value) === '[object Blob]'
+}
+
+export function isSymbol<T extends symbol>(value: T | unknown): value is T {
+  return Object.prototype.toString.call(value) === '[object Symbol]'
+}
+
+export function isBigInt<T extends bigint>(value: T | unknown): value is T {
+  return Object.prototype.toString.call(value) === '[object BigInt]'
+}
+
+export function isWindow<T extends Window>(value: T | unknown): value is T {
+  return Object.prototype.toString.call(value) === '[object Window]'
+}
+
+export function isDocument<T extends Document>(value: T | unknown): value is T {
+  return Object.prototype.toString.call(value) === '[object Document]'
+}
