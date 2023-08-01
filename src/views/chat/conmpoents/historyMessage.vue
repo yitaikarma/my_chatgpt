@@ -13,6 +13,7 @@ import {
 import type { DrawerPlacement } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useSession } from '@/hooks/chat/core/useSession'
+import { useAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
@@ -36,6 +37,17 @@ watch(editableIndex, (value) => {
 // 切换抽屉显示状态
 function toggleActive(flag = false) {
   active.value = flag
+
+  nextTick(() => {
+    useAnimation(
+      document.getElementById('history_list') as HTMLElement,
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      300
+    )
+  })
 }
 
 // 恢复历史话题
@@ -53,6 +65,14 @@ function handleRestoreTopic(index: number) {
   sessionStore.updateCurrentRoleSession(sessions)
 
   nextTick(() => {
+    useAnimation(
+      document.getElementById('message_list') as HTMLElement,
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      300
+    )
     scrollToBottom('message_list', false)
   })
 }
@@ -104,7 +124,7 @@ function handleclearRoleHistory() {
         </div>
       </template>
       <div class="history-message">
-        <div class="list">
+        <div id="history_list" class="list">
           <div
             class="list-item"
             v-for="(item, i) in historyList"

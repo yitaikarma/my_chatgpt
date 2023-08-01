@@ -4,6 +4,8 @@ import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
+import { useAnimation } from '@/hooks/useAnimation'
+
 import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
@@ -42,6 +44,9 @@ onBeforeMount(() => {
 function initRoleList() {
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
+  nextTick(() => {
+    scrollToBottom('message_list', false)
+  })
 }
 
 // 切换抽屉显示状态
@@ -54,6 +59,17 @@ function handleAddNewRole() {
   message.warning('暂未开放')
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
+  nextTick(() => {
+    useAnimation(
+      document.getElementById('message_list') as HTMLElement,
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      300
+    )
+    scrollToBottom('message_list', false)
+  })
 }
 
 // 切换角色
@@ -62,6 +78,14 @@ function handleChangeRole(uuid: string) {
   sessionStore.updateCurrentRoleUUID(uuid)
   roleConfigStore.updateCurrentRoleUUID(uuid)
   nextTick(() => {
+    useAnimation(
+      document.getElementById('message_list') as HTMLElement,
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      300
+    )
     scrollToBottom('message_list', false)
   })
 }

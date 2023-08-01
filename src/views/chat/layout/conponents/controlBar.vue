@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
+import { useAnimation } from '@/hooks/useAnimation'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
 import type { SelectOption } from 'naive-ui'
 import {
@@ -86,6 +87,32 @@ function handleStyleChange() {
   // )
   // 全局切换
   settingsStore.switchChatTheme()
+
+  nextTick(() => {
+    const messageListEl = document.querySelectorAll('.message_item[role="user"]')
+    for (let i = 0; i < messageListEl.length; i++) {
+      const element = messageListEl[i]
+      if (element.getAttribute('chatTheme') === 'Q&A') {
+        useAnimation(
+          element as HTMLElement,
+          [
+            { opacity: 0, transform: 'translateX(10px)' },
+            { opacity: 1, transform: 'translateX(0)' }
+          ],
+          300
+        )
+      } else {
+        useAnimation(
+          element as HTMLElement,
+          [
+            { opacity: 0, transform: 'translateX(-10px)' },
+            { opacity: 1, transform: 'translateX(0)' }
+          ],
+          300
+        )
+      }
+    }
+  })
 }
 
 // 主题切换

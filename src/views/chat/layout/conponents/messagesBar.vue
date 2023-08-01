@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/stores/modules/settings'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { useChat } from '@/views/chat/hooks/useChat'
+import { useAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
@@ -28,7 +29,15 @@ onBeforeMount(() => {
   md = useMarkdown()
   initMessage()
   nextTick(() => {
-    scrollToBottom('message_list', true)
+    useAnimation(
+      document.getElementById('message_list') as HTMLElement,
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ],
+      300
+    )
+    scrollToBottom('message_list', false)
   })
 })
 
@@ -39,8 +48,9 @@ function renderMarkdown(text: string) {
 </script>
 
 <template>
-  <div id="message_list" class="chat_history_container scroll">
+  <div id="message_list" class="message_container scroll">
     <div
+      id="message_item"
       class="message_item"
       :role="item.role"
       :chatTheme="chatTheme"
@@ -86,6 +96,10 @@ function renderMarkdown(text: string) {
   background-color: var(--color-scroll-thumb-bg);
   // transition: border-color 0.5s ease-out, background-color 0.5s ease-out;
 }
+
+.scroll::-webkit-scrollbar-corner {
+  background-color: var(--color-bg);
+}
 // .scroll::-webkit-scrollbar-track {
 //   background-color: #232425;
 // }
@@ -95,7 +109,8 @@ function renderMarkdown(text: string) {
   background-color: var(--color-scroll-thumb-bg);
 }
 
-.chat_history_container {
+.message_container {
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 20px 0;
   width: 100%;
@@ -107,6 +122,7 @@ function renderMarkdown(text: string) {
 }
 
 .message_item {
+  // content-visibility: auto;
   display: grid;
   /* grid-template-columns: 60px 700px 60px; */
   grid-template-columns: 60px 1fr 60px;
@@ -307,4 +323,3 @@ function renderMarkdown(text: string) {
   color: #8f68cd;
 }
 </style>
-@/hooks/chat/core/useSession
