@@ -297,11 +297,8 @@ function handledeleteRole(target_uuid: string) {
     & {
       --is-hide: initial;
     }
-    &:hover {
-      background-color: #3d3d50;
-    }
     &[cureent_session='true'] {
-      background-color: #3d3d50;
+      outline: 2px solid var(--color-msg-ctn-border-1);
     }
     .avatar {
       user-select: none;
@@ -372,6 +369,7 @@ function handledeleteRole(target_uuid: string) {
     }
 
     &:hover {
+      background-color: var(--color-bg-hover);
       .content .info {
         .desc {
           color: #9990;

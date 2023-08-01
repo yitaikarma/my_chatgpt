@@ -167,7 +167,7 @@ function handleclearRoleHistory() {
                       </template>
                     </NButton>
                   </template>
-                  编辑
+                  编辑标题
                 </NTooltip>
                 <NTooltip trigger="hover">
                   <template #trigger>
@@ -234,7 +234,7 @@ function handleclearRoleHistory() {
     border-radius: 5px;
     cursor: pointer;
     &:hover {
-      background-color: #3d3d50;
+      background-color: var(--color-bg-hover);
     }
     .content {
       width: 80%;

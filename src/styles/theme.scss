@@ -20,6 +20,7 @@
   --vt-c-blur-black: #23252b;
   --vt-c-blur-black-soft: #282831;
   --vt-c-blur-black-mute: #2c2e35;
+  --vt-c-blur-black-mute: #323541;
 
   --vt-c-indigo: #2c3e50;
 
@@ -78,6 +79,7 @@
   --color-bg: var(--vt-c-white);
   --color-bg-soft: var(--vt-c-white-soft);
   --color-bg-mute: var(--vt-c-white-mute);
+  --color-bg-hover: var(--vt-c-white-mute);
 
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
@@ -103,6 +105,7 @@
   --color-bg: var(--vt-c-black);
   --color-bg-soft: var(--vt-c-black-soft);
   --color-bg-mute: var(--vt-c-black-mute);
+  --color-bg-hover: var(--vt-c-black-mute);
 
   --color-border: var(--vt-c-divider-dark-2);
   --color-border-hover: var(--vt-c-divider-dark-1);
@@ -128,6 +131,7 @@
   --color-bg: var(--vt-c-shallow-black);
   --color-bg-soft: var(--vt-c-shallow-black-soft);
   --color-bg-mute: var(--vt-c-shallow-black-mute);
+  --color-bg-hover: var(--vt-c-shallow-black-mute);
 
   --color-border: var(--vt-c-divider-shallow-dark-2);
   --color-border-hover: var(--vt-c-divider-shallow-dark-1);
@@ -153,6 +157,7 @@
   --color-bg: var(--vt-c-blur-black);
   --color-bg-soft: var(--vt-c-blur-black-soft);
   --color-bg-mute: var(--vt-c-blur-black-mute);
+  --color-bg-hover: var(--vt-c-blur-black-mute);
 
   --color-border: var(--vt-c-divider-blue-dark-2);
   --color-border-hover: var(--vt-c-divider-blue-dark-1);
