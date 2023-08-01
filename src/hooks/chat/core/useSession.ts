@@ -31,7 +31,8 @@ export function useSession() {
         title: greetingsMessage.content,
         date: new Date().toLocaleString(),
         message_list: [greetingsMessage],
-        request_message_list: [requestMessageList]
+        request_message_list: [requestMessageList],
+        is_history: false
       },
       history_list: []
     })
