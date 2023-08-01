@@ -6,7 +6,7 @@ export const useSettingsStore = defineStore('settings', {
       theme: 'auto',
       api_base_url: 'https://api.finalvk.com',
       api_path: '/v1/chat/completions',
-      api_key: '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',
+      api_key: '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',
       model: 'gpt-3.5-turbo-16k',
       chat_theme: 'chat',
       user_nick: 'You',
