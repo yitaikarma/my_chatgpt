@@ -127,6 +127,9 @@ function renderMarkdown(text: string) {
   /* grid-template-columns: 60px 700px 60px; */
   grid-template-columns: 60px 1fr 60px;
   padding: 10px 20px;
+  border-color: transparent;
+  background-color: transparent;
+  transition: border-color 0.5s, border-bottom-color 0.5s, background-color 0.5s, color 0.5s;
 }
 
 .avatar {
@@ -204,7 +207,7 @@ function renderMarkdown(text: string) {
     color: #b9b9b9;
     color: var(--color-text);
     box-shadow: 0 0 10px #0000001a;
-    transition: background-color 0.5s, border-color 0.5s, color 0.5s, border-radius 0.5s;
+    transition: border-color 0.5s, border-radius 0.5s, background-color 0.5s, color 0.5s;
     .message_text {
       width: 100%;
     }
@@ -213,7 +216,6 @@ function renderMarkdown(text: string) {
 
 .message_item[role='user'] {
   justify-items: end;
-  transition: background-color 0.5s, border-color 0.5s, color 0.5s;
   .avatar {
     grid-column: 3;
     margin-left: 20px;
@@ -243,13 +245,13 @@ function renderMarkdown(text: string) {
 .message_item[chatTheme='Q&A'] {
   border-bottom: 1px solid var(--color-msg-ctn-border-1);
   .message_role {
-    display: none;
+    content-visibility: hidden;
   }
   .message_content {
-    transition: border-color 0.5s, color 0.5s, border-radius 0.5s;
-    border: initial;
+    transition: border-color 0.5s, border-radius 0.5s, background-color 0.5s, color 0.5s;
+    border-color: transparent;
     border-radius: initial;
-    background-color: initial;
+    background-color: transparent;
     box-shadow: none;
   }
 
@@ -257,6 +259,7 @@ function renderMarkdown(text: string) {
     justify-items: initial;
     border-bottom: 1px solid var(--color-msg-ctn-border-1);
     background-color: var(--color-msg-ctn-bg-1);
+    transition: border-color 0.5s, border-radius 0.5s, background-color 0.5s, color 0.5s;
     .avatar {
       grid-column: 1;
       margin-left: initial;
@@ -268,6 +271,14 @@ function renderMarkdown(text: string) {
       align-items: initial;
       .message_header {
         justify-content: initial;
+      }
+      .message_content {
+        transition: color 0.5s, border-radius 0.5s;
+        // border: initial;
+        border-color: transparent;
+        border-radius: initial;
+        background-color: transparent;
+        box-shadow: none;
       }
     }
   }
