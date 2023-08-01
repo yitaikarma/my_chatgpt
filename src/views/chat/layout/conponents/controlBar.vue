@@ -196,7 +196,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        风格
+        风格：{{ getSettingsAttr('chat_theme').toLocaleUpperCase() }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>

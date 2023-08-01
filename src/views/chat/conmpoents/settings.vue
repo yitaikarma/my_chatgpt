@@ -199,12 +199,8 @@ function cancelCallback() {
           <NFormItemGi span="24" path="role_remarks" label="角色备注">
             <NInput v-model:value="configForm.role_remarks" clearable placeholder="必填" />
           </NFormItemGi>
-          <NFormItemGridItem
-            span="24"
-            path="role_directive"
-            label="角色指令"
-            feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全"
-          >
+          <!-- feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全" -->
+          <NFormItemGridItem span="24" path="role_directive" label="角色指令">
             <NInput
               v-model:value="configForm.role_directive"
               type="textarea"

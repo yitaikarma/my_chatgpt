@@ -94,6 +94,7 @@ function handleChangeRole(uuid: string) {
   sessionStore.updateCurrentRoleUUID(uuid)
   roleConfigStore.updateCurrentRoleUUID(uuid)
 
+  // TODO: 逻辑可以封装到useAnimation中
   nextTick(() => {
     let counter = -1
 
