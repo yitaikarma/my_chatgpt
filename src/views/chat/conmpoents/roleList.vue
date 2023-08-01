@@ -56,7 +56,6 @@ function toggleActive(flag = false) {
 
 // 添加新角色
 function handleAddNewRole() {
-  message.warning('暂未开放')
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
   nextTick(() => {
