@@ -89,27 +89,37 @@ function handleStyleChange() {
   settingsStore.switchChatTheme()
 
   nextTick(() => {
-    const messageListEl = document.querySelectorAll('.message_item[role="user"]')
-    for (let i = 0; i < messageListEl.length; i++) {
+    let counter = -1
+
+    const messageListEl = document.querySelectorAll('.message_item')
+
+    const createAnimation = (element: HTMLElement, distance: number) => {
+      counter++
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateX(${distance}px)` },
+          { opacity: 1, transform: 'translateX(0)' }
+        ],
+        { duration: 300, delay: counter * 40 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    }
+
+    const messageElementLength = messageListEl.length
+
+    for (let i = 0; i < messageElementLength; i++) {
       const element = messageListEl[i]
+
       if (element.getAttribute('chatTheme') === 'Q&A') {
-        useAnimation(
-          element as HTMLElement,
-          [
-            { opacity: 0, transform: 'translateX(10px)' },
-            { opacity: 1, transform: 'translateX(0)' }
-          ],
-          300
-        )
+        createAnimation(element as HTMLElement, 20)
       } else {
-        useAnimation(
-          element as HTMLElement,
-          [
-            { opacity: 0, transform: 'translateX(-10px)' },
-            { opacity: 1, transform: 'translateX(0)' }
-          ],
-          300
-        )
+        if (element.getAttribute('role') === 'user') {
+          createAnimation(element as HTMLElement, -20)
+        } else {
+          createAnimation(element as HTMLElement, 20)
+        }
       }
     }
   })

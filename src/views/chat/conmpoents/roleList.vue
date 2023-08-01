@@ -60,14 +60,31 @@ function handleAddNewRole() {
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
   nextTick(() => {
-    useAnimation(
-      document.getElementById('message_list') as HTMLElement,
-      [
-        { opacity: 0, transform: 'translateY(10px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      300
-    )
+    let counter = -1
+
+    const messageListEl = document.querySelectorAll('.message_item')
+
+    const createAnimation = (element: HTMLElement, distance: number) => {
+      counter++
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateY(${distance}px)` },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        { duration: 300, delay: counter * 20 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    }
+
+    const messageElementLength = messageListEl.length
+
+    for (let i = 0; i < messageElementLength; i++) {
+      const element = messageListEl[i]
+
+      createAnimation(element as HTMLElement, 20)
+    }
     scrollToBottom('message_list', false)
   })
 }
@@ -77,15 +94,33 @@ function handleChangeRole(uuid: string) {
   if (uuid === roleConfigStore.current_role_uuid) return
   sessionStore.updateCurrentRoleUUID(uuid)
   roleConfigStore.updateCurrentRoleUUID(uuid)
+
   nextTick(() => {
-    useAnimation(
-      document.getElementById('message_list') as HTMLElement,
-      [
-        { opacity: 0, transform: 'translateY(10px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      300
-    )
+    let counter = -1
+
+    const messageListEl = document.querySelectorAll('.message_item')
+
+    const createAnimation = (element: HTMLElement, distance: number) => {
+      counter++
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateY(${distance}px)` },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        { duration: 300, delay: counter * 20 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    }
+
+    const messageElementLength = messageListEl.length
+
+    for (let i = 0; i < messageElementLength; i++) {
+      const element = messageListEl[i]
+
+      createAnimation(element as HTMLElement, 20)
+    }
     scrollToBottom('message_list', false)
   })
 }
