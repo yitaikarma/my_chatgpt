@@ -79,12 +79,6 @@ function handleOpenRoleSettings() {
 
 // 风格切换
 function handleStyleChange() {
-  // 角色切换
-  // userSettingsStore.setConfigForAttr(
-  //   'a',
-  //   'chat_theme',
-  //   chat.value.a.chat_theme === 'chat' ? 'Q&A' : 'chat'
-  // )
   // 全局切换
   settingsStore.switchChatTheme()
 
@@ -95,13 +89,14 @@ function handleStyleChange() {
 
     const createAnimation = (element: HTMLElement, distance: number) => {
       counter++
+
       useAnimation(
         element,
         [
           { opacity: 0, transform: `translateX(${distance}px)` },
           { opacity: 1, transform: 'translateX(0)' }
         ],
-        { duration: 300, delay: counter * 40 },
+        { duration: 300, delay: counter * 30 },
         () => (element.style.opacity = '0'),
         () => (element.style.opacity = 'initial')
       )
