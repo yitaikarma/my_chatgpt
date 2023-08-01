@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
 import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
-import { DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
+import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { scrollToBottom } from '@/utils/operationElement'
@@ -106,16 +106,9 @@ function handledeleteRole(target_uuid: string) {
       <div class="title">角色列表</div>
       <div class="desc">{{ `${roleList.length}个角色` }}</div>
     </div>
-    <NButton
-      size="small"
-      type="default"
-      secondary
-      round
-      :focusable="false"
-      @click="handleAddNewRole"
-    >
+    <NButton size="small" type="default" secondary :focusable="false" @click="handleAddNewRole">
       <template #icon>
-        <NIcon> <DocumentEdit24Regular /> </NIcon>
+        <NIcon> <AddCircle24Regular /> </NIcon>
       </template>
       新角色
     </NButton>
