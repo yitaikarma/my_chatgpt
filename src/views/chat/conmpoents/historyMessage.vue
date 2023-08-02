@@ -10,7 +10,6 @@ import {
   NTooltip,
   NInput
 } from 'naive-ui'
-import type { DrawerPlacement } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { useAnimation } from '@/hooks/useAnimation'
@@ -21,7 +20,6 @@ const { sessionStore } = useSession()
 
 const historyList = toRef(() => sessionStore.getHistoryList())
 const active = ref(false)
-const placement = ref<DrawerPlacement>('right')
 const editableIndex = ref(-1)
 
 defineExpose({ toggleActive })
@@ -38,16 +36,48 @@ watch(editableIndex, (value) => {
 function toggleActive(flag = false) {
   active.value = flag
 
-  nextTick(() => {
+  if (flag) {
+    nextTick(() => {
+      const messageListEl = document.querySelectorAll('.history_item')
+
+      const createAnimation = (element: HTMLElement) => {
+        element.style.opacity = '0'
+      }
+
+      const messageElementLength = messageListEl.length
+      for (let i = 0; i < messageElementLength; i++) {
+        const element = messageListEl[i] as HTMLElement
+        createAnimation(element)
+      }
+    })
+  }
+}
+
+// 打开历史消息抽屉后
+function handleAfterEnter() {
+  let counter = -1
+  const messageListEl = document.querySelectorAll('.history_item')
+
+  const createAnimation = (element: HTMLElement, distance: number) => {
+    counter++
+
     useAnimation(
-      document.getElementById('history_list') as HTMLElement,
+      element,
       [
-        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 0, transform: `translateY(${distance}px)` },
         { opacity: 1, transform: 'translateY(0)' }
       ],
-      300
+      { duration: 300, delay: counter * 20 },
+      () => {},
+      () => (element.style.opacity = 'initial')
     )
-  })
+  }
+
+  const messageElementLength = messageListEl.length
+  for (let i = 0; i < messageElementLength; i++) {
+    const element = messageListEl[i] as HTMLElement
+    createAnimation(element, 20)
+  }
 }
 
 // 恢复历史话题
@@ -65,23 +95,51 @@ function handleRestoreTopic(index: number) {
   sessionStore.updateCurrentRoleSession(sessions)
 
   nextTick(() => {
-    useAnimation(
-      document.getElementById('message_list') as HTMLElement,
-      [
-        { opacity: 0, transform: 'translateY(10px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      300
-    )
     scrollToBottom('message_list', false)
+
+    let counter = -1
+    const messageListEl = document.querySelectorAll('.message_item')
+
+    const createAnimation = (element: HTMLElement, distance: number) => {
+      counter++
+
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateX(${distance}px)` },
+          { opacity: 1, transform: 'translateX(0)' }
+        ],
+        { duration: 300, delay: counter * 30 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    }
+
+    const messageElementLength = messageListEl.length
+
+    for (let i = 0; i < messageElementLength; i++) {
+      const element = messageListEl[i]
+
+      if (element.getAttribute('chatTheme') === 'Q&A') {
+        createAnimation(element as HTMLElement, 20)
+      } else {
+        if (element.getAttribute('role') === 'user') {
+          createAnimation(element as HTMLElement, -20)
+        } else {
+          createAnimation(element as HTMLElement, 20)
+        }
+      }
+    }
   })
 }
 
+// 点击输入框外，取消编辑状态
 const inputCallback = () => {
   if (editableIndex.value !== -1) {
     editableIndex.value = -1
   }
 }
+
 // 编辑历史话题
 function handleEditHistoryItem(index: number) {
   editableIndex.value = editableIndex.value === -1 ? index : -1
@@ -103,8 +161,14 @@ function handleclearRoleHistory() {
 </script>
 
 <template>
-  <NDrawer v-model:show="active" :width="400" :height="200" :placement="placement">
-    <NDrawerContent title="历史话题">
+  <NDrawer
+    v-model:show="active"
+    :width="400"
+    :height="200"
+    placement="right"
+    :on-after-enter="handleAfterEnter"
+  >
+    <NDrawerContent title="历史话题" :native-scrollbar="false">
       <template #header>
         <div class="drawer_header">
           <div class="content">
@@ -123,10 +187,10 @@ function handleclearRoleHistory() {
           </NButton>
         </div>
       </template>
-      <div class="history-message">
-        <div id="history_list" class="list">
+      <div class="history_container">
+        <div id="history_list" class="history_list">
           <div
-            class="list-item"
+            class="history_item"
             v-for="(item, i) in historyList"
             :key="i"
             @click="handleRestoreTopic(i)"
@@ -151,7 +215,7 @@ function handleclearRoleHistory() {
             </div>
             <!-- TODO:调整为hover显示 -->
             <div class="control">
-              <NSpace :size="4">
+              <NSpace :size="4" :wrap="false">
                 <NTooltip trigger="hover">
                   <template #trigger>
                     <NButton
@@ -220,13 +284,13 @@ function handleclearRoleHistory() {
     }
   }
 }
-.history-message {
-  .list {
+.history_container {
+  .history_list {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
-  .list-item {
+  .history_item {
     display: flex;
     flex-direction: row;
     gap: 5px;
