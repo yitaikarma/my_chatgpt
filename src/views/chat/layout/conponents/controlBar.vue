@@ -243,4 +243,3 @@ function handleNewMessage() {
   border-radius: 100px;
 }
 </style>
-@/stores/modules/globalConfig/settings

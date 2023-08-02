@@ -366,4 +366,3 @@ function renderMarkdown(text: string) {
   color: #8f68cd;
 }
 </style>
-@/stores/modules/globalConfig/settings
