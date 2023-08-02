@@ -155,7 +155,7 @@ function handledeleteRole(target_uuid: string) {
         </div>
         <div class="control">
           <NSpace :size="4">
-            <NTooltip trigger="hover">
+            <NTooltip trigger="hover" :delay="1000">
               <template #trigger>
                 <NButton
                   size="small"
@@ -172,7 +172,7 @@ function handledeleteRole(target_uuid: string) {
               </template>
               编辑
             </NTooltip>
-            <NTooltip trigger="hover">
+            <NTooltip trigger="hover" :delay="1000">
               <template #trigger>
                 <NButton
                   size="small"

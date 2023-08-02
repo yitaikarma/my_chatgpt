@@ -216,7 +216,7 @@ function handleclearRoleHistory() {
             <!-- TODO:调整为hover显示 -->
             <div class="control">
               <NSpace :size="4" :wrap="false">
-                <NTooltip trigger="hover">
+                <NTooltip trigger="hover" :delay="1000">
                   <template #trigger>
                     <NButton
                       size="small"
@@ -233,7 +233,7 @@ function handleclearRoleHistory() {
                   </template>
                   编辑标题
                 </NTooltip>
-                <NTooltip trigger="hover">
+                <NTooltip trigger="hover" :delay="1000">
                   <template #trigger>
                     <NButton
                       size="small"

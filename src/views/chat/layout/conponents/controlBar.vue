@@ -122,7 +122,7 @@ function handleNewMessage() {
 <template>
   <div class="toolbar">
     <NSpace>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             ghost
@@ -139,7 +139,7 @@ function handleNewMessage() {
         </template>
         角色设置
       </NTooltip>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             ghost
@@ -156,7 +156,7 @@ function handleNewMessage() {
         </template>
         布局：{{ currentChatThemeName }}
       </NTooltip>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             ghost
@@ -173,7 +173,7 @@ function handleNewMessage() {
         </template>
         主题：{{ currentThemeName }}
       </NTooltip>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             ghost
@@ -190,7 +190,7 @@ function handleNewMessage() {
         </template>
         历史话题
       </NTooltip>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             ghost
@@ -209,7 +209,7 @@ function handleNewMessage() {
       </NTooltip>
     </NSpace>
     <NSpace>
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NSelect
             size="small"

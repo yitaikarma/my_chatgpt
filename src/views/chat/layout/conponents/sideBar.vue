@@ -2,8 +2,8 @@
 import Settings from '@/views/chat/conmpoents/settings.vue'
 import RoleList from '@/views/chat/conmpoents/roleList.vue'
 import { ref } from 'vue'
+import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { Settings24Regular } from '@vicons/fluent'
-import { NIcon, NTooltip } from 'naive-ui'
 
 const settingsRef = ref<InstanceType<typeof Settings> | null>(null)
 
@@ -17,7 +17,7 @@ function handleChangeSettingsDisplay() {
   <div class="side_wrapper">
     <RoleList />
     <div class="utils_nav">
-      <NTooltip trigger="hover">
+      <NTooltip trigger="hover" :delay="1000">
         <template #trigger>
           <NButton
             size="large"
