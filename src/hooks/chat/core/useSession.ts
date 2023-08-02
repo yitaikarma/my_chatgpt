@@ -24,6 +24,7 @@ export function useSession() {
     }
 
     // 更新角色当前会话
+    sessionStore.updateCurrentRoleUUID(role_uuid)
     sessionStore.updateCurrentRole(role_uuid, {
       uuid: role_uuid,
       current: {
