@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import {
   NForm,
   NFormItemGi,
@@ -98,6 +98,13 @@ const options: SelectOption[] = [
   }
 ]
 
+watchEffect(
+  () => {
+    configForm.value = { ...settingsStore.config }
+  },
+  { flush: 'post' }
+)
+
 defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
@@ -107,6 +114,11 @@ function openSettings() {
 
 function closeSettings() {
   showModal.value = false
+  configForm.value = { ...settingsStore.config }
+}
+
+function cancelCallback() {
+  closeSettings()
 }
 
 function submitCallback() {
@@ -119,10 +131,6 @@ function submitCallback() {
       message.error('验证失败')
     }
   })
-}
-
-function cancelCallback() {
-  closeSettings()
 }
 </script>
 <template>

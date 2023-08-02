@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, toRef, watchEffect } from 'vue'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst, SelectOption } from 'naive-ui'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
@@ -9,7 +9,7 @@ const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const userConfigForm = ref({ ...roleConfigStore.getRoleAttr('session_config') })
+const userConfigForm = toRef({ ...roleConfigStore.getRoleAttr('session_config') })
 const rules: FormRules = {}
 const options: SelectOption[] = [
   {
@@ -53,7 +53,12 @@ const options: SelectOption[] = [
     disabled: true
   }
 ]
-
+watchEffect(
+  () => {
+    userConfigForm.value = { ...roleConfigStore.getRoleAttr('session_config') }
+  },
+  { flush: 'post' }
+)
 defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
@@ -62,6 +67,11 @@ function openSettings() {
 
 function closeSettings() {
   showModal.value = false
+  userConfigForm.value = { ...roleConfigStore.getRoleAttr('session_config') }
+}
+
+function cancelCallback() {
+  closeSettings()
 }
 
 function submitCallback() {
@@ -74,10 +84,6 @@ function submitCallback() {
       message.error('验证失败')
     }
   })
-}
-
-function cancelCallback() {
-  closeSettings()
 }
 </script>
 <template>
