@@ -79,7 +79,7 @@ function handledeleteRole(target_uuid: string) {
       <div class="title">角色列表</div>
       <div class="desc">{{ `${roleList.length}个角色` }}</div>
     </div>
-    <NButton size="small" type="default" secondary :focusable="false" @click="handleAddNewRole">
+    <NButton size="small" ghost type="primary" :focusable="false" @click="handleAddNewRole">
       <template #icon>
         <NIcon> <AddCircle24Regular /> </NIcon>
       </template>
