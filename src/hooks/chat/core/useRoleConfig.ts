@@ -14,23 +14,23 @@ export function useRoleConfig() {
       uuid: newUuid,
       prev_role_uuid: '',
       next_role_uuid: '',
-      sort: Object.keys(roleConfigStore.role_list).length + 1,
+      sort: roleConfigStore.role_list.length + 1,
       date: new Date().toLocaleString(),
       session_config: roleConfigStore.getPresetRole.session_config
     }
 
     roleConfigStore.updateCurrentRoleUUID(newUuid)
-    roleConfigStore.addRole(newUuid, newRole)
+    roleConfigStore.addRole(newRole)
 
     // 关联前后角色的UUID
-    if (Object.keys(roleConfigStore.role_list).length >= 2) {
-      const { uuid } = roleConfigStore.role_list[roleConfigStore.last_role_uuid]
+    if (roleConfigStore.role_list.length >= 2) {
+      const { uuid } = roleConfigStore.getRole(roleConfigStore.last_role_uuid)
       roleConfigStore.updateRoleNextUUID(uuid, newUuid)
       roleConfigStore.updateRolePrevUUID(newUuid, uuid)
     }
 
     // 如果没有第一个角色，或者只有一个角色，那么新角色就是第一个角色. 否则，新角色就是最后一个角色
-    if (!roleConfigStore.first_role_uuid && Object.keys(roleConfigStore.role_list).length <= 1) {
+    if (!roleConfigStore.first_role_uuid && roleConfigStore.role_list.length <= 1) {
       roleConfigStore.updateGlobalAttr('first_role_uuid', newUuid)
     }
     roleConfigStore.updateGlobalAttr('last_role_uuid', newUuid)

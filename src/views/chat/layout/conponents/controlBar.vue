@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
-import { nextTick, ref } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref, computed, nextTick } from 'vue'
 import { useSettingsStore } from '@/stores/modules/settings'
-import { useRoleConfigStore } from '@/stores/modules/roleConfig'
+import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useAnimation } from '@/hooks/useAnimation'
@@ -23,11 +22,15 @@ const { initMessage, clearMessage, seveMessage } = useChat()
 
 const settingsStore = useSettingsStore()
 
-const roleConfigStore = useRoleConfigStore()
-const { role_list, current_role_uuid } = storeToRefs(roleConfigStore)
+const { roleConfigStore } = useRoleConfig()
 
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
+
+const sessionConfigModel = computed({
+  get: () => roleConfigStore.getRoleConfigAttr('model'),
+  set: (value) => roleConfigStore.updateRoleConfigAttr('model', value)
+})
 
 const options: SelectOption[] = [
   {
@@ -255,7 +258,7 @@ function handleNewMessage() {
         <template #trigger>
           <NSelect
             size="small"
-            v-model:value="role_list[current_role_uuid].session_config.model"
+            v-model:value="sessionConfigModel"
             :options="options"
             :consistent-menu-width="false"
             style="border-radius: 100px"

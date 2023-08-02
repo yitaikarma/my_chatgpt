@@ -12,13 +12,9 @@ const message = useMessage()
 const { roleConfigStore, addNewRole } = useRoleConfig()
 const { sessionStore, initRoleSession } = useSession()
 
-const roleList = toRef(() =>
-  Object.values(roleConfigStore.getRoleList).sort((a, b) => a.sort - b.sort)
-)
+const roleList = toRef(() => roleConfigStore.getRoleList)
 const active = ref(false)
 const editableIndex = ref(-1)
-
-defineExpose({ toggleActive })
 
 watch(editableIndex, (value) => {
   if (value !== -1) {
@@ -28,11 +24,7 @@ watch(editableIndex, (value) => {
   }
 })
 
-const inputCallback = () => {
-  if (editableIndex.value !== -1) {
-    editableIndex.value = -1
-  }
-}
+defineExpose({ toggleActive })
 
 onBeforeMount(() => {
   if (roleList.value.length === 0) {
@@ -40,10 +32,17 @@ onBeforeMount(() => {
   }
 })
 
+const inputCallback = () => {
+  if (editableIndex.value !== -1) {
+    editableIndex.value = -1
+  }
+}
+
 // 初始化角色列表
 function initRoleList() {
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
+
   nextTick(() => {
     scrollToBottom('message_list', false)
   })
@@ -58,6 +57,7 @@ function toggleActive(flag = false) {
 function handleAddNewRole() {
   addNewRole()
   initRoleSession(roleConfigStore.current_role_uuid)
+
   nextTick(() => {
     let counter = -1
 
@@ -137,18 +137,18 @@ function handledeleteRole(target_uuid: string) {
   if (roleList.value.length >= 2) {
     const { prev_role_uuid, next_role_uuid } = roleConfigStore.getRole(target_uuid)
 
-    // 如果删除当前角色，需要切换到下一个角色，如果没有下一个角色，切换到上一个角色
-    if (roleConfigStore.current_role_uuid === target_uuid) {
-      const toRoleUuid = next_role_uuid ? next_role_uuid : prev_role_uuid
-      handleChangeRole(toRoleUuid)
-    }
-
     // 重新关联前后角色的uuid
     prev_role_uuid && roleConfigStore.updateRoleNextUUID(prev_role_uuid, next_role_uuid)
     next_role_uuid && roleConfigStore.updateRolePrevUUID(next_role_uuid, prev_role_uuid)
     // 更新第一个角色和最后一个角色的uuid
     prev_role_uuid || roleConfigStore.updateGlobalAttr('first_role_uuid', next_role_uuid)
     next_role_uuid || roleConfigStore.updateGlobalAttr('last_role_uuid', prev_role_uuid)
+
+    // 如果删除当前角色，需要切换到下一个角色，如果没有下一个角色，切换到上一个角色
+    if (roleConfigStore.current_role_uuid === target_uuid) {
+      const toRoleUuid = next_role_uuid ? next_role_uuid : prev_role_uuid
+      handleChangeRole(toRoleUuid)
+    }
 
     roleConfigStore.deleteRole(target_uuid)
     sessionStore.deleteRole(target_uuid)
@@ -195,7 +195,7 @@ function handledeleteRole(target_uuid: string) {
               autofocus
               placeholder="请输入话题标题"
               :value="item.session_config.role_nick"
-              @update:value="roleConfigStore.updateRoleAttrAttr('role_nick', $event, item.uuid)"
+              @update:value="roleConfigStore.updateRoleConfigAttr('role_nick', $event, item.uuid)"
               @blur="editableIndex = -1"
               @click.stop
             />

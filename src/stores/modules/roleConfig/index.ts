@@ -3,7 +3,7 @@ import type { RoleConfigStore, RoleConfig, RoleChatConfig } from './types'
 
 export const useRoleConfigStore = defineStore('role_config', {
   state: (): RoleConfigStore => ({
-    role_list: {},
+    role_list: [],
     preset_role: {
       sort: 0,
       prev_role_uuid: '',
@@ -27,28 +27,34 @@ export const useRoleConfigStore = defineStore('role_config', {
   }),
 
   getters: {
+    // 获取角色索引
+    getRoleIndex({ role_list, current_role_uuid }) {
+      return (uuid?: string) =>
+        role_list.findIndex((role) => role.uuid === (uuid || current_role_uuid))
+    },
+
     // 获取角色配置的某个属性
-    getRoleConfigAttr({ role_list, current_role_uuid }) {
+    getRoleConfigAttr({ role_list }) {
       return (configProp: keyof RoleChatConfig, uuid?: string) => {
-        return role_list[uuid || current_role_uuid].session_config[configProp]
+        const index = this.getRoleIndex(uuid)
+        return role_list[index].session_config[configProp]
       }
     },
 
     // 获取角色的某个属性
-    getRoleAttr({ role_list, current_role_uuid }) {
-      return (prop: keyof RoleConfig, uuid?: string) => {
-        return role_list[uuid || current_role_uuid][prop]
+    getRoleAttr({ role_list }) {
+      return <T extends keyof RoleConfig>(prop: T, uuid?: string): RoleConfig[T] => {
+        const index = this.getRoleIndex(uuid)
+        return role_list[index][prop]
       }
     },
 
-    // 获取角色
+    // 获取角色,默认当前角色
     getRole({ role_list }) {
-      return (uuid: string) => role_list[uuid]
-    },
-
-    // 获取当前角色
-    getCurrentRole({ role_list, current_role_uuid }) {
-      return role_list[current_role_uuid]
+      return (uuid?: string) => {
+        const index = this.getRoleIndex(uuid)
+        return role_list[index]
+      }
     },
 
     // 获取角色列表
@@ -64,32 +70,49 @@ export const useRoleConfigStore = defineStore('role_config', {
 
   actions: {
     // 更新角色配置的某个属性
-    updateRoleAttrAttr<T extends keyof RoleChatConfig>(
+    updateRoleConfigAttr<T extends keyof RoleChatConfig>(
       config_prop: T,
       value: RoleChatConfig[T],
       uuid?: string
     ) {
-      this.role_list[uuid || this.current_role_uuid].session_config[config_prop] = value
+      const index = this.getRoleIndex(uuid)
+      this.role_list[index].session_config[config_prop] = value
     },
 
     // 更新角色的某个属性
     updateRoleAttr<T extends keyof RoleConfig>(prop: T, data: RoleConfig[T], uuid?: string) {
-      this.role_list[uuid || this.current_role_uuid][prop] = data
+      const index = this.getRoleIndex(uuid)
+      this.role_list[index][prop] = data
+    },
+
+    // 更新角色上一个角色UUID
+    updateRolePrevUUID(uuid: string, prev_uuid: string) {
+      const index = this.getRoleIndex(uuid)
+      this.role_list[index].prev_role_uuid = prev_uuid
+    },
+
+    // 更新角色下一个角色UUID
+    updateRoleNextUUID(uuid: string, next_uuid: string) {
+      const index = this.getRoleIndex(uuid)
+      this.role_list[index].next_role_uuid = next_uuid
     },
 
     // 更新角色
     updateRole(config: RoleConfig, uuid?: string) {
-      this.role_list[uuid || this.current_role_uuid] = config
+      const index = this.getRoleIndex(uuid)
+      this.role_list[index] = config
     },
 
     // 添加角色
-    addRole(uuid: string, config: RoleConfig) {
-      this.role_list[uuid] = config
+    addRole(config: RoleConfig) {
+      this.role_list.push(config)
     },
 
     // 删除角色
     deleteRole(uuid: string) {
-      delete this.role_list[uuid]
+      const index = this.getRoleIndex(uuid)
+      // delete this.role_list[index]
+      this.role_list.splice(index, 1)
     },
 
     // 更新预设角色
@@ -105,16 +128,6 @@ export const useRoleConfigStore = defineStore('role_config', {
     // 更新全局属性
     updateGlobalAttr<T extends keyof RoleConfigStore>(prop: T, data: RoleConfigStore[T]) {
       ;(this as any)[prop] = data
-    },
-
-    // 更新角色上一个角色UUID
-    updateRolePrevUUID(uuid: string, prev_uuid: string) {
-      this.role_list[uuid].prev_role_uuid = prev_uuid
-    },
-
-    // 更新角色下一个角色UUID
-    updateRoleNextUUID(uuid: string, next_uuid: string) {
-      this.role_list[uuid].next_role_uuid = next_uuid
     }
   },
 

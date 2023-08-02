@@ -2,15 +2,14 @@
 import { ref } from 'vue'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst, SelectOption } from 'naive-ui'
-import { useRoleConfigStore } from '@/stores/modules/roleConfig'
+import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 
-const roleConfigStore = useRoleConfigStore()
-const { role_list, current_role_uuid } = roleConfigStore
+const { roleConfigStore } = useRoleConfig()
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const userConfigForm = ref({ ...role_list[current_role_uuid].session_config })
+const userConfigForm = ref({ ...roleConfigStore.getRoleAttr('session_config') })
 const rules: FormRules = {}
 const options: SelectOption[] = [
   {

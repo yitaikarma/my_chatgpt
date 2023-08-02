@@ -19,9 +19,10 @@ export interface RoleConfig {
 }
 
 export interface RoleConfigStore {
-  role_list: {
-    [uuid: string]: RoleConfig
-  }
+  // role_list: {
+  //   [uuid: string]: RoleConfig
+  // }
+  role_list: RoleConfig[]
   preset_role: RoleConfig
   first_role_uuid: string
   last_role_uuid: string
