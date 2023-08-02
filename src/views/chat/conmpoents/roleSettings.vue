@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, toRef, watchEffect } from 'vue'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
-import type { FormRules, FormInst, SelectOption } from 'naive-ui'
+import type { FormRules, FormInst } from 'naive-ui'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
+import { useSettingsStore } from '@/stores/modules/settings'
+
+const settingsStore = useSettingsStore()
 
 const { roleConfigStore } = useRoleConfig()
 const message = useMessage()
@@ -11,48 +14,7 @@ const formRef = ref<FormInst | null>()
 const showModal = ref(false)
 const userConfigForm = toRef({ ...roleConfigStore.getRoleAttr('session_config') })
 const rules: FormRules = {}
-const options: SelectOption[] = [
-  {
-    label: 'GPT-3.5',
-    value: 'gpt-3.5'
-  },
-  {
-    label: 'GPT-3.5-Turbo',
-    value: 'gpt-3.5-turbo'
-  },
-  {
-    label: 'GPT-3.5-Turbo-0613',
-    value: 'gpt-3.5-turbo-0613'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k',
-    value: 'gpt-3.5-turbo-16k'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k-0613',
-    value: 'gpt-3.5-turbo-16k-0613'
-  },
-  {
-    label: 'GPT-4',
-    value: 'gpt-4',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-0613',
-    value: 'gpt-4-0613',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k',
-    value: 'gpt-4-32k',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k-0613',
-    value: 'gpt-4-32k-0613',
-    disabled: true
-  }
-]
+const modelOptions = settingsStore.model_options
 watchEffect(
   () => {
     userConfigForm.value = { ...roleConfigStore.getRoleAttr('session_config') }
@@ -113,12 +75,7 @@ function submitCallback() {
       >
         <NGrid cols="24" y-gap="10">
           <NFormItemGi span="24" path="model" label="模型">
-            <NSelect
-              v-model:value="userConfigForm.model"
-              :options="options"
-              clearable
-              placeholder="必填"
-            />
+            <NSelect v-model:value="userConfigForm.model" :options="modelOptions" />
           </NFormItemGi>
           <NFormItemGi span="24" path="user_nick" label="用户昵称">
             <NInput v-model:value="userConfigForm.user_nick" clearable placeholder="必填" />

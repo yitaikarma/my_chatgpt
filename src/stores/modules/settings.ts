@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
+import type { GloablState, GloablConfig, GlobalConfigExtended } from './types'
 
 export const useSettingsStore = defineStore('settings', {
-  state: (): { config: Settings.Option } => ({
+  state: (): GloablState => ({
     config: {
       theme: 'auto',
       api_base_url: 'https://api.finalvk.com',
@@ -13,11 +14,34 @@ export const useSettingsStore = defineStore('settings', {
       role_nick: 'ChatGPT',
       role_remarks: '小明是一个小学生',
       role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
-    }
+    },
+    theme_options: [
+      { value: 'auto', label: '自动' },
+      { value: 'light', label: '浅色' },
+      { value: 'dark', label: '深色' },
+      { value: 'shallow_dark', label: '深灰色' },
+      { value: 'blue_dark', label: '深蓝色' }
+    ],
+    chat_theme_options: [
+      { value: 'chat', label: '聊天' },
+      { value: 'Q&A', label: '问答' }
+    ],
+    model_options: [
+      { label: 'GPT-3.5', value: 'gpt-3.5' },
+      { label: 'GPT-3.5-Turbo', value: 'gpt-3.5-turbo' },
+      { label: 'GPT-3.5-Turbo-0613', value: 'gpt-3.5-turbo-0613' },
+      { label: 'GPT-3.5-Turbo-16k', value: 'gpt-3.5-turbo-16k' },
+      { label: 'GPT-3.5-Turbo-16k-0613', value: 'gpt-3.5-turbo-16k-0613' },
+      { label: 'GPT-4', value: 'gpt-4', disabled: true },
+      { label: 'GPT-4-0613', value: 'gpt-4-0613', disabled: true },
+      { label: 'GPT-4-32k', value: 'gpt-4-32k', disabled: true },
+      { label: 'GPT-4-32k-0613', value: 'gpt-4-32k-0613', disabled: true }
+    ]
   }),
+
   getters: {
     getConfigAttr(state) {
-      return (name: keyof Settings.Config) => {
+      return (name: keyof GlobalConfigExtended) => {
         if (name === 'api_url') {
           return state.config.api_base_url + state.config.api_path
         }
@@ -25,11 +49,12 @@ export const useSettingsStore = defineStore('settings', {
       }
     }
   },
+
   actions: {
-    setConfig(config: Settings.Option) {
+    setConfig(config: GloablConfig) {
       this.config = config
     },
-    setConfigAttr(name: keyof Settings.Option, value: keyof Settings.Option) {
+    setConfigAttr<T extends keyof GloablConfig>(name: T, value: GloablConfig[T]) {
       this.config[name] = value
     },
     setTheme(theme: string) {

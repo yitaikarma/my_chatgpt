@@ -1,6 +1,7 @@
 import { ref, toRef, watch } from 'vue'
 import type { _DeepPartial } from 'pinia'
 import { useSettingsStore } from '@/stores/modules/settings'
+import type { GlobalConfigExtended } from '@/stores/modules/types'
 
 export function useConfig() {
   const settingsStore = useSettingsStore()
@@ -9,7 +10,7 @@ export function useConfig() {
    * @param name 属性名
    * @returns 属性值
    */
-  const getSettingsAttr = (optionName: keyof Settings.Config) => {
+  const getSettingsAttr = (optionName: keyof GlobalConfigExtended) => {
     if (optionName === 'api_url') {
       return settingsStore.config.api_base_url + settingsStore.config.api_path
     }

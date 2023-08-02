@@ -12,21 +12,13 @@ import {
   NSpace,
   useMessage
 } from 'naive-ui'
-import type { FormRules, FormInst, SelectOption } from 'naive-ui'
+import type { FormRules, FormInst } from 'naive-ui'
 import { useSettingsStore } from '@/stores/modules/settings'
 
 const settingsStore = useSettingsStore()
 
 const message = useMessage()
 
-interface ThemeRadio {
-  value: string
-  label: string
-}
-interface ChatThemeRadio {
-  value: string
-  label: string
-}
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
 const configForm = ref({ ...settingsStore.config })
@@ -37,80 +29,9 @@ const rules: FormRules = {
     message: '请输入 API 秘钥'
   }
 }
-const themeOptions: ThemeRadio[] = [
-  {
-    value: 'auto',
-    label: '自动'
-  },
-  {
-    value: 'light',
-    label: '浅色'
-  },
-  {
-    value: 'dark',
-    label: '深色'
-  },
-  {
-    value: 'shallow_dark',
-    label: '深灰色'
-  },
-  {
-    value: 'blue_dark',
-    label: '深蓝色'
-  }
-]
-const chatThemeOptions: ChatThemeRadio[] = [
-  {
-    value: 'chat',
-    label: '聊天'
-  },
-  {
-    value: 'Q&A',
-    label: '问答'
-  }
-]
-const options: SelectOption[] = [
-  {
-    label: 'GPT-3.5',
-    value: 'gpt-3.5'
-  },
-  {
-    label: 'GPT-3.5-Turbo',
-    value: 'gpt-3.5-turbo'
-  },
-  {
-    label: 'GPT-3.5-Turbo-0613',
-    value: 'gpt-3.5-turbo-0613'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k',
-    value: 'gpt-3.5-turbo-16k'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k-0613',
-    value: 'gpt-3.5-turbo-16k-0613'
-  },
-  {
-    label: 'GPT-4',
-    value: 'gpt-4',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-0613',
-    value: 'gpt-4-0613',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k',
-    value: 'gpt-4-32k',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k-0613',
-    value: 'gpt-4-32k-0613',
-    disabled: true
-  }
-]
+const themeOptions = settingsStore.theme_options
+const chatThemeOptions = settingsStore.chat_theme_options
+const modelOptions = settingsStore.model_options
 
 watchEffect(
   () => {
@@ -214,12 +135,7 @@ function submitCallback() {
             />
           </NFormItemGi>
           <NFormItemGi span="24" path="model" label="模型">
-            <NSelect
-              v-model:value="configForm.model"
-              :options="options"
-              clearable
-              placeholder="必填"
-            />
+            <NSelect v-model:value="configForm.model" :options="modelOptions" />
           </NFormItemGi>
           <NFormItemGi span="24" path="user_nick" label="用户昵称">
             <NInput v-model:value="configForm.user_nick" clearable placeholder="必填" />
