@@ -7,7 +7,6 @@ import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useAnimation } from '@/hooks/useAnimation'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
-import type { SelectOption } from 'naive-ui'
 import {
   ChatSettings24Regular,
   StyleGuide24Regular,
@@ -23,53 +22,13 @@ const { initMessage, clearMessage, seveMessage } = useChat()
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
 
+const modelOptions = globalConfigStore.model_options
+const currentThemeName = computed(() => globalConfigStore.getOptionItem('theme')?.label)
+const currentChatThemeName = computed(() => globalConfigStore.getOptionItem('chat_theme')?.label)
 const sessionConfigModel = computed({
   get: () => roleConfigStore.getRoleConfigAttr('model'),
   set: (value) => roleConfigStore.updateRoleConfigAttr('model', value)
 })
-
-const options: SelectOption[] = [
-  {
-    label: 'GPT-3.5',
-    value: 'gpt-3.5'
-  },
-  {
-    label: 'GPT-3.5-Turbo',
-    value: 'gpt-3.5-turbo'
-  },
-  {
-    label: 'GPT-3.5-Turbo-0613',
-    value: 'gpt-3.5-turbo-0613'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k',
-    value: 'gpt-3.5-turbo-16k'
-  },
-  {
-    label: 'GPT-3.5-Turbo-16k-0613',
-    value: 'gpt-3.5-turbo-16k-0613'
-  },
-  {
-    label: 'GPT-4',
-    value: 'gpt-4',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-0613',
-    value: 'gpt-4-0613',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k',
-    value: 'gpt-4-32k',
-    disabled: true
-  },
-  {
-    label: 'GPT-4-32k-0613',
-    value: 'gpt-4-32k-0613',
-    disabled: true
-  }
-]
 
 // 打开角色设置
 function handleOpenRoleSettings() {
@@ -195,7 +154,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        风格：{{ globalConfigStore.getConfigAttr('chat_theme').toLocaleUpperCase() }}
+        布局：{{ currentChatThemeName }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -212,7 +171,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        主题：{{ globalConfigStore.getConfigAttr('theme').toLocaleUpperCase() }}
+        主题：{{ currentThemeName }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -255,7 +214,7 @@ function handleNewMessage() {
           <NSelect
             size="small"
             v-model:value="sessionConfigModel"
-            :options="options"
+            :options="modelOptions"
             :consistent-menu-width="false"
             style="border-radius: 100px"
           />

@@ -23,9 +23,12 @@ export interface GlobalConfigExtended extends GlobalConfig {
   api_url: string
 }
 
-export interface GlobalState {
-  config: GlobalConfig
+export interface SelectOptionCopyState {
   theme_options: SelectOptionCopy[]
   chat_theme_options: SelectOptionCopy[]
   model_options: SelectOptionCopy[]
+}
+
+export interface GlobalState extends SelectOptionCopyState {
+  config: GlobalConfig
 }

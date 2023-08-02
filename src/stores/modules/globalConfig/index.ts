@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
-import type { GlobalState, GlobalConfig, GlobalConfigExtended } from './types'
+import type {
+  GlobalState,
+  GlobalConfig,
+  SelectOptionCopyState,
+  GlobalConfigExtended
+} from './types'
 
 export const useGlobalConfig = defineStore('globalConfig', {
   state: (): GlobalState => ({
@@ -16,7 +21,7 @@ export const useGlobalConfig = defineStore('globalConfig', {
       role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
     },
     theme_options: [
-      { value: 'auto', label: '自动' },
+      { value: 'auto', label: '跟随系统' },
       { value: 'light', label: '浅色' },
       { value: 'dark', label: '深色' },
       { value: 'shallow_dark', label: '深灰色' },
@@ -47,6 +52,13 @@ export const useGlobalConfig = defineStore('globalConfig', {
           return config.api_base_url + config.api_path
         }
         return config[name]
+      }
+    },
+
+    // 获取全局配置的某个属性的选项
+    getOptionItem(state) {
+      return <T extends keyof SelectOptionCopyState>(name: keyof GlobalConfig) => {
+        return state[`${name}_options` as T].find((item) => item.value === state.config[name])
       }
     }
   },
