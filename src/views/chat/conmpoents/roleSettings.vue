@@ -3,10 +3,9 @@ import { ref, toRef, watchEffect } from 'vue'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 
-const settingsStore = useSettingsStore()
-
+const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const message = useMessage()
 
@@ -14,7 +13,7 @@ const formRef = ref<FormInst | null>()
 const showModal = ref(false)
 const userConfigForm = toRef({ ...roleConfigStore.getRoleAttr('session_config') })
 const rules: FormRules = {}
-const modelOptions = settingsStore.model_options
+const modelOptions = globalConfigStore.model_options
 watchEffect(
   () => {
     userConfigForm.value = { ...roleConfigStore.getRoleAttr('session_config') }
@@ -105,3 +104,4 @@ function submitCallback() {
 </template>
 
 <style scoped lang="scss"></style>
+@/stores/modules/globalConfig/settings

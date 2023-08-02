@@ -13,15 +13,14 @@ import {
   useMessage
 } from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 
-const settingsStore = useSettingsStore()
-
+const { globalConfigStore } = useConfig()
 const message = useMessage()
 
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
-const configForm = ref({ ...settingsStore.config })
+const configForm = ref({ ...globalConfigStore.config })
 const rules: FormRules = {
   api_key: {
     required: true,
@@ -29,13 +28,13 @@ const rules: FormRules = {
     message: '请输入 API 秘钥'
   }
 }
-const themeOptions = settingsStore.theme_options
-const chatThemeOptions = settingsStore.chat_theme_options
-const modelOptions = settingsStore.model_options
+const themeOptions = globalConfigStore.theme_options
+const chatThemeOptions = globalConfigStore.chat_theme_options
+const modelOptions = globalConfigStore.model_options
 
 watchEffect(
   () => {
-    configForm.value = { ...settingsStore.config }
+    configForm.value = { ...globalConfigStore.config }
   },
   { flush: 'post' }
 )
@@ -44,12 +43,12 @@ defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
   showModal.value = true
-  configForm.value = { ...settingsStore.config }
+  configForm.value = { ...globalConfigStore.config }
 }
 
 function closeSettings() {
   showModal.value = false
-  configForm.value = { ...settingsStore.config }
+  configForm.value = { ...globalConfigStore.config }
 }
 
 function cancelCallback() {
@@ -59,7 +58,7 @@ function cancelCallback() {
 function submitCallback() {
   return formRef.value?.validate((errors) => {
     if (!errors) {
-      configForm.value && settingsStore.setConfig(configForm.value)
+      configForm.value && globalConfigStore.updateConfig(configForm.value)
       message.success('已保存')
     } else {
       console.log(errors)
@@ -163,3 +162,4 @@ function submitCallback() {
 </template>
 
 <style scoped lang="scss"></style>
+@/stores/modules/globalConfig/settings

@@ -1,5 +1,5 @@
 import { ref, nextTick, watch } from 'vue'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
@@ -10,7 +10,7 @@ import { Message } from '@vicons/tabler'
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
 
-const settingsStore = useSettingsStore()
+const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore } = useSession()
 
@@ -27,7 +27,7 @@ const questionText = ref<string>('')
 
 // 监听前缀指令变化
 // watch(
-//   // () => settingsStore.getConfigAttr('role_directive'),
+//   // () => globalConfigStore.getConfigAttr('role_directive'),
 //   () => userSettingsStore.getConfig('a', 'role_directive'),
 //   (value) => {
 //     // console.log('updateRoleDirective', value)
@@ -135,7 +135,7 @@ export function useChat() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${settingsStore.getConfigAttr('api_key')}`
+        Authorization: `Bearer ${globalConfigStore.getConfigAttr('api_key')}`
       },
       body: JSON.stringify({
         messages: sessionStore.getCurrentSessionAttr('request_message_list'),
@@ -147,7 +147,7 @@ export function useChat() {
     }
 
     // openai.createChatCompletion(requestOptions.body)
-    fetch(settingsStore.getConfigAttr('api_url'), requestOptions)
+    fetch(globalConfigStore.getConfigAttr('api_url'), requestOptions)
       .then((response: Response) => {
         // FIXME: 当前消息赋值类型待优化
         const currentMessage = sessionStore.getCurrentSessionAttr('message_list').at(-1) || {

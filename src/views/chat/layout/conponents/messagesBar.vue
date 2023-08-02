@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRef, nextTick, watch, onBeforeMount } from 'vue'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { useChat } from '@/views/chat/hooks/useChat'
@@ -9,14 +9,14 @@ import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 
-const settingsStore = useSettingsStore()
+const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore } = useSession()
 const { initMessage } = useChat()
 
 let md: MarkdownIt | null = null
 const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
-const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
+const chatTheme = toRef(() => globalConfigStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
 
@@ -366,3 +366,4 @@ function renderMarkdown(text: string) {
   color: #8f68cd;
 }
 </style>
+@/stores/modules/globalConfig/settings

@@ -2,9 +2,8 @@
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref, computed, nextTick } from 'vue'
-import { useSettingsStore } from '@/stores/modules/settings'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
-import { useConfig } from '@/hooks/core/useConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useAnimation } from '@/hooks/useAnimation'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
@@ -17,12 +16,9 @@ import {
   FormNew24Regular
 } from '@vicons/fluent'
 
-const { getSettingsAttr } = useConfig()
-const { initMessage, clearMessage, seveMessage } = useChat()
-
-const settingsStore = useSettingsStore()
-
+const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
+const { initMessage, clearMessage, seveMessage } = useChat()
 
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
@@ -83,7 +79,7 @@ function handleOpenRoleSettings() {
 // 风格切换
 function handleStyleChange() {
   // 全局切换
-  settingsStore.switchChatTheme()
+  globalConfigStore.switchChatTheme()
 
   nextTick(() => {
     let counter = -1
@@ -125,27 +121,27 @@ function handleStyleChange() {
 
 // 主题切换
 function handleThemeChange() {
-  const theme = getSettingsAttr('theme')
+  const theme = globalConfigStore.getConfigAttr('theme')
 
   switch (theme) {
     case 'light':
-      settingsStore.setTheme('dark')
+      globalConfigStore.updateConfigAttr('theme', 'dark')
       break
 
     case 'dark':
-      settingsStore.setTheme('shallow_dark')
+      globalConfigStore.updateConfigAttr('theme', 'shallow_dark')
       break
 
     case 'shallow_dark':
-      settingsStore.setTheme('blue_dark')
+      globalConfigStore.updateConfigAttr('theme', 'blue_dark')
       break
 
     case 'blue_dark':
-      settingsStore.setTheme('auto')
+      globalConfigStore.updateConfigAttr('theme', 'auto')
       break
 
     default:
-      settingsStore.setTheme('light')
+      globalConfigStore.updateConfigAttr('theme', 'light')
       break
   }
 }
@@ -199,7 +195,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        风格：{{ getSettingsAttr('chat_theme').toLocaleUpperCase() }}
+        风格：{{ globalConfigStore.getConfigAttr('chat_theme').toLocaleUpperCase() }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -216,7 +212,7 @@ function handleNewMessage() {
             </template>
           </NButton>
         </template>
-        主题：{{ getSettingsAttr('theme').toLocaleUpperCase() }}
+        主题：{{ globalConfigStore.getConfigAttr('theme').toLocaleUpperCase() }}
       </NTooltip>
       <NTooltip trigger="hover">
         <template #trigger>
@@ -288,3 +284,4 @@ function handleNewMessage() {
   border-radius: 100px;
 }
 </style>
+@/stores/modules/globalConfig/settings
