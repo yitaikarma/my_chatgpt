@@ -23,6 +23,10 @@ interface ThemeRadio {
   value: string
   label: string
 }
+interface ChatThemeRadio {
+  value: string
+  label: string
+}
 const formRef = ref<FormInst | null>()
 const showModal = ref(false)
 const configForm = ref({ ...settingsStore.config })
@@ -53,6 +57,16 @@ const themeOptions: ThemeRadio[] = [
   {
     value: 'blue_dark',
     label: '深蓝色'
+  }
+]
+const chatThemeOptions: ChatThemeRadio[] = [
+  {
+    value: 'chat',
+    label: '聊天'
+  },
+  {
+    value: 'Q&A',
+    label: '问答'
   }
 ]
 const options: SelectOption[] = [
@@ -138,7 +152,7 @@ function submitCallback() {
     <NModal
       v-model:show="showModal"
       preset="dialog"
-      title="设置"
+      title="全局设置"
       :show-icon="false"
       bordered
       transform-origin="center"
@@ -163,6 +177,15 @@ function submitCallback() {
             <NRadioGroup v-model:value="configForm.theme" name="radiogroup">
               <NSpace>
                 <NRadio v-for="theme in themeOptions" :key="theme.value" :value="theme.value">
+                  {{ theme.label }}
+                </NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </NFormItemGi>
+          <NFormItemGi span="24" path="chat_theme" label="对话布局">
+            <NRadioGroup v-model:value="configForm.chat_theme" name="radiogroup">
+              <NSpace>
+                <NRadio v-for="theme in chatThemeOptions" :key="theme.value" :value="theme.value">
                   {{ theme.label }}
                 </NRadio>
               </NSpace>
