@@ -14,10 +14,8 @@ function handleChangeSettingsDisplay() {
 </script>
 
 <template>
-  <div class="chat_list_wrapper">
-    <div class="chat_list">
-      <RoleList />
-    </div>
+  <div class="side_wrapper">
+    <RoleList />
     <div class="utils_nav">
       <NTooltip trigger="hover">
         <template #trigger>
@@ -39,7 +37,7 @@ function handleChangeSettingsDisplay() {
 </template>
 
 <style scoped lang="scss">
-.chat_list_wrapper {
+.side_wrapper {
   width: 300px;
   height: 100%;
   display: flex;
@@ -51,12 +49,6 @@ function handleChangeSettingsDisplay() {
   background-color: #23252b;
   background-color: var(--color-bg);
   transition: background-color 0.5s;
-
-  .chat_list {
-    width: 300px;
-    height: 100%;
-    padding: 20px;
-  }
 
   .utils_nav {
     width: 100%;

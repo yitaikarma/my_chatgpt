@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, toRef, watch, onBeforeMount } from 'vue'
+import { ref, toRef, watch, nextTick, onBeforeMount } from 'vue'
 import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
+import { useAnimation } from '@/hooks/useAnimation'
 
 const message = useMessage()
 const { roleConfigStore, addRole, changeRole, deleteRole } = useRoleConfig()
@@ -39,6 +40,32 @@ function initRoleList() {
     addRole()
     initRoleSession(roleConfigStore.current_role_uuid)
   }
+
+  nextTick(() => {
+    let counter = -1
+
+    const messageListEl = document.querySelectorAll('.role_item')
+
+    const createAnimation = (element: HTMLElement, distance: number) => {
+      counter++
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateY(${distance}px)` },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        { duration: 300, delay: counter * 20 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    }
+
+    const messageElementLength = messageListEl.length
+    for (let i = 0; i < messageElementLength; i++) {
+      const element = messageListEl[i]
+      createAnimation(element as HTMLElement, 20)
+    }
+  })
 }
 
 // 切换抽屉显示状态
@@ -74,22 +101,22 @@ function handledeleteRole(target_uuid: string) {
 </script>
 
 <template>
-  <div class="drawer_header">
-    <div class="content">
-      <div class="title">角色列表</div>
-      <div class="desc">{{ `${roleList.length}个角色` }}</div>
+  <div class="role_container">
+    <div class="drawer_header">
+      <div class="content">
+        <div class="title">角色列表</div>
+        <div class="desc">{{ `${roleList.length}个角色` }}</div>
+      </div>
+      <NButton size="small" ghost type="primary" :focusable="false" @click="handleAddNewRole">
+        <template #icon>
+          <NIcon> <AddCircle24Regular /> </NIcon>
+        </template>
+        新角色
+      </NButton>
     </div>
-    <NButton size="small" ghost type="primary" :focusable="false" @click="handleAddNewRole">
-      <template #icon>
-        <NIcon> <AddCircle24Regular /> </NIcon>
-      </template>
-      新角色
-    </NButton>
-  </div>
-  <div class="history-message">
-    <div class="list">
+    <div class="role_list scroll">
       <div
-        class="list-item"
+        class="role_item"
         :cureent_session="item.uuid === roleConfigStore.current_role_uuid"
         v-for="(item, i) in roleList"
         :key="i"
@@ -119,7 +146,7 @@ function handledeleteRole(target_uuid: string) {
               <div class="history_total">
                 {{
                   `${sessionStore.getRoleSession(item.uuid).history_list.length}个历史话题,
-                  ${sessionStore.getRoleSession(item.uuid).current.message_list.length - 1}条会话`
+                    ${sessionStore.getRoleSession(item.uuid).current.message_list.length - 1}条会话`
                 }}
               </div>
             </div>
@@ -170,8 +197,32 @@ function handledeleteRole(target_uuid: string) {
 </template>
 
 <style lang="scss" scoped>
+.scroll::-webkit-scrollbar {
+  height: 16px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  border: 6px solid var(--color-bg);
+  border-radius: 50px;
+  background-color: var(--color-scroll-thumb-bg);
+}
+
+.scroll::-webkit-scrollbar-corner {
+  background-color: var(--color-bg);
+}
+
+.scroll::-webkit-scrollbar-thumb:hover {
+  border: 4px solid var(--color-bg);
+  background-color: var(--color-scroll-thumb-bg);
+}
 :deep(.n-drawer-header__main) {
   width: 100%;
+}
+.role_container {
+  width: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .drawer_header {
   width: 100%;
@@ -180,7 +231,7 @@ function handledeleteRole(target_uuid: string) {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
+  padding: 20px 20px 10px;
   .content {
     display: flex;
     flex-direction: column;
@@ -195,107 +246,112 @@ function handledeleteRole(target_uuid: string) {
     }
   }
 }
-.history-message {
-  .list {
+
+.role_list {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0;
+}
+.role_item {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin: 0 10px;
+  padding: 10px;
+  border-radius: 5px;
+  & {
+    --is-hide: initial;
+  }
+  &[cureent_session='true'] {
+    outline: 2px solid var(--color-msg-ctn-border-1);
+  }
+  .avatar {
+    user-select: none;
+    width: 44px;
+    height: 44px;
+    position: sticky;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    border: 1px solid var(--color-msg-ctn-border-1);
+    border-radius: 50%;
+    background-color: #ffffff;
+    transition: border-color 0.5s;
+    img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+  }
+
+  .content {
+    width: 80%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-  }
-  .list-item {
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    padding: 10px;
-    border-radius: 5px;
-    & {
-      --is-hide: initial;
-    }
-    &[cureent_session='true'] {
-      outline: 2px solid var(--color-msg-ctn-border-1);
-    }
-    .avatar {
-      user-select: none;
-      width: 44px;
-      height: 44px;
-      position: sticky;
-      top: 0px;
+    // gap: 5px;
+    .title {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      border: 1px solid var(--color-msg-ctn-border-1);
-      border-radius: 50%;
-      background-color: #ffffff;
-      transition: border-color 0.5s;
-      img {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      span {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
-
-    .content {
-      width: 80%;
-      display: flex;
-      flex-direction: column;
-      // gap: 5px;
-      .title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        span {
-          flex: 1;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+    .info {
+      position: relative;
+      height: min-content;
+      .desc {
+        position: absolute;
+        font-size: 12px;
+        color: #999;
+        transition: color 0.1s;
       }
-      .info {
-        position: relative;
-        height: min-content;
-        .desc {
-          position: absolute;
-          font-size: 12px;
-          color: #999;
-          transition: color 0.1s;
-        }
-        .date {
-          // position: absolute;
-          text-align: right;
-          font-size: 12px;
-          color: #9990;
-          transition: color 0.1s;
-        }
+      .date {
+        // position: absolute;
+        text-align: right;
+        font-size: 12px;
+        color: #9990;
+        transition: color 0.1s;
       }
     }
+  }
 
+  .control {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 10px;
+    border-radius: 100px;
+  }
+
+  &:hover {
+    background-color: var(--color-bg-hover);
+    .content .info {
+      .desc {
+        color: #9990;
+      }
+      .date {
+        color: #999;
+      }
+    }
     .control {
-      visibility: hidden;
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 0 10px;
-      border-radius: 100px;
-    }
-
-    &:hover {
-      background-color: var(--color-bg-hover);
-      .content .info {
-        .desc {
-          color: #9990;
-        }
-        .date {
-          color: #999;
-        }
-      }
-      .control {
-        visibility: initial;
-      }
+      visibility: initial;
     }
   }
 }
