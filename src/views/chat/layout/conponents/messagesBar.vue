@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { toRef, nextTick, onBeforeMount } from 'vue'
-// import { storeToRefs } from 'pinia'
+import { toRef, nextTick, watch, onBeforeMount } from 'vue'
 import { useSettingsStore } from '@/stores/modules/settings'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
@@ -15,20 +14,54 @@ const { roleConfigStore } = useRoleConfig()
 const { sessionStore } = useSession()
 const { initMessage } = useChat()
 
-// const { role_collection, current_role_uuid } = storeToRefs(sessionStore)
-
 let md: MarkdownIt | null = null
-// const messageList = toRef(() => role_collection.value[current_role_uuid.value].current.message_list)
 const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
 const chatTheme = toRef(() => settingsStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
 
+watch(
+  () => roleConfigStore.current_role_uuid,
+  () => {
+    nextTick(() => {
+      scrollToBottom('message_list', false)
+
+      // TODO: 逻辑可以封装到useAnimation中
+      let counter = -1
+
+      const messageListEl = document.querySelectorAll('.message_item')
+
+      const createAnimation = (element: HTMLElement, distance: number) => {
+        counter++
+        useAnimation(
+          element,
+          [
+            { opacity: 0, transform: `translateY(${distance}px)` },
+            { opacity: 1, transform: 'translateY(0)' }
+          ],
+          { duration: 300, delay: counter * 20 },
+          () => (element.style.opacity = '0'),
+          () => (element.style.opacity = 'initial')
+        )
+      }
+
+      const messageElementsLength = messageListEl.length
+      for (let i = 0; i < messageElementsLength; i++) {
+        const element = messageListEl[i]
+        createAnimation(element as HTMLElement, 20)
+      }
+    })
+  }
+)
+
 onBeforeMount(() => {
   // createGPT()
   md = useMarkdown()
   initMessage()
+
   nextTick(() => {
+    scrollToBottom('message_list', false)
+
     useAnimation(
       document.getElementById('message_list') as HTMLElement,
       [
@@ -37,7 +70,6 @@ onBeforeMount(() => {
       ],
       300
     )
-    scrollToBottom('message_list', false)
   })
 })
 

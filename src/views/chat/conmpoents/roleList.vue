@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
+import { ref, toRef, watch, onBeforeMount } from 'vue'
 import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
-import { useAnimation } from '@/hooks/useAnimation'
-
-import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
-const { roleConfigStore, addNewRole } = useRoleConfig()
+const { roleConfigStore, addRole, changeRole, deleteRole } = useRoleConfig()
 const { sessionStore, initRoleSession } = useSession()
 
 const roleList = toRef(() => roleConfigStore.getRoleList)
@@ -27,9 +24,7 @@ watch(editableIndex, (value) => {
 defineExpose({ toggleActive })
 
 onBeforeMount(() => {
-  if (roleList.value.length === 0) {
-    initRoleList()
-  }
+  initRoleList()
 })
 
 const inputCallback = () => {
@@ -40,12 +35,10 @@ const inputCallback = () => {
 
 // 初始化角色列表
 function initRoleList() {
-  addNewRole()
-  initRoleSession(roleConfigStore.current_role_uuid)
-
-  nextTick(() => {
-    scrollToBottom('message_list', false)
-  })
+  if (roleList.value.length === 0) {
+    addRole()
+    initRoleSession(roleConfigStore.current_role_uuid)
+  }
 }
 
 // 切换抽屉显示状态
@@ -55,103 +48,24 @@ function toggleActive(flag = false) {
 
 // 添加新角色
 function handleAddNewRole() {
-  addNewRole()
+  addRole()
   initRoleSession(roleConfigStore.current_role_uuid)
-
-  nextTick(() => {
-    let counter = -1
-
-    const messageListEl = document.querySelectorAll('.message_item')
-
-    const createAnimation = (element: HTMLElement, distance: number) => {
-      counter++
-      useAnimation(
-        element,
-        [
-          { opacity: 0, transform: `translateY(${distance}px)` },
-          { opacity: 1, transform: 'translateY(0)' }
-        ],
-        { duration: 300, delay: counter * 20 },
-        () => (element.style.opacity = '0'),
-        () => (element.style.opacity = 'initial')
-      )
-    }
-
-    const messageElementLength = messageListEl.length
-
-    for (let i = 0; i < messageElementLength; i++) {
-      const element = messageListEl[i]
-
-      createAnimation(element as HTMLElement, 20)
-    }
-    scrollToBottom('message_list', false)
-  })
 }
 
 // 切换角色
 function handleChangeRole(uuid: string) {
-  if (uuid === roleConfigStore.current_role_uuid) return
-  sessionStore.updateCurrentRoleUUID(uuid)
-  roleConfigStore.updateCurrentRoleUUID(uuid)
-
-  // TODO: 逻辑可以封装到useAnimation中
-  nextTick(() => {
-    let counter = -1
-
-    const messageListEl = document.querySelectorAll('.message_item')
-
-    const createAnimation = (element: HTMLElement, distance: number) => {
-      counter++
-      useAnimation(
-        element,
-        [
-          { opacity: 0, transform: `translateY(${distance}px)` },
-          { opacity: 1, transform: 'translateY(0)' }
-        ],
-        { duration: 300, delay: counter * 20 },
-        () => (element.style.opacity = '0'),
-        () => (element.style.opacity = 'initial')
-      )
-    }
-
-    const messageElementLength = messageListEl.length
-
-    for (let i = 0; i < messageElementLength; i++) {
-      const element = messageListEl[i]
-
-      createAnimation(element as HTMLElement, 20)
-    }
-    scrollToBottom('message_list', false)
-  })
+  changeRole(uuid)
 }
 
-// 角色重命名
+// 编辑角色名称
 function handleRoleRename(index: number) {
   editableIndex.value = editableIndex.value === -1 ? index : -1
-  message.warning('暂未开放')
 }
 
 // 删除角色
 function handledeleteRole(target_uuid: string) {
-  // TODO:排序问题
   if (roleList.value.length >= 2) {
-    const { prev_role_uuid, next_role_uuid } = roleConfigStore.getRole(target_uuid)
-
-    // 重新关联前后角色的uuid
-    prev_role_uuid && roleConfigStore.updateRoleNextUUID(prev_role_uuid, next_role_uuid)
-    next_role_uuid && roleConfigStore.updateRolePrevUUID(next_role_uuid, prev_role_uuid)
-    // 更新第一个角色和最后一个角色的uuid
-    prev_role_uuid || roleConfigStore.updateGlobalAttr('first_role_uuid', next_role_uuid)
-    next_role_uuid || roleConfigStore.updateGlobalAttr('last_role_uuid', prev_role_uuid)
-
-    // 如果删除当前角色，需要切换到下一个角色，如果没有下一个角色，切换到上一个角色
-    if (roleConfigStore.current_role_uuid === target_uuid) {
-      const toRoleUuid = next_role_uuid ? next_role_uuid : prev_role_uuid
-      handleChangeRole(toRoleUuid)
-    }
-
-    roleConfigStore.deleteRole(target_uuid)
-    sessionStore.deleteRole(target_uuid)
+    deleteRole(target_uuid)
     message.success('删除成功')
   } else {
     message.warning('至少保留一个角色')
