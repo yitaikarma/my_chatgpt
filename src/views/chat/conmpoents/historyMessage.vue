@@ -48,7 +48,6 @@ function toggleActive(flag = false) {
 // 打开历史消息抽屉后
 function handleAfterEnter() {
   nextTick(() => {
-    // FIXME: 列表元素不是滚动元素，无法计算是否在可视区域内
     useInitListAnimation('history_list')
   })
 }
@@ -56,9 +55,10 @@ function handleAfterEnter() {
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
   const messageList = sessionStore.getCurrentSessionAttr('message_list')
+  const currentSession = sessionStore.getCurrentSession
+
   if (messageList.length > 2) {
     // 未进行过对话，不保存
-    const currentSession = sessionStore.getCurrentSession
     if (!currentSession.is_history) {
       sessionStore.updateCurrentSessionToHistory()
     }
@@ -67,9 +67,11 @@ function handleRestoreTopic(index: number) {
   const sessions = sessionStore.getHistory(index)
   sessionStore.updateCurrentRoleSession(sessions)
 
+  const changeDirection = sessionStore.getSessionIndex(currentSession.uuid) > index ? 'up' : 'down'
+
   nextTick(() => {
     scrollToBottom('message_list', false)
-    useInitListAnimation('message_list')
+    useInitListAnimation('message_list', changeDirection)
   })
 }
 

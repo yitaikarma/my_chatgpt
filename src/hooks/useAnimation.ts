@@ -37,8 +37,13 @@ export function useAnimation(
  * 使用每个元素
  * @param {string} elementId 列表元素 id
  * @param {() => void} callback 回调函数
+ * @param {boolean} reverse 是否反向遍历
  */
-export function useEachElement(elementId: string, callback?: (element: HTMLElement) => void) {
+export function useEachElement(
+  elementId: string,
+  callback: (element: HTMLElement) => void,
+  reverse: boolean = false
+) {
   const container = document.getElementById(elementId) as HTMLElement
 
   if (!container) return
@@ -64,8 +69,10 @@ export function useEachElement(elementId: string, callback?: (element: HTMLEleme
   const childrenLength = children.length
   let child, visibleTop, visibleBottom, childTop, childBottom
 
+  // for (let i = childrenLength - 1; i >= 0; i--) {
   for (let i = 0; i < childrenLength; i++) {
-    child = children[i] as HTMLElement
+    const index = reverse ? childrenLength - 1 - i : i
+    child = children[index] as HTMLElement
 
     visibleTop = scrollContainer.scrollTop
     visibleBottom = visibleTop + scrollContainer.offsetHeight
@@ -103,22 +110,27 @@ export function useEachElement(elementId: string, callback?: (element: HTMLEleme
  * 通用初始化列表动画
  * @param {string} elementId 要绑定动画的列表元素 id
  */
-export function useInitListAnimation(elementId: string) {
+export function useInitListAnimation(elementId: string, direction: string = 'down') {
   let counter = -1
 
-  useEachElement(elementId, (element) => {
-    counter++
-    useAnimation(
-      element,
-      [
-        { opacity: 0, transform: `translateY(${20}px)` },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      { duration: 300, delay: counter * 30 },
-      () => (element.style.opacity = '0'),
-      () => (element.style.opacity = 'initial')
-    )
-  })
+  const rule: { [key: string]: number } = { down: 20, up: -20 }
+  useEachElement(
+    elementId,
+    (element) => {
+      counter++
+      useAnimation(
+        element,
+        [
+          { opacity: 0, transform: `translateY(${rule[direction]}px)` },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        { duration: 300, delay: counter * 30 },
+        () => (element.style.opacity = '0'),
+        () => (element.style.opacity = 'initial')
+      )
+    },
+    direction === 'down' ? false : true
+  )
 }
 
 /**

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRef, nextTick, watch, onBeforeMount } from 'vue'
+import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
 import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
@@ -19,10 +19,13 @@ const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
 const chatTheme = toRef(() => globalConfigStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
+const changeDirection = ref('down')
 
 watch(
   () => roleConfigStore.current_role_uuid,
-  () => {
+  (val, oldVal) => {
+    changeDirection.value =
+      roleConfigStore.getRoleIndex(val) > roleConfigStore.getRoleIndex(oldVal) ? 'down' : 'up'
     sessionTransform()
   }
 )
@@ -43,7 +46,7 @@ function initSession() {
 function sessionTransform() {
   nextTick(() => {
     scrollToBottom('message_list', false)
-    useInitListAnimation('message_list')
+    useInitListAnimation('message_list', changeDirection.value)
   })
 }
 

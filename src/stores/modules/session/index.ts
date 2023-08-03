@@ -20,6 +20,15 @@ export const useSessionStore = defineStore('session', {
   }),
 
   getters: {
+    // 获取角色索引
+    getSessionIndex({ role_collection, current_role_uuid }) {
+      return (uuid: string) => {
+        return role_collection[current_role_uuid].history_list.findIndex(
+          (session) => session.uuid === uuid
+        )
+      }
+    },
+
     // 获取历史的某个属性
     getHistoryAttr({ role_collection, current_role_uuid }) {
       return <T extends keyof SessionHistory>(index: number, prop: T, uuid?: string) => {
