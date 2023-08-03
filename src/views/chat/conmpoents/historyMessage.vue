@@ -12,7 +12,7 @@ import {
 } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useSession } from '@/hooks/chat/core/useSession'
-import { useAnimation } from '@/hooks/useAnimation'
+import { useEachElement, useInitListAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
@@ -38,46 +38,19 @@ function toggleActive(flag = false) {
 
   if (flag) {
     nextTick(() => {
-      const messageListEl = document.querySelectorAll('.history_item')
-
-      const createAnimation = (element: HTMLElement) => {
-        element.style.opacity = '0'
-      }
-
-      const messageElementLength = messageListEl.length
-      for (let i = 0; i < messageElementLength; i++) {
-        const element = messageListEl[i] as HTMLElement
-        createAnimation(element)
-      }
+      useEachElement('history_list', (child) => {
+        child.style.opacity = '0'
+      })
     })
   }
 }
 
 // 打开历史消息抽屉后
 function handleAfterEnter() {
-  let counter = -1
-  const messageListEl = document.querySelectorAll('.history_item')
-
-  const createAnimation = (element: HTMLElement, distance: number) => {
-    counter++
-
-    useAnimation(
-      element,
-      [
-        { opacity: 0, transform: `translateY(${distance}px)` },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      { duration: 300, delay: counter * 20 },
-      () => {},
-      () => (element.style.opacity = 'initial')
-    )
-  }
-
-  const messageElementLength = messageListEl.length
-  for (let i = 0; i < messageElementLength; i++) {
-    const element = messageListEl[i] as HTMLElement
-    createAnimation(element, 20)
-  }
+  nextTick(() => {
+    // FIXME: 列表元素不是滚动元素，无法计算是否在可视区域内
+    useInitListAnimation('history_list')
+  })
 }
 
 // 恢复历史话题
@@ -96,40 +69,7 @@ function handleRestoreTopic(index: number) {
 
   nextTick(() => {
     scrollToBottom('message_list', false)
-
-    let counter = -1
-    const messageListEl = document.querySelectorAll('.message_item')
-
-    const createAnimation = (element: HTMLElement, distance: number) => {
-      counter++
-
-      useAnimation(
-        element,
-        [
-          { opacity: 0, transform: `translateX(${distance}px)` },
-          { opacity: 1, transform: 'translateX(0)' }
-        ],
-        { duration: 300, delay: counter * 30 },
-        () => (element.style.opacity = '0'),
-        () => (element.style.opacity = 'initial')
-      )
-    }
-
-    const messageElementLength = messageListEl.length
-
-    for (let i = 0; i < messageElementLength; i++) {
-      const element = messageListEl[i]
-
-      if (element.getAttribute('chatTheme') === 'Q&A') {
-        createAnimation(element as HTMLElement, 20)
-      } else {
-        if (element.getAttribute('role') === 'user') {
-          createAnimation(element as HTMLElement, -20)
-        } else {
-          createAnimation(element as HTMLElement, 20)
-        }
-      }
-    }
+    useInitListAnimation('message_list')
   })
 }
 
@@ -187,71 +127,69 @@ function handleclearRoleHistory() {
           </NButton>
         </div>
       </template>
-      <div class="history_container">
-        <div id="history_list" class="history_list">
-          <div
-            class="history_item"
-            v-for="(item, i) in historyList"
-            :key="i"
-            @click="handleRestoreTopic(i)"
-          >
-            <div class="content">
-              <div class="title">
-                <NIcon size="20"> <Chat24Regular /> </NIcon>
-                <span v-show="i !== editableIndex"> {{ item.title }} </span>
-                <NInput
-                  v-if="i === editableIndex"
-                  size="small"
-                  type="text"
-                  autofocus
-                  placeholder="请输入话题标题"
-                  :value="item.title"
-                  @update:value="sessionStore.updateHistoryAttr(i, 'title', $event)"
-                  @blur="editableIndex = -1"
-                  @click.stop
-                />
-              </div>
-              <div class="date">{{ item.date }}</div>
+      <div id="history_list" class="history_list">
+        <div
+          class="history_item"
+          v-for="(item, i) in historyList"
+          :key="i"
+          @click="handleRestoreTopic(i)"
+        >
+          <div class="content">
+            <div class="title">
+              <NIcon size="20"> <Chat24Regular /> </NIcon>
+              <span v-show="i !== editableIndex"> {{ item.title }} </span>
+              <NInput
+                v-if="i === editableIndex"
+                size="small"
+                type="text"
+                autofocus
+                placeholder="请输入话题标题"
+                :value="item.title"
+                @update:value="sessionStore.updateHistoryAttr(i, 'title', $event)"
+                @blur="editableIndex = -1"
+                @click.stop
+              />
             </div>
-            <!-- TODO:调整为hover显示 -->
-            <div class="control">
-              <NSpace :size="4" :wrap="false">
-                <NTooltip trigger="hover" :delay="1000">
-                  <template #trigger>
-                    <NButton
-                      size="small"
-                      type="default"
-                      quaternary
-                      circle
-                      :focusable="false"
-                      @click.stop="handleEditHistoryItem(i)"
-                    >
-                      <template #icon>
-                        <NIcon> <DocumentEdit24Regular /> </NIcon>
-                      </template>
-                    </NButton>
-                  </template>
-                  编辑标题
-                </NTooltip>
-                <NTooltip trigger="hover" :delay="1000">
-                  <template #trigger>
-                    <NButton
-                      size="small"
-                      type="error"
-                      quaternary
-                      circle
-                      :focusable="false"
-                      @click.stop="handledeleteHistory(item.uuid)"
-                    >
-                      <template #icon>
-                        <NIcon> <Delete24Regular /> </NIcon>
-                      </template>
-                    </NButton>
-                  </template>
-                  删除
-                </NTooltip>
-              </NSpace>
-            </div>
+            <div class="date">{{ item.date }}</div>
+          </div>
+          <!-- TODO:调整为hover显示 -->
+          <div class="control">
+            <NSpace :size="4" :wrap="false">
+              <NTooltip trigger="hover" :delay="1000">
+                <template #trigger>
+                  <NButton
+                    size="small"
+                    type="default"
+                    quaternary
+                    circle
+                    :focusable="false"
+                    @click.stop="handleEditHistoryItem(i)"
+                  >
+                    <template #icon>
+                      <NIcon> <DocumentEdit24Regular /> </NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                编辑标题
+              </NTooltip>
+              <NTooltip trigger="hover" :delay="1000">
+                <template #trigger>
+                  <NButton
+                    size="small"
+                    type="error"
+                    quaternary
+                    circle
+                    :focusable="false"
+                    @click.stop="handledeleteHistory(item.uuid)"
+                  >
+                    <template #icon>
+                      <NIcon> <Delete24Regular /> </NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                删除
+              </NTooltip>
+            </NSpace>
           </div>
         </div>
       </div>
@@ -284,45 +222,44 @@ function handleclearRoleHistory() {
     }
   }
 }
-.history_container {
-  .history_list {
+
+.history_list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.history_item {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--color-bg-hover);
+  }
+  .content {
+    width: 80%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-  }
-  .history_item {
-    display: flex;
-    flex-direction: row;
     gap: 5px;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    &:hover {
-      background-color: var(--color-bg-hover);
-    }
-    .content {
-      width: 80%;
+    .title {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
-      .title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        span {
-          flex: 1;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      span {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
-      .date {
-        font-size: 12px;
-        color: #999;
-      }
+    }
+    .date {
+      font-size: 12px;
+      color: #999;
     }
   }
 }

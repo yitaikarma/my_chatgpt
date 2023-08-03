@@ -4,7 +4,7 @@ import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { useChat } from '@/views/chat/hooks/useChat'
-import { useAnimation } from '@/hooks/useAnimation'
+import { useInitListAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
@@ -23,55 +23,29 @@ const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
 watch(
   () => roleConfigStore.current_role_uuid,
   () => {
-    nextTick(() => {
-      scrollToBottom('message_list', false)
-
-      // TODO: 逻辑可以封装到useAnimation中
-      let counter = -1
-
-      const messageListEl = document.querySelectorAll('.message_item')
-
-      const createAnimation = (element: HTMLElement, distance: number) => {
-        counter++
-        useAnimation(
-          element,
-          [
-            { opacity: 0, transform: `translateY(${distance}px)` },
-            { opacity: 1, transform: 'translateY(0)' }
-          ],
-          { duration: 300, delay: counter * 20 },
-          () => (element.style.opacity = '0'),
-          () => (element.style.opacity = 'initial')
-        )
-      }
-
-      const messageElementsLength = messageListEl.length
-      for (let i = 0; i < messageElementsLength; i++) {
-        const element = messageListEl[i]
-        createAnimation(element as HTMLElement, 20)
-      }
-    })
+    sessionTransform()
   }
 )
 
 onBeforeMount(() => {
+  initSession()
+  sessionTransform()
+})
+
+// 初始化会话
+function initSession() {
   // createGPT()
   md = useMarkdown()
   initMessage()
+}
 
+// 会话过渡
+function sessionTransform() {
   nextTick(() => {
     scrollToBottom('message_list', false)
-
-    useAnimation(
-      document.getElementById('message_list') as HTMLElement,
-      [
-        { opacity: 0, transform: 'translateY(10px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ],
-      300
-    )
+    useInitListAnimation('message_list')
   })
-})
+}
 
 // 渲染markdown
 function renderMarkdown(text: string) {
@@ -142,11 +116,11 @@ function renderMarkdown(text: string) {
 }
 
 .message_container {
+  width: 100%;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   padding: 20px 0;
-  width: 100%;
-  height: 100%;
   border-radius: 6px;
   background-color: #232425;
   background-color: var(--color-bg);

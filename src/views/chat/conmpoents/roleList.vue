@@ -4,7 +4,7 @@ import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
-import { useAnimation } from '@/hooks/useAnimation'
+import { useInitListAnimation } from '@/hooks/useAnimation'
 
 const message = useMessage()
 const { roleConfigStore, addRole, changeRole, deleteRole } = useRoleConfig()
@@ -40,31 +40,8 @@ function initRoleList() {
     addRole()
     initRoleSession(roleConfigStore.current_role_uuid)
   }
-
   nextTick(() => {
-    let counter = -1
-
-    const messageListEl = document.querySelectorAll('.role_item')
-
-    const createAnimation = (element: HTMLElement, distance: number) => {
-      counter++
-      useAnimation(
-        element,
-        [
-          { opacity: 0, transform: `translateY(${distance}px)` },
-          { opacity: 1, transform: 'translateY(0)' }
-        ],
-        { duration: 300, delay: counter * 20 },
-        () => (element.style.opacity = '0'),
-        () => (element.style.opacity = 'initial')
-      )
-    }
-
-    const messageElementLength = messageListEl.length
-    for (let i = 0; i < messageElementLength; i++) {
-      const element = messageListEl[i]
-      createAnimation(element as HTMLElement, 20)
-    }
+    useInitListAnimation('role_list')
   })
 }
 
@@ -114,7 +91,7 @@ function handledeleteRole(target_uuid: string) {
         新角色
       </NButton>
     </div>
-    <div class="role_list scroll">
+    <div id="role_list" class="role_list scroll">
       <div
         class="role_item"
         :cureent_session="item.uuid === roleConfigStore.current_role_uuid"

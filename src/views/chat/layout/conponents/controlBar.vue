@@ -5,7 +5,7 @@ import { ref, computed, nextTick } from 'vue'
 import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useChat } from '@/views/chat/hooks/useChat'
-import { useAnimation } from '@/hooks/useAnimation'
+import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
 import {
   ChatSettings24Regular,
@@ -41,41 +41,75 @@ function handleStyleChange() {
   globalConfigStore.switchChatTheme()
 
   nextTick(() => {
-    let counter = -1
-
-    const messageListEl = document.querySelectorAll('.message_item')
-
-    const createAnimation = (element: HTMLElement, distance: number) => {
-      counter++
-
-      useAnimation(
-        element,
-        [
-          { opacity: 0, transform: `translateX(${distance}px)` },
-          { opacity: 1, transform: 'translateX(0)' }
-        ],
-        { duration: 300, delay: counter * 30 },
-        () => (element.style.opacity = '0'),
-        () => (element.style.opacity = 'initial')
-      )
-    }
-
-    const messageElementLength = messageListEl.length
-
-    for (let i = 0; i < messageElementLength; i++) {
-      const element = messageListEl[i]
-
-      if (element.getAttribute('chatTheme') === 'Q&A') {
-        createAnimation(element as HTMLElement, 20)
-      } else {
-        if (element.getAttribute('role') === 'user') {
-          createAnimation(element as HTMLElement, -20)
-        } else {
-          createAnimation(element as HTMLElement, 20)
-        }
-      }
-    }
+    useSessionSwitchLayoutAnimation()
   })
+
+  // nextTick(() => {
+  //   let counter = -1
+
+  //   const createAnimation = (element: HTMLElement, distance: number) => {
+  //     counter++
+  //     useAnimation(
+  //       element,
+  //       [
+  //         { opacity: 0, transform: `translateX(${distance}px)` },
+  //         { opacity: 1, transform: 'translateX(0)' }
+  //       ],
+  //       { duration: 300, delay: counter * 30 },
+  //       () => (element.style.opacity = '0'),
+  //       () => (element.style.opacity = 'initial')
+  //     )
+  //   }
+
+  //   useBindAnimation('message_list', (element) => {
+  //     if (element.getAttribute('chatTheme') === 'Q&A') {
+  //       createAnimation(element, 20)
+  //     } else {
+  //       if (element.getAttribute('role') === 'user') {
+  //         createAnimation(element, -20)
+  //       } else {
+  //         createAnimation(element, 20)
+  //       }
+  //     }
+  //   })
+  // })
+
+  // nextTick(() => {
+  //   let counter = -1
+
+  //   const messageListEl = document.querySelectorAll('.message_item')
+
+  //   const createAnimation = (element: HTMLElement, distance: number) => {
+  //     counter++
+
+  //     useAnimation(
+  //       element,
+  //       [
+  //         { opacity: 0, transform: `translateX(${distance}px)` },
+  //         { opacity: 1, transform: 'translateX(0)' }
+  //       ],
+  //       { duration: 300, delay: counter * 30 },
+  //       () => (element.style.opacity = '0'),
+  //       () => (element.style.opacity = 'initial')
+  //     )
+  //   }
+
+  //   const messageElementLength = messageListEl.length
+
+  //   for (let i = 0; i < messageElementLength; i++) {
+  //     const element = messageListEl[i]
+
+  //     if (element.getAttribute('chatTheme') === 'Q&A') {
+  //       createAnimation(element as HTMLElement, 20)
+  //     } else {
+  //       if (element.getAttribute('role') === 'user') {
+  //         createAnimation(element as HTMLElement, -20)
+  //       } else {
+  //         createAnimation(element as HTMLElement, 20)
+  //       }
+  //     }
+  //   }
+  // })
 }
 
 // 主题切换
