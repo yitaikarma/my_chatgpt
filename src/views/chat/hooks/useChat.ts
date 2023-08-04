@@ -178,7 +178,7 @@ export function useChat() {
         currentMessage.content = ''
 
         const throttleScrollBottom = throttle(() => {
-          scrollToBottom('message_list')
+          scrollToBottom('message_list', false)
         }, 50)
 
         transformSSEMessage(response.body, (done, streamDataList) => {
