@@ -119,7 +119,7 @@ export function useChat() {
    * @param requestConfig 请求配置
    */
   const sendMessage = () => {
-    // TODO: 需要添加节流控制
+    // FIXME: 需要添加节流控制
     // 若用户未输入内容（包括换行和空格），则不发送请求
     if (!questionText.value.trim()) {
       console.log('请输入内容或合法内容')
@@ -149,19 +149,70 @@ export function useChat() {
     // openai.createChatCompletion(requestOptions.body)
     fetch(globalConfigStore.getConfigAttr('api_url'), requestOptions)
       .then((response: Response) => {
-        // FIXME: 当前消息赋值类型待优化
-        const currentMessage = sessionStore.getCurrentSessionAttr('message_list').at(-1) || {
-          role: 'assistant',
-          content: ''
-        }
-
-        transformSSEMessage(response, (done, textDataList) => {
-          afterReceiveMessage(done, textDataList, currentMessage)
-        })
+        afterSendMessage('successful', response)
       })
       .catch((error) => {
-        console.error('Error occurred when fetching SSE endpoint', error)
+        afterSendMessage('failed', error)
       })
+  }
+
+  /**
+   * 发送消息后的处理
+   * @param status 请求状态
+   * @param response 响应
+   */
+  const afterSendMessage = (status: string, response: Response | any) => {
+    // FIXME: 当前消息赋值类型待优化
+    const currentMessage = sessionStore.getCurrentSessionAttr('message_list').at(-1) || {
+      role: 'assistant',
+      content: ''
+    }
+    if (status === 'successful') {
+      // console.log('successful', response)
+      // 处理响应错误
+      if (!response.ok) {
+        response.text().then((text: string) => {
+          currentMessage.content = `\`\`\`json\n${text}\n\`\`\``
+          requesting.value = false
+          console.log('done')
+          scrollToBottom('message_list')
+        })
+        return
+      }
+      // 处理响应成功
+      if (response.body) {
+        transformSSEMessage(response.body, (done, streamDataList) => {
+          // afterReceiveMessage(done, streamDataList, currentMessage)
+          if (done) {
+            const message = setRequestMessage('assistant', currentMessage.content)
+            sessionStore.updateCurrentSessionAttr('request_message_list', [message])
+            requesting.value = false
+            console.log('done')
+            return
+          }
+          // 生成新的消息时，清空当前消息
+          currentMessage.content = ''
+
+          for (let i = 0; i < streamDataList.length; i++) {
+            const messageTextObj = streamDataList[i]
+            if (messageTextObj?.choices) {
+              const choice = messageTextObj.choices?.[0]
+              const content: string = choice?.delta?.content
+              if (content) {
+                currentMessage.content += content
+                scrollToBottom('message_list')
+              }
+            }
+          }
+        })
+      }
+    } else {
+      // 处理请求错误
+      // console.log('error', response)
+      currentMessage.content = `\`\`\`text\n${response}\n\`\`\``
+      requesting.value = false
+      console.log('done')
+    }
   }
 
   /**
@@ -226,41 +277,6 @@ export function useChat() {
     nextTick(() => {
       scrollToBottom('message_list')
     })
-  }
-
-  /**
-   * 接收消息时的处理
-   * @param done 是否完成
-   * @param textDataList 文本数据列表
-   * @param currentMessage 当前消息
-   */
-  const afterReceiveMessage = (done: boolean, textDataList: any[], currentMessage: Message) => {
-    if (done) {
-      const message: Message = setRequestMessage('assistant', currentMessage.content)
-      sessionStore.updateCurrentSessionAttr('request_message_list', [message])
-      // FIXME: 消息传输状态待优化
-      msgStatus.value = 'requesting'
-      requesting.value = false
-      console.log('done')
-      return
-    }
-    // 状态从请求中转为生成中
-    if (msgStatus.value === 'requesting') {
-      currentMessage.content = ''
-      msgStatus.value = 'generating'
-    }
-
-    for (let i = 0; i < textDataList.length; i++) {
-      const messageTextObj = textDataList[i]
-      if (messageTextObj?.choices) {
-        const choice = messageTextObj.choices?.[0]
-        const content: string = choice?.delta?.content
-        if (content) {
-          currentMessage.content += content
-          scrollToBottom('message_list')
-        }
-      }
-    }
   }
 
   return {
