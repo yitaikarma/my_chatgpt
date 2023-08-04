@@ -120,14 +120,6 @@ export function useChat() {
    * @param requestConfig 请求配置
    */
   const sendMessage = () => {
-    // FIXME: 需要添加节流控制
-    // 若用户未输入内容（包括换行和空格），则不发送请求
-    if (!questionText.value.trim()) {
-      console.log('请输入内容或合法内容')
-      // message.warning('请输入内容或合法内容')
-      return
-    }
-
     requesting.value = true
 
     beforeSendMessage()

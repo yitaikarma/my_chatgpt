@@ -1,14 +1,29 @@
 <script setup lang="ts">
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useEventListener } from '@/views/chat/hooks/useEventListener'
-import { NButton, NIcon, NInput } from 'naive-ui'
+import { NButton, NIcon, NInput, useMessage } from 'naive-ui'
 import { Send } from '@vicons/tabler'
+import { throttle } from '@/utils/functions/throttle'
 
+const message = useMessage()
 const { sendMessage, requesting, questionText } = useChat()
 
 useEventListener(document, 'keydown', handleEnter as EventListener)
 
 const placeholder = `请入内容后，按Enter键发送`
+
+// 发送消息
+function handleSendMessage() {
+  // 若用户未输入内容（包括换行和空格），则不发送请求
+  if (!questionText.value.trim()) {
+    message.warning('请输入内容或合法内容')
+    return
+  }
+  sendMessage()
+}
+
+// 节流发送消息
+const throttleSendMessage = throttle(handleSendMessage, 1000)
 
 // Enter键发送消息与换行
 function handleEnter(event: KeyboardEvent) {
@@ -19,7 +34,9 @@ function handleEnter(event: KeyboardEvent) {
     event.preventDefault()
 
     // console.log('requesting.value', requesting)
-    if (!requesting.value) sendMessage()
+    if (!requesting.value) {
+      throttleSendMessage()
+    }
   }
 }
 </script>
@@ -41,7 +58,7 @@ function handleEnter(event: KeyboardEvent) {
           ghost
           :loading="requesting"
           style="margin-bottom: 12px"
-          @click="sendMessage"
+          @click="throttleSendMessage"
         >
           <template #icon>
             <NIcon> <Send /> </NIcon>
