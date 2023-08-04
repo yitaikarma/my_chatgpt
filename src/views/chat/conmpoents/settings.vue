@@ -131,7 +131,9 @@ function submitCallback() {
               v-model:value="configForm.api_key"
               clearable
               placeholder="必填"
+              aria-autocomplete="new-password"
             />
+            <input type="password" autocomplete="new-password" style="display: none" />
           </NFormItemGi>
           <NFormItemGi span="24" path="model" label="模型">
             <NSelect v-model:value="configForm.model" :options="modelOptions" />
