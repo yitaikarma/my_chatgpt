@@ -8,6 +8,11 @@ import { useInitListAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
+import { useClipboard } from '@/hooks/useClipoard'
+import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
+import { Delete24Regular } from '@vicons/fluent'
+import { CopyOutline, RefreshOutline } from '@vicons/ionicons5'
+import { debounce } from '@/utils/functions/debounce'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
@@ -20,6 +25,7 @@ const chatTheme = toRef(() => globalConfigStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
 const changeDirection = ref('down')
+const clipboardStatus = ref('拷贝')
 
 watch(
   () => roleConfigStore.current_role_uuid,
@@ -50,6 +56,48 @@ function sessionTransform() {
   })
 }
 
+// 拷贝消息
+function copyMessage(event: MouseEvent, content: string) {
+  // navigator.clipboard.writeText(content)
+  // console.log('copySession', content)
+
+  const findButton = (element: HTMLElement): HTMLElement => {
+    if (element.tagName === 'BUTTON') {
+      return element
+    }
+    return findButton(element.parentElement as HTMLElement)
+  }
+
+  const buttonId = `copyButton${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`
+
+  findButton(event.target as HTMLElement).setAttribute('id', buttonId)
+
+  const clipboard = useClipboard(`#${buttonId}`, {
+    text: () => content
+  })
+
+  const debounceSetClipboard = debounce(() => {
+    setTimeout(() => {
+      clipboardStatus.value = '拷贝'
+    }, 1000)
+  }, 1000)
+
+  clipboard.on('success', () => {
+    clipboardStatus.value = '已拷贝'
+    debounceSetClipboard()
+  })
+}
+
+// 重发消息
+function resendMessage(content: string) {
+  console.log('resendMessage', content)
+}
+
+// 移除消息
+function removeMessage(message: Message) {
+  console.log('removeMessage', message)
+}
+
 // 渲染markdown
 function renderMarkdown(text: string) {
   return md && md.render(text)
@@ -74,8 +122,65 @@ function renderMarkdown(text: string) {
       </div>
       <div class="message" :user="item.role === 'user'">
         <div class="message_header">
-          <div class="message_role">{{ item.role === 'user' ? userNick : roleNick }}</div>
-          <div class="message_time">{{ item.date }}</div>
+          <div class="message_header_left">
+            <div class="message_role">{{ item.role === 'user' ? userNick : roleNick }}</div>
+            <div class="message_time">{{ item.date }}</div>
+          </div>
+          <div class="message_control_list">
+            <NSpace>
+              <NTooltip trigger="hover" :delay="100">
+                <template #trigger>
+                  <NButton
+                    tertiary
+                    size="small"
+                    type="default"
+                    :focusable="false"
+                    @click="removeMessage(item)"
+                  >
+                    <template #icon>
+                      <NIcon> <Delete24Regular /> </NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                移除
+              </NTooltip>
+              <NTooltip trigger="hover" :delay="100">
+                <template #trigger>
+                  <NButton
+                    tertiary
+                    size="small"
+                    type="default"
+                    :focusable="false"
+                    @click="resendMessage(item.content)"
+                  >
+                    <template #icon>
+                      <NIcon> <RefreshOutline /> </NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                重新发送
+              </NTooltip>
+              <NTooltip trigger="hover" :delay="100">
+                <template #trigger>
+                  <NButton
+                    tertiary
+                    size="small"
+                    type="default"
+                    :focusable="false"
+                    @click="copyMessage($event, item.content)"
+                  >
+                    <template #icon>
+                      <NIcon> <CopyOutline /> </NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                {{ clipboardStatus }}
+              </NTooltip>
+            </NSpace>
+            <!-- <div class="message_control_item" @click="copySession($event, item.content)">
+              <NIcon size="large"> <CopyOutline /> </NIcon>
+            </div> -->
+          </div>
         </div>
         <div class="message_content">
           <div v-if="item.role === 'user'" class="message_text">{{ item.content }}</div>
@@ -94,28 +199,30 @@ function renderMarkdown(text: string) {
     url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
     url('@/assets/fonts/FiraCode-Regular.woff2');
 }
-// FIXME: 对话容器滚动条样式，主题切换的过渡效果无法实现
-.scroll::-webkit-scrollbar {
-  height: 16px;
-}
+.scroll {
+  &::-webkit-scrollbar {
+    height: 16px;
+  }
 
-.scroll::-webkit-scrollbar-thumb {
-  border: 6px solid var(--color-bg);
-  border-radius: 50px;
-  background-color: var(--color-scroll-thumb-bg);
-  // transition: border-color 0.5s ease-out, background-color 0.5s ease-out;
-}
+  &::-webkit-scrollbar-thumb {
+    border: 6px solid var(--color-bg);
+    border-radius: 50px;
+    background-color: var(--color-scroll-thumb-bg);
+    // transition: border-color 0.5s ease-out, background-color 0.5s ease-out;
+  }
 
-.scroll::-webkit-scrollbar-corner {
-  background-color: var(--color-bg);
-}
-// .scroll::-webkit-scrollbar-track {
-//   background-color: #232425;
-// }
+  &::-webkit-scrollbar-corner {
+    background-color: var(--color-bg);
+  }
 
-.scroll::-webkit-scrollbar-thumb:hover {
-  border: 4px solid var(--color-bg);
-  background-color: var(--color-scroll-thumb-bg);
+  // .scroll::-webkit-scrollbar-track {
+  //   background-color: #232425;
+  // }
+
+  &::-webkit-scrollbar-thumb:hover {
+    border: 4px solid var(--color-bg);
+    background-color: var(--color-scroll-thumb-bg);
+  }
 }
 
 .message_container {
@@ -131,6 +238,7 @@ function renderMarkdown(text: string) {
 }
 
 .message_item {
+  position: relative;
   // content-visibility: auto;
   display: grid;
   /* grid-template-columns: 60px 700px 60px; */
@@ -176,7 +284,7 @@ function renderMarkdown(text: string) {
 }
 
 .message {
-  width: 100%;
+  // width: 100%;
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -185,24 +293,39 @@ function renderMarkdown(text: string) {
     width: 100%;
     min-height: 24px;
     display: flex;
-    align-items: baseline;
-    justify-content: flex-start;
-    margin-bottom: 4px;
-    .message_role {
-      margin: 0 6px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      color: var(--color-text);
-      transition: color 0.5s;
+    gap: 20px;
+
+    .message_header_left {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-start;
+      // margin-bottom: 4px;
+      margin-top: 5px;
+      .message_role {
+        margin: 0 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        color: var(--color-text);
+        transition: color 0.5s;
+      }
+      .message_time {
+        margin: 0 6px;
+        // letter-spacing: -1px;
+        font-size: 12px;
+        color: #b9b9b9;
+        color: var(--color-text);
+        transition: color 0.5s;
+      }
     }
-    .message_time {
-      margin: 0 6px;
-      // letter-spacing: -1px;
-      font-size: 12px;
-      color: #b9b9b9;
-      color: var(--color-text);
-      transition: color 0.5s;
+    .message_control_list {
+      visibility: hidden;
+      position: sticky;
+      top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 2px;
     }
   }
   .message_content {
@@ -224,6 +347,11 @@ function renderMarkdown(text: string) {
     }
   }
 }
+.message_item:hover {
+  .message_control_list {
+    visibility: initial;
+  }
+}
 
 .message_item[role='user'] {
   justify-items: end;
@@ -235,6 +363,9 @@ function renderMarkdown(text: string) {
     .fake_avatar_img {
       background-color: var(--color-msg-ctn-bg-2);
     }
+  }
+  .message_header_left {
+    order: 1;
   }
   .message {
     grid-row: 1;
@@ -255,8 +386,11 @@ function renderMarkdown(text: string) {
 
 .message_item[chatTheme='Q&A'] {
   border-bottom: 1px solid var(--color-msg-ctn-border-1);
-  .message_role {
-    content-visibility: hidden;
+  .message_header {
+    justify-content: space-between;
+    .message_role {
+      content-visibility: hidden;
+    }
   }
   .message_content {
     transition: border-color 0.5s, border-radius 0.5s, background-color 0.5s, color 0.5s;
@@ -281,8 +415,15 @@ function renderMarkdown(text: string) {
       grid-column: 2;
       align-items: initial;
       .message_header {
-        justify-content: initial;
+        justify-content: space-between;
+        .message_role {
+          order: initial;
+        }
+        .message_header_left {
+          order: initial;
+        }
       }
+
       .message_content {
         transition: color 0.5s, border-radius 0.5s;
         // border: initial;
