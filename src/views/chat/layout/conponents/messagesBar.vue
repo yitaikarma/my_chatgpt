@@ -176,6 +176,8 @@ function renderMarkdown(text: string) {
 }
 
 .message {
+  width: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
