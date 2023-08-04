@@ -6,6 +6,7 @@ import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
 import { Message } from '@vicons/tabler'
+import { throttle } from '@/utils/functions/throttle'
 
 // import { ChatGPTAPI } from 'chatgpt'
 // import { Configuration, OpenAIApi } from 'openai';
@@ -181,8 +182,14 @@ export function useChat() {
       }
       // 处理响应成功
       if (response.body) {
+        // 生成新的消息时，清空当前消息
+        currentMessage.content = ''
+
+        const throttleScrollBottom = throttle(() => {
+          scrollToBottom('message_list')
+        }, 50)
+
         transformSSEMessage(response.body, (done, streamDataList) => {
-          // afterReceiveMessage(done, streamDataList, currentMessage)
           if (done) {
             const message = setRequestMessage('assistant', currentMessage.content)
             sessionStore.updateCurrentSessionAttr('request_message_list', [message])
@@ -190,8 +197,6 @@ export function useChat() {
             console.log('done')
             return
           }
-          // 生成新的消息时，清空当前消息
-          currentMessage.content = ''
 
           for (let i = 0; i < streamDataList.length; i++) {
             const messageTextObj = streamDataList[i]
@@ -200,7 +205,7 @@ export function useChat() {
               const content: string = choice?.delta?.content
               if (content) {
                 currentMessage.content += content
-                scrollToBottom('message_list')
+                throttleScrollBottom()
               }
             }
           }
