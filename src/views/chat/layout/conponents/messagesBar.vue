@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
+import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
+import { Delete24Regular } from '@vicons/fluent'
+import { CopyOutline, RefreshOutline } from '@vicons/ionicons5'
 import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
 import { useSession } from '@/hooks/chat/core/useSession'
 import { useChat } from '@/views/chat/hooks/useChat'
 import { useInitListAnimation } from '@/hooks/useAnimation'
-import { scrollToBottom } from '@/utils/operationElement'
 import { useMarkdown } from '@/views/chat/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
+import { scrollToBottom } from '@/utils/operationElement'
 import { useClipboard } from '@/hooks/useClipoard'
-import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
-import { Delete24Regular } from '@vicons/fluent'
-import { CopyOutline, RefreshOutline } from '@vicons/ionicons5'
 import { debounce } from '@/utils/functions/debounce'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore } = useSession()
-const { initMessage } = useChat()
+const { initMessage, sendMessage, requesting, questionText } = useChat()
 
 let md: MarkdownIt | null = null
 const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
@@ -90,7 +90,10 @@ function copyMessage(event: MouseEvent, content: string) {
 
 // 重发消息
 function resendMessage(content: string) {
-  console.log('resendMessage', content)
+  // FIXME: 阻止回答消息重发
+  // console.log('resendMessage', content)
+  questionText.value = content
+  if (!requesting.value) sendMessage()
 }
 
 // 移除消息
