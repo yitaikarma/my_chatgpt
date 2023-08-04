@@ -3,7 +3,7 @@
  * @param fn 需要防抖的函数
  * @param delay 防抖延迟时间
  */
-export const debounce2 = (fn: (...args: any[]) => void, delay: number) => {
+export const debounce = (fn: (...args: any[]) => void, delay: number) => {
   let timer: NodeJS.Timeout
 
   return (...args: any[]) => {

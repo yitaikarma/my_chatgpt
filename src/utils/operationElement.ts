@@ -1,4 +1,5 @@
-// BUG: 过快的执行会导致不能滚动到底部，可能是因为滚动事件还没执行完就执行了滚动到底部的方法，可以考虑使用节流函数
+import { throttle } from '@/utils/functions/throttle'
+
 /**
  * 滚动到底部
  * @param elementId 元素id
@@ -19,4 +20,46 @@ export const scrollToBottom = (elementId: string, isTransition: boolean = true):
   } finally {
     // console.log('scrollToBottom');
   }
+}
+
+/**
+ * 滚动到顶部
+ * @param elementId 元素id
+ * @param isTransition 是否使用过渡动画
+ */
+export const scrollToTop = (elementId: string, isTransition: boolean = true): void => {
+  try {
+    const container = document.getElementById(elementId)
+    if (container && container.scrollTop > 0) {
+      // console.log('滚动到顶部')
+      container.scrollTo({
+        top: 0,
+        behavior: isTransition ? 'smooth' : 'auto'
+      })
+    }
+  } catch (e) {
+    console.log(e)
+  } finally {
+    // console.log('scrollToTop');
+  }
+}
+type ScrollDirction = 'top' | 'bottom'
+
+/**
+ * 节流滚动到顶部或底部
+ * @param elementId 元素id
+ * @param isTransition 是否使用过渡动画
+ * @param direction 滚动方向
+ * @param delay 节流延迟时间
+ */
+export const throttleScrollTo = (
+  elementId: string,
+  isTransition: boolean = true,
+  direction: ScrollDirction,
+  delay: number
+) => {
+  const scrollTo = direction === 'top' ? scrollToTop : scrollToBottom
+  throttle(() => {
+    scrollTo(elementId, isTransition)
+  }, delay)
 }

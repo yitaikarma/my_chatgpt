@@ -1,5 +1,3 @@
-import { json } from 'stream/consumers'
-
 /**
  * SSE 文本消息逐字转换
  * @param response 响应数据
