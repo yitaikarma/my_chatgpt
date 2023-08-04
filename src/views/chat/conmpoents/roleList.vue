@@ -243,11 +243,12 @@ function handledeleteRole(target_uuid: string) {
   margin: 0 10px;
   padding: 10px;
   border-radius: 5px;
+  border: 2px solid transparent;
   & {
     --is-hide: initial;
   }
   &[cureent_session='true'] {
-    outline: 2px solid var(--color-msg-ctn-border-1);
+    border-color: var(--color-msg-ctn-border-1);
   }
   .avatar {
     user-select: none;
