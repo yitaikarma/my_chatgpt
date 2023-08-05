@@ -13,7 +13,7 @@ import { throttle } from '@/utils/functions/throttle'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { sessionStore } = useSession()
+const { sessionStore, initSession } = useSession()
 
 // let openai = null
 
@@ -40,56 +40,11 @@ const questionText = ref<string>('')
 
 export function useChat() {
   /**
-   * 初始化消息
+   * 初始化聊天状态
    */
-  const initMessage = () => {
+  const initChatStatus = () => {
     questionText.value = ''
-    // FIXME: 是否初始化消息的逻辑待优化
-    if (!sessionStore.getCurrentSessionAttr('title')) {
-      clearMessage()
-    }
-
     requesting.value = false
-  }
-
-  /**
-   * 重置消息
-   */
-  const clearMessage = () => {
-    const greetingsMessage = setChatMessage(
-      generateUUIDUsingMathRandom(),
-      'assistant',
-      roleConfigStore.getRoleConfigAttr('greetings_text'),
-      roleConfigStore.getRoleConfigAttr('role_nick')
-    )
-    const requestMessageList = setRequestMessage(
-      'user',
-      roleConfigStore.getRoleConfigAttr('role_directive')
-    )
-
-    sessionStore.updateCurrentRoleSession({
-      uuid: generateUUIDUsingMathRandom(),
-      title: greetingsMessage.content,
-      date: new Date().toLocaleString(),
-      message_list: [greetingsMessage],
-      request_message_list: [requestMessageList],
-      is_history: false
-    })
-  }
-
-  /**
-   * 保存消息
-   */
-  const seveMessage = () => {
-    // FIXME: 当前历史删除后，又继续发送消息，需要再次保存为历史
-    const messageList = sessionStore.getCurrentSessionAttr('message_list')
-    // 未进行过对话，不保存
-    if (messageList.length < 2) return
-
-    const currentSession = sessionStore.getCurrentSession
-    if (!currentSession.is_history) {
-      sessionStore.updateCurrentSessionToHistory()
-    }
   }
 
   // 创建 Node-GPT
@@ -151,6 +106,48 @@ export function useChat() {
   }
 
   /**
+   * 发送消息前的处理
+   */
+  const beforeSendMessage = () => {
+    // FIXME: 消息传输状态待优化, 用调用模板方法的方式
+    const userMessage = {
+      uuid: generateUUIDUsingMathRandom(),
+      role: 'user',
+      content: questionText.value,
+      name: roleConfigStore.getRoleConfigAttr('user_nick'),
+      date: new Date().toLocaleString()
+    }
+    const waitMessage = {
+      uuid: generateUUIDUsingMathRandom(),
+      role: 'assistant',
+      content: roleConfigStore.getRoleConfigAttr('wait_text'),
+      name: roleConfigStore.getRoleConfigAttr('role_nick'),
+      date: new Date().toLocaleString()
+    }
+    const questionMessage = {
+      role: 'user',
+      content: questionText.value
+    }
+
+    sessionStore.updateCurrentSessionAttr('message_list', [userMessage, waitMessage])
+    sessionStore.updateCurrentSessionAttr('request_message_list', [questionMessage])
+    questionText.value = ''
+
+    // 若当前会话是历史会话，并且已从历史列表移除，则更新为非历史会话
+    const isHistory = sessionStore.getCurrentSession.is_history
+    const isHistoryExist = sessionStore.getHistoryList().some((history) => {
+      return history.uuid === sessionStore.getCurrentSession.uuid
+    })
+    if (isHistory && !isHistoryExist) {
+      sessionStore.updateCurrentSessionAttr('is_history', false)
+    }
+
+    nextTick(() => {
+      scrollToBottom('message_list')
+    })
+  }
+
+  /**
    * 发送消息后的处理
    * @param status 请求状态
    * @param response 响应
@@ -184,7 +181,7 @@ export function useChat() {
 
         transformSSEMessage(response.body, (done, streamDataList) => {
           if (done) {
-            const message = setRequestMessage('assistant', currentMessage.content)
+            const message = { role: 'assistant', content: currentMessage.content }
             sessionStore.updateCurrentSessionAttr('request_message_list', [message])
             requesting.value = false
             console.log('done')
@@ -213,79 +210,8 @@ export function useChat() {
     }
   }
 
-  /**
-   * 设置请求消息
-   * @param role 角色
-   * @param content 内容
-   * @returns Message 消息
-   */
-  const setRequestMessage = (role: string, content: string) => {
-    return {
-      role,
-      content
-    }
-  }
-
-  /**
-   * 设置聊天消息
-   * @param role 角色
-   * @param content 内容
-   * @param name 昵称
-   * @returns Message 消息
-   */
-  const setChatMessage = (uuid: string, role: string, content: string, name: string) => {
-    return {
-      uuid,
-      role,
-      content,
-      name,
-      date: new Date().toLocaleString()
-    }
-  }
-
-  /**
-   * 发送消息前的处理
-   */
-  const beforeSendMessage = () => {
-    // FIXME: 消息传输状态待优化, 用调用模板方法的方式
-    const userMessage = setChatMessage(
-      generateUUIDUsingMathRandom(),
-      'user',
-      questionText.value,
-      roleConfigStore.getRoleConfigAttr('user_nick')
-    )
-    const waitMessage = setChatMessage(
-      generateUUIDUsingMathRandom(),
-      'assistant',
-      roleConfigStore.getRoleConfigAttr('wait_text'),
-      roleConfigStore.getRoleConfigAttr('role_nick')
-    )
-    const questionMessage = setRequestMessage('user', questionText.value)
-
-    sessionStore.updateCurrentSessionAttr('message_list', [userMessage, waitMessage])
-    sessionStore.updateCurrentSessionAttr('request_message_list', [questionMessage])
-    questionText.value = ''
-
-    // 若当前会话是历史会话，并且已从历史列表移除，则更新为非历史会话
-    const isHistory = sessionStore.getCurrentSession.is_history
-    const isHistoryExist = sessionStore.getHistoryList().some((history) => {
-      return history.uuid === sessionStore.getCurrentSession.uuid
-    })
-    if (isHistory && !isHistoryExist) {
-      sessionStore.updateCurrentSessionAttr('is_history', false)
-    }
-
-    nextTick(() => {
-      scrollToBottom('message_list')
-    })
-  }
-
   return {
-    setRequestMessage,
-    setChatMessage,
-    initMessage,
-    clearMessage,
-    seveMessage,
+    initChatStatus,
     sendMessage,
     questionText,
     requesting,

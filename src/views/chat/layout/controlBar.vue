@@ -12,12 +12,14 @@ import {
 } from '@vicons/fluent'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
+import { useSession } from '@/hooks/chat/useSession'
 import { useChat } from '@/hooks/chat/useChat'
 import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { initMessage, clearMessage, seveMessage } = useChat()
+const { initSession, seveSession } = useSession()
+const { initChatStatus } = useChat()
 
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
@@ -73,16 +75,16 @@ function handleThemeChange() {
 }
 
 // 历史话题
-function handleOpenHistoryMessage() {
+function handleOpenHistorySession() {
   historyMsgRef.value?.toggleActive(true)
 }
 
 // 新话题
-function handleNewMessage() {
-  seveMessage()
+function handleNewSession() {
   // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
-  initMessage()
-  clearMessage()
+  seveSession()
+  initSession()
+  initChatStatus()
 }
 </script>
 
@@ -148,7 +150,7 @@ function handleNewMessage() {
             type="default"
             round
             :focusable="false"
-            @click="handleOpenHistoryMessage"
+            @click="handleOpenHistorySession"
           >
             <template #icon>
               <NIcon> <DocumentBulletListClock24Regular /> </NIcon>
@@ -165,7 +167,7 @@ function handleNewMessage() {
             type="primary"
             round
             :focusable="false"
-            @click="handleNewMessage"
+            @click="handleNewSession"
           >
             <template #icon>
               <NIcon> <FormNew24Regular /> </NIcon>

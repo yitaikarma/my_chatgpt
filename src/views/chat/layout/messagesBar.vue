@@ -16,8 +16,8 @@ import { debounce } from '@/utils/functions/debounce'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { sessionStore } = useSession()
-const { initMessage, sendMessage, requesting, questionText } = useChat()
+const { sessionStore, initSession } = useSession()
+const { initChatStatus, sendMessage, requesting, questionText } = useChat()
 const message = useMessage()
 
 let md: MarkdownIt | null = null
@@ -31,6 +31,7 @@ const clipboardStatus = ref('拷贝')
 watch(
   () => roleConfigStore.current_role_uuid,
   (val, oldVal) => {
+    initChatStatus()
     changeDirection.value =
       roleConfigStore.getRoleIndex(val) > roleConfigStore.getRoleIndex(oldVal) ? 'down' : 'up'
     sessionTransform()
@@ -38,15 +39,19 @@ watch(
 )
 
 onBeforeMount(() => {
-  initSession()
+  init()
   sessionTransform()
 })
 
-// 初始化会话
-function initSession() {
+// 初始化
+function init() {
   // createGPT()
   md = useMarkdown()
-  initMessage()
+  initChatStatus()
+  // 没有历史消息则初始化
+  if (!sessionStore.getCurrentSessionAttr('title')) {
+    initSession()
+  }
 }
 
 // 会话过渡
