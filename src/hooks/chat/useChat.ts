@@ -1,4 +1,4 @@
-import { ref, nextTick, watch } from 'vue'
+import { nextTick } from 'vue'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useSession } from '@/hooks/chat/useSession'
@@ -14,21 +14,6 @@ const { roleConfigStore } = useRoleConfig()
 const { sessionStore, sessionTemplate } = useSession()
 
 // let openai = null
-
-// FIXME: 指令更新逻辑待重构, 改为统一管理状态后，更加需要重构。
-// 思路是：从请求聊天数据里分离出指令，每次请求都从同一配置里获取指令，否则指令更新后，需要需要处理所有的历史消息。
-
-// 监听前缀指令变化
-// watch(
-//   // () => globalConfigStore.getConfigAttr('role_directive'),
-//   () => userSettingsStore.getConfig('a', 'role_directive'),
-//   (value) => {
-//     // console.log('updateRoleDirective', value)
-//     // if (requestMessageList?.[0]) {
-//     //   requestMessageList[0].content = value
-//     // }
-//   }
-// )
 
 export function useChat() {
   // 初始化聊天状态
@@ -158,8 +143,10 @@ export function useChat() {
         response.text().then((text: string) => {
           currentMessage.content = `\`\`\`json\n${text}\n\`\`\``
           sessionStore.setRequesting(false)
+          nextTick(() => {
+            scrollToBottom('message_list')
+          })
           console.log('done')
-          scrollToBottom('message_list')
         })
         return
       }
@@ -189,7 +176,9 @@ export function useChat() {
               const content: string = choice?.delta?.content
               if (content) {
                 currentMessage.content += content
-                throttleScrollBottom()
+                nextTick(() => {
+                  throttleScrollBottom()
+                })
               }
             }
           }
@@ -200,6 +189,9 @@ export function useChat() {
       // console.log('error', response)
       currentMessage.content = `\`\`\`text\n${response}\n\`\`\``
       sessionStore.setRequesting(false)
+      nextTick(() => {
+        scrollToBottom('message_list')
+      })
       console.log('done')
     }
   }
