@@ -2,8 +2,8 @@
 import { ref, toRef, watchEffect } from 'vue'
 import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
-import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
-import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
+import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
+import { useConfig } from '@/hooks/chat/useGlobalConfig'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()

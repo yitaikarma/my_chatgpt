@@ -10,8 +10,8 @@ import {
   DocumentBulletListClock24Regular,
   FormNew24Regular
 } from '@vicons/fluent'
-import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
-import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
+import { useConfig } from '@/hooks/chat/useGlobalConfig'
+import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useChat } from '@/hooks/chat/useChat'
 import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 

@@ -1,7 +1,7 @@
 import { computed, onBeforeMount } from 'vue'
 import { darkTheme, useOsTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
-import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
+import { useConfig } from '@/hooks/chat/useGlobalConfig'
 
 // 自定义 NaiveUI 主题
 const themeOverrides: GlobalThemeOverrides = {

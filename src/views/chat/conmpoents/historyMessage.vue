@@ -11,7 +11,7 @@ import {
   NInput
 } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
-import { useSession } from '@/hooks/chat/core/useSession'
+import { useSession } from '@/hooks/chat/useSession'
 import { useEachElement, useInitListAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 

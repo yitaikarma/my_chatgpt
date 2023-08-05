@@ -2,8 +2,8 @@
 import { ref, toRef, watch, nextTick, onBeforeMount } from 'vue'
 import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
-import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
-import { useSession } from '@/hooks/chat/core/useSession'
+import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
+import { useSession } from '@/hooks/chat/useSession'
 import { useInitListAnimation } from '@/hooks/useAnimation'
 
 const message = useMessage()

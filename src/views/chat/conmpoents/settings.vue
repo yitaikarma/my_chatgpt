@@ -13,7 +13,7 @@ import {
   useMessage
 } from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
-import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
+import { useConfig } from '@/hooks/chat/useGlobalConfig'
 
 const { globalConfigStore } = useConfig()
 const message = useMessage()
