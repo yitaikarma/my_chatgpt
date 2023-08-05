@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useChat } from '@/views/chat/hooks/useChat'
-import { useEventListener } from '@/views/chat/hooks/useEventListener'
 import { NButton, NIcon, NInput, useMessage } from 'naive-ui'
 import { Send } from '@vicons/tabler'
+import { useChat } from '@/hooks/chat/useChat'
+import { useEventListener } from '@/views/chat/hooks/useEventListener'
 import { throttle } from '@/utils/functions/throttle'
 
 const message = useMessage()

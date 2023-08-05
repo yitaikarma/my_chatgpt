@@ -2,10 +2,6 @@
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref, computed, nextTick } from 'vue'
-import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
-import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
-import { useChat } from '@/views/chat/hooks/useChat'
-import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
 import {
   ChatSettings24Regular,
@@ -14,6 +10,10 @@ import {
   DocumentBulletListClock24Regular,
   FormNew24Regular
 } from '@vicons/fluent'
+import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
+import { useRoleConfig } from '@/hooks/chat/core/useRoleConfig'
+import { useChat } from '@/hooks/chat/useChat'
+import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
