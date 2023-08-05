@@ -99,6 +99,7 @@ function resendMessage(content: string) {
 // 移除消息
 function removeMessage(message: Message) {
   console.log('removeMessage', message)
+  // 每条消息都需要一个唯一的uuid
 }
 
 // 渲染markdown
