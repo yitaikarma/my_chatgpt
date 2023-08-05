@@ -27,9 +27,11 @@ export interface RoleSession {
 }
 
 export interface SessionStore {
+  preset_role: RoleSession
   role_collection: {
     [role: string]: RoleSession
   }
-  preset_role: RoleSession
   current_role_uuid: string
+  question_text: string
+  requesting: boolean
 }

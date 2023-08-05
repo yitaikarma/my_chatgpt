@@ -1,7 +1,6 @@
 import { useSessionStore } from '@/stores/modules/session'
 import { useRoleConfigStore } from '@/stores/modules/roleConfig'
 import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
-import type { SessionHistory } from '@/stores/modules/session/types'
 
 export function useSession() {
   const roleConfigStore = useRoleConfigStore()
@@ -21,10 +20,34 @@ export function useSession() {
       date: new Date().toLocaleString()
     }
 
+    // 用户提问
+    const userMessage = {
+      uuid: generateUUIDUsingMathRandom(),
+      role: 'user',
+      content: sessionStore.getQuestionText,
+      name: roleConfigStore.getRoleConfigAttr('user_nick'),
+      date: new Date().toLocaleString()
+    }
+
+    // 等待回复
+    const waitMessage = {
+      uuid: generateUUIDUsingMathRandom(),
+      role: 'assistant',
+      content: roleConfigStore.getRoleConfigAttr('wait_text'),
+      name: roleConfigStore.getRoleConfigAttr('role_nick'),
+      date: new Date().toLocaleString()
+    }
+
     // 助理请求指令
     const requestMessageList = {
       role: 'user',
       content: roleConfigStore.getRoleConfigAttr('role_directive')
+    }
+
+    // 用户请求提问
+    const questionMessage = {
+      role: 'user',
+      content: sessionStore.getQuestionText
     }
 
     // 会话模板
@@ -40,6 +63,9 @@ export function useSession() {
     return {
       greetingsMessage,
       requestMessageList,
+      userMessage,
+      waitMessage,
+      questionMessage,
       session
     }
   }
@@ -83,5 +109,5 @@ export function useSession() {
     }
   }
 
-  return { sessionStore, initRoleSession, initSession, seveSession }
+  return { sessionStore, sessionTemplate, initRoleSession, initSession, seveSession }
 }

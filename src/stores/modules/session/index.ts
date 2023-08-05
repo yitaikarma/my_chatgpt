@@ -3,7 +3,6 @@ import type { SessionStore, SessionHistory, RoleSession, Message, RequestMessage
 
 export const useSessionStore = defineStore('session', {
   state: (): SessionStore => ({
-    role_collection: {},
     preset_role: {
       uuid: '',
       current: {
@@ -16,10 +15,23 @@ export const useSessionStore = defineStore('session', {
       },
       history_list: []
     },
-    current_role_uuid: 'role'
+    role_collection: {},
+    current_role_uuid: 'role',
+    question_text: '',
+    requesting: false
   }),
 
   getters: {
+    // 获取请求状态
+    getRequesting({ requesting }) {
+      return requesting
+    },
+
+    // 获取输入框的问题文本
+    getQuestionText({ question_text }) {
+      return question_text
+    },
+
     // 获取角色索引
     getSessionIndex({ role_collection, current_role_uuid }) {
       return (uuid: string) => {
@@ -67,6 +79,16 @@ export const useSessionStore = defineStore('session', {
   },
 
   actions: {
+    // 设置请求状态
+    setRequesting(requesting: boolean) {
+      this.requesting = requesting
+    },
+
+    // 更新输入框的问题文本
+    setQuestionText(text: string) {
+      this.question_text = text
+    },
+
     // 更新历史的属性
     updateHistoryAttr<T extends keyof SessionHistory>(
       index: number,

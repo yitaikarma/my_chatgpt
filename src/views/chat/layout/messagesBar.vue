@@ -17,7 +17,7 @@ import { debounce } from '@/utils/functions/debounce'
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore, initSession } = useSession()
-const { initChatStatus, sendMessage, requesting, questionText } = useChat()
+const { initChatStatus, sendMessage } = useChat()
 const message = useMessage()
 
 let md: MarkdownIt | null = null
@@ -32,8 +32,10 @@ watch(
   () => roleConfigStore.current_role_uuid,
   (val, oldVal) => {
     initChatStatus()
+
     changeDirection.value =
       roleConfigStore.getRoleIndex(val) > roleConfigStore.getRoleIndex(oldVal) ? 'down' : 'up'
+
     sessionTransform()
   }
 )
@@ -65,8 +67,6 @@ function sessionTransform() {
 // 拷贝消息
 function copyMessage(event: MouseEvent, content: string) {
   // navigator.clipboard.writeText(content)
-  // console.log('copySession', content)
-
   const findButton = (element: HTMLElement): HTMLElement => {
     if (element.tagName === 'BUTTON') {
       return element
@@ -97,14 +97,12 @@ function copyMessage(event: MouseEvent, content: string) {
 
 // 重发消息
 function resendMessage(content: string) {
-  // console.log('resendMessage', content)
-  questionText.value = content
-  if (!requesting.value) sendMessage()
+  sessionStore.setQuestionText(content)
+  if (!sessionStore.getRequesting) sendMessage()
 }
 
 // 移除消息
 function removeMessage(index: number) {
-  // console.log('removeMessage', index)
   // 每条消息都需要一个唯一的uuid
   sessionStore.deleteCurrentMessage(index)
 }

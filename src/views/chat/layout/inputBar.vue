@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { NButton, NIcon, NInput, useMessage } from 'naive-ui'
 import { Send } from '@vicons/tabler'
 import { useChat } from '@/hooks/chat/useChat'
+import { useSession } from '@/hooks/chat/useSession'
 import { useEventListener } from '@/hooks/useEventListener'
 import { throttle } from '@/utils/functions/throttle'
 
 const message = useMessage()
-const { sendMessage, requesting, questionText } = useChat()
+const { sendMessage } = useChat()
+const { sessionStore } = useSession()
 
 useEventListener(document, 'keydown', handleEnter as EventListener)
 
+const questionText = computed({
+  get: () => sessionStore.getQuestionText,
+  set: (value) => sessionStore.setQuestionText(value)
+})
 const placeholder = `请入内容后，按Enter键发送`
 
 // 发送消息
@@ -29,13 +36,9 @@ const throttleSendMessage = throttle(handleSendMessage, 1000)
 function handleEnter(event: KeyboardEvent) {
   if (event.code === 'Enter') {
     // shift + enter 换行
-    if (event.shiftKey) return
-
-    event.preventDefault()
-
-    // console.log('requesting.value', requesting)
-    if (!requesting.value) {
-      throttleSendMessage()
+    if (!event.shiftKey) {
+      event.preventDefault()
+      if (!sessionStore.getRequesting) throttleSendMessage()
     }
   }
 }
@@ -56,7 +59,7 @@ function handleEnter(event: KeyboardEvent) {
           size="medium"
           type="primary"
           ghost
-          :loading="requesting"
+          :loading="sessionStore.getRequesting"
           style="margin-bottom: 12px"
           @click="throttleSendMessage"
         >

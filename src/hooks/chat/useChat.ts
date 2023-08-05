@@ -2,10 +2,8 @@ import { ref, nextTick, watch } from 'vue'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useSession } from '@/hooks/chat/useSession'
-import { generateUUIDUsingMathRandom } from '@/utils/functions/crypto'
 import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
-import { Message } from '@vicons/tabler'
 import { throttle } from '@/utils/functions/throttle'
 
 // import { ChatGPTAPI } from 'chatgpt'
@@ -13,15 +11,9 @@ import { throttle } from '@/utils/functions/throttle'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { sessionStore, initSession } = useSession()
+const { sessionStore, sessionTemplate } = useSession()
 
 // let openai = null
-
-// FIXME: 状态管理，需要重新设计
-const requesting = ref<boolean>(false)
-const msgStatus = ref<string>('requesting')
-// 用户问题
-const questionText = ref<string>('')
 
 // FIXME: 指令更新逻辑待重构, 改为统一管理状态后，更加需要重构。
 // 思路是：从请求聊天数据里分离出指令，每次请求都从同一配置里获取指令，否则指令更新后，需要需要处理所有的历史消息。
@@ -39,12 +31,10 @@ const questionText = ref<string>('')
 // )
 
 export function useChat() {
-  /**
-   * 初始化聊天状态
-   */
+  // 初始化聊天状态
   const initChatStatus = () => {
-    questionText.value = ''
-    requesting.value = false
+    sessionStore.setQuestionText('')
+    sessionStore.setRequesting(false)
   }
 
   // 创建 Node-GPT
@@ -76,7 +66,7 @@ export function useChat() {
    * @param requestConfig 请求配置
    */
   const sendMessage = () => {
-    requesting.value = true
+    sessionStore.setRequesting(true)
 
     beforeSendMessage()
 
@@ -109,29 +99,13 @@ export function useChat() {
    * 发送消息前的处理
    */
   const beforeSendMessage = () => {
-    // FIXME: 消息传输状态待优化, 用调用模板方法的方式
-    const userMessage = {
-      uuid: generateUUIDUsingMathRandom(),
-      role: 'user',
-      content: questionText.value,
-      name: roleConfigStore.getRoleConfigAttr('user_nick'),
-      date: new Date().toLocaleString()
-    }
-    const waitMessage = {
-      uuid: generateUUIDUsingMathRandom(),
-      role: 'assistant',
-      content: roleConfigStore.getRoleConfigAttr('wait_text'),
-      name: roleConfigStore.getRoleConfigAttr('role_nick'),
-      date: new Date().toLocaleString()
-    }
-    const questionMessage = {
-      role: 'user',
-      content: questionText.value
-    }
+    const userMessage = sessionTemplate().userMessage
+    const waitMessage = sessionTemplate().waitMessage
+    const questionMessage = sessionTemplate().questionMessage
 
     sessionStore.updateCurrentSessionAttr('message_list', [userMessage, waitMessage])
     sessionStore.updateCurrentSessionAttr('request_message_list', [questionMessage])
-    questionText.value = ''
+    sessionStore.setQuestionText('')
 
     // 若当前会话是历史会话，并且已从历史列表移除，则更新为非历史会话
     const isHistory = sessionStore.getCurrentSession.is_history
@@ -158,18 +132,21 @@ export function useChat() {
       role: 'assistant',
       content: ''
     }
+
     if (status === 'successful') {
       // console.log('successful', response)
+
       // 处理响应错误
       if (!response.ok) {
         response.text().then((text: string) => {
           currentMessage.content = `\`\`\`json\n${text}\n\`\`\``
-          requesting.value = false
+          sessionStore.setRequesting(false)
           console.log('done')
           scrollToBottom('message_list')
         })
         return
       }
+
       // 处理响应成功
       if (response.body) {
         // 生成新的消息时，清空当前消息
@@ -183,7 +160,7 @@ export function useChat() {
           if (done) {
             const message = { role: 'assistant', content: currentMessage.content }
             sessionStore.updateCurrentSessionAttr('request_message_list', [message])
-            requesting.value = false
+            sessionStore.setRequesting(false)
             console.log('done')
             return
           }
@@ -205,16 +182,10 @@ export function useChat() {
       // 处理请求错误
       // console.log('error', response)
       currentMessage.content = `\`\`\`text\n${response}\n\`\`\``
-      requesting.value = false
+      sessionStore.setRequesting(false)
       console.log('done')
     }
   }
 
-  return {
-    initChatStatus,
-    sendMessage,
-    questionText,
-    requesting,
-    msgStatus
-  }
+  return { initChatStatus, sendMessage }
 }
