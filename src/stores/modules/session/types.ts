@@ -1,3 +1,16 @@
+export interface RequestMessage {
+  role: string
+  content: string
+}
+
+export interface Message {
+  uuid: string
+  role: string
+  name?: string
+  content: string
+  date?: string
+}
+
 export interface SessionHistory {
   title: string
   message_list: Message[]

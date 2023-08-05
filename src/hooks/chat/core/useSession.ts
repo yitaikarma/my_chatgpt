@@ -13,6 +13,7 @@ export function useSession() {
    */
   const initRoleSession = (role_uuid: string) => {
     const greetingsMessage = {
+      uuid: generateUUIDUsingMathRandom(),
       role: 'assistant',
       content: roleConfigStore.getRoleConfigAttr('greetings_text'),
       name: roleConfigStore.getRoleConfigAttr('role_nick'),

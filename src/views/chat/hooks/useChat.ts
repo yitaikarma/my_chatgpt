@@ -57,6 +57,7 @@ export function useChat() {
    */
   const clearMessage = () => {
     const greetingsMessage = setChatMessage(
+      generateUUIDUsingMathRandom(),
       'assistant',
       roleConfigStore.getRoleConfigAttr('greetings_text'),
       roleConfigStore.getRoleConfigAttr('role_nick')
@@ -218,7 +219,7 @@ export function useChat() {
    * @param content 内容
    * @returns Message 消息
    */
-  const setRequestMessage = (role: string, content: string): Message => {
+  const setRequestMessage = (role: string, content: string) => {
     return {
       role,
       content
@@ -232,8 +233,9 @@ export function useChat() {
    * @param name 昵称
    * @returns Message 消息
    */
-  const setChatMessage = (role: string, content: string, name: string): Message => {
+  const setChatMessage = (uuid: string, role: string, content: string, name: string) => {
     return {
+      uuid,
       role,
       content,
       name,
@@ -247,11 +249,13 @@ export function useChat() {
   const beforeSendMessage = () => {
     // FIXME: 消息传输状态待优化, 用调用模板方法的方式
     const userMessage = setChatMessage(
+      generateUUIDUsingMathRandom(),
       'user',
       questionText.value,
       roleConfigStore.getRoleConfigAttr('user_nick')
     )
     const waitMessage = setChatMessage(
+      generateUUIDUsingMathRandom(),
       'assistant',
       roleConfigStore.getRoleConfigAttr('wait_text'),
       roleConfigStore.getRoleConfigAttr('role_nick')
