@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NIcon, useMessage } from 'naive-ui'
 import { Delete24Regular } from '@vicons/fluent'
 import { CopyOutline, RefreshOutline } from '@vicons/ionicons5'
 import { useConfig } from '@/hooks/chat/core/useGlobalConfig'
@@ -18,6 +18,7 @@ const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore } = useSession()
 const { initMessage, sendMessage, requesting, questionText } = useChat()
+const message = useMessage()
 
 let md: MarkdownIt | null = null
 const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
@@ -83,6 +84,7 @@ function copyMessage(event: MouseEvent, content: string) {
   }, 1000)
 
   clipboard.on('success', () => {
+    message.success('已拷贝到剪贴板', { duration: 1000 })
     clipboardStatus.value = '已拷贝'
     debounceSetClipboard()
   })
@@ -90,16 +92,16 @@ function copyMessage(event: MouseEvent, content: string) {
 
 // 重发消息
 function resendMessage(content: string) {
-  // FIXME: 阻止回答消息重发
   // console.log('resendMessage', content)
   questionText.value = content
   if (!requesting.value) sendMessage()
 }
 
 // 移除消息
-function removeMessage(message: Message) {
-  console.log('removeMessage', message)
+function removeMessage(index: number) {
+  // console.log('removeMessage', index)
   // 每条消息都需要一个唯一的uuid
+  sessionStore.deleteCurrentMessage(index)
 }
 
 // 渲染markdown
@@ -130,7 +132,7 @@ function renderMarkdown(text: string) {
             <div class="message_role">{{ item.role === 'user' ? userNick : roleNick }}</div>
             <div class="message_time">{{ item.date }}</div>
           </div>
-          <div class="message_control_list">
+          <div :hidden="i === 0" class="message_control_list">
             <NSpace>
               <NTooltip trigger="hover" :delay="100">
                 <template #trigger>
@@ -139,7 +141,7 @@ function renderMarkdown(text: string) {
                     size="small"
                     type="default"
                     :focusable="false"
-                    @click="removeMessage(item)"
+                    @click="removeMessage(i)"
                   >
                     <template #icon>
                       <NIcon> <Delete24Regular /> </NIcon>
@@ -148,7 +150,7 @@ function renderMarkdown(text: string) {
                 </template>
                 移除
               </NTooltip>
-              <NTooltip trigger="hover" :delay="100">
+              <NTooltip v-if="item.role === 'user'" trigger="hover" :delay="100">
                 <template #trigger>
                   <NButton
                     tertiary
@@ -352,7 +354,7 @@ function renderMarkdown(text: string) {
   }
 }
 .message_item:hover {
-  .message_control_list {
+  .message_control_list:not([hidden]) {
     visibility: initial;
   }
 }

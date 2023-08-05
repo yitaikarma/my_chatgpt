@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { SessionStore, SessionHistory, RoleSession } from './types'
+import type { SessionStore, SessionHistory, RoleSession, Message, RequestMessage } from './types'
 
 export const useSessionStore = defineStore('session', {
   state: (): SessionStore => ({
@@ -150,6 +150,23 @@ export const useSessionStore = defineStore('session', {
     // 删除角色
     deleteRole(uuid?: string) {
       delete this.role_collection[uuid || this.current_role_uuid]
+    },
+
+    // 删除角色某条消息
+    deleteCurrentMessage(index: number) {
+      const current_session_uuid = this.role_collection[this.current_role_uuid].current.uuid
+
+      // 删除当前会话的消息
+      this.role_collection[this.current_role_uuid].current.message_list.splice(index, 1)
+      this.role_collection[this.current_role_uuid].current.request_message_list?.splice(index, 1)
+
+      // 删除历史会话的消息
+      this.role_collection[this.current_role_uuid].history_list.forEach((item) => {
+        if (item.uuid === current_session_uuid) {
+          item.message_list.splice(index, 1)
+          item.request_message_list?.splice(index, 1)
+        }
+      })
     }
   },
 
