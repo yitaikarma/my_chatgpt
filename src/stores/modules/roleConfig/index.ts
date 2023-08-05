@@ -18,7 +18,11 @@ export const useRoleConfigStore = defineStore('role_config', {
         user_nick: 'You',
         role_nick: 'ChatGPT',
         role_remarks: '小明是一个小学生',
-        role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`
+        role_directive: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Use markdown code block format for keywords, English words, and phrases used in your Chinese sentences in the reply. Respond using markdown. All questions should be answered in Chinese, unless the user specifically states otherwise.`,
+        stream: true,
+        request_message_length: 10,
+        max_tokens: 1000,
+        temperature: 0.5
       }
     },
     first_role_uuid: '',
@@ -35,7 +39,7 @@ export const useRoleConfigStore = defineStore('role_config', {
 
     // 获取角色配置的某个属性
     getRoleConfigAttr({ role_list }) {
-      return (configProp: keyof RoleChatConfig, uuid?: string) => {
+      return <T extends keyof RoleChatConfig>(configProp: T, uuid?: string) => {
         const index = this.getRoleIndex(uuid)
         return role_list[index].session_config[configProp]
       }
@@ -43,7 +47,7 @@ export const useRoleConfigStore = defineStore('role_config', {
 
     // 获取角色的某个属性
     getRoleAttr({ role_list }) {
-      return <T extends keyof RoleConfig>(prop: T, uuid?: string): RoleConfig[T] => {
+      return <T extends keyof RoleConfig>(prop: T, uuid?: string) => {
         const index = this.getRoleIndex(uuid)
         return role_list[index][prop]
       }

@@ -7,6 +7,10 @@ export interface RoleChatConfig {
   role_nick: string
   role_remarks: string
   role_directive: string
+  stream: boolean
+  request_message_length: number
+  max_tokens: number
+  temperature: number
 }
 
 export interface RoleConfig {

@@ -61,6 +61,38 @@ export function useChat() {
   //   // getCompletionFromOpenAI();
   // }
 
+  // 创建请求参数
+  const createRequestParams = () => {
+    // TODO: 请求消息数量限制功能待完善
+    const requestMessageLength = roleConfigStore.getRoleConfigAttr('request_message_length')
+    const temperature = roleConfigStore.getRoleConfigAttr('temperature')
+    const maxTokens = roleConfigStore.getRoleConfigAttr('max_tokens')
+    const stream = roleConfigStore.getRoleConfigAttr('stream')
+
+    const historyList = sessionStore
+      .getCurrentSessionAttr('request_message_list')
+      .slice(0, requestMessageLength)
+
+    const messages = [sessionTemplate().promptMessage, ...historyList]
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${globalConfigStore.getConfigAttr('api_key')}`
+      },
+      body: JSON.stringify({
+        messages: messages,
+        model: roleConfigStore.getRoleConfigAttr('model') || 'gpt-3.5-turbo',
+        temperature: temperature,
+        max_tokens: maxTokens,
+        stream: stream
+      })
+    }
+
+    return requestOptions
+  }
+
   /**
    * 发送消息
    * @param requestConfig 请求配置
@@ -70,23 +102,8 @@ export function useChat() {
 
     beforeSendMessage()
 
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${globalConfigStore.getConfigAttr('api_key')}`
-      },
-      body: JSON.stringify({
-        messages: sessionStore.getCurrentSessionAttr('request_message_list'),
-        model: roleConfigStore.getRoleConfigAttr('model') || 'gpt-3.5-turbo',
-        temperature: 0.5,
-        max_tokens: 1000,
-        stream: true
-      })
-    }
-
     // openai.createChatCompletion(requestOptions.body)
-    fetch(globalConfigStore.getConfigAttr('api_url'), requestOptions)
+    fetch(globalConfigStore.getConfigAttr('api_url'), createRequestParams())
       .then((response: Response) => {
         afterSendMessage('successful', response)
       })

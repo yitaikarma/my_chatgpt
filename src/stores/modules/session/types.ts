@@ -14,7 +14,7 @@ export interface Message {
 export interface SessionHistory {
   title: string
   message_list: Message[]
-  request_message_list?: RequestMessage[]
+  request_message_list: RequestMessage[]
   date: string
   uuid: string
   is_history: boolean

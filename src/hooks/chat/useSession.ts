@@ -39,7 +39,7 @@ export function useSession() {
     }
 
     // 助理请求指令
-    const requestMessageList = {
+    const promptMessage = {
       role: 'user',
       content: roleConfigStore.getRoleConfigAttr('role_directive')
     }
@@ -56,15 +56,15 @@ export function useSession() {
       title: greetingsMessage.content,
       date: new Date().toLocaleString(),
       message_list: [greetingsMessage],
-      request_message_list: [requestMessageList],
+      request_message_list: [],
       is_history: false
     }
 
     return {
       greetingsMessage,
-      requestMessageList,
       userMessage,
       waitMessage,
+      promptMessage,
       questionMessage,
       session
     }
