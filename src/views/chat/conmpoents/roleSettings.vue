@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { ref, toRef, watchEffect } from 'vue'
-import { NForm, NFormItemGi, NGrid, NInput, NModal, NSelect, useMessage } from 'naive-ui'
+import {
+  NForm,
+  NFormItemGi,
+  NGrid,
+  NInput,
+  NInputNumber,
+  NModal,
+  NSelect,
+  NSlider,
+  NSwitch,
+  useMessage
+} from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
@@ -14,12 +25,14 @@ const showModal = ref(false)
 const userConfigForm = toRef({ ...roleConfigStore.getRoleAttr('session_config') })
 const rules: FormRules = {}
 const modelOptions = globalConfigStore.model_options
+
 watchEffect(
   () => {
     userConfigForm.value = { ...roleConfigStore.getRoleAttr('session_config') }
   },
   { flush: 'post' }
 )
+
 defineExpose({ openSettings, closeSettings })
 
 function openSettings() {
@@ -85,10 +98,7 @@ function submitCallback() {
           <NFormItemGi span="24" path="role_remarks" label="角色备注">
             <NInput v-model:value="userConfigForm.role_remarks" clearable placeholder="必填" />
           </NFormItemGi>
-          <!-- <NFormItemGridItem
-            feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全"
-          > -->
-          <NFormItemGridItem span="24" path="role_directive" label="角色指令">
+          <NFormItemGi span="24" path="role_directive" label="角色指令">
             <NInput
               v-model:value="userConfigForm.role_directive"
               type="textarea"
@@ -96,12 +106,59 @@ function submitCallback() {
               placeholder="必填"
               :autosize="{ minRows: 4, maxRows: 8 }"
             />
-          </NFormItemGridItem>
+          </NFormItemGi>
+          <NFormItemGi
+            span="24"
+            path="stream"
+            label="逐字回复"
+            feedback="开启后，角色将逐字回复，关闭后，角色将一次性回复。"
+          >
+            <NSwitch v-model:value="userConfigForm.stream" />
+          </NFormItemGi>
+          <NFormItemGi span="24" path="request_message_length" label="最大上下文">
+            <NSlider
+              v-model:value="userConfigForm.request_message_length"
+              :step="1"
+              :min="1"
+              :max="80"
+            />
+            <NInputNumber
+              v-model:value="userConfigForm.request_message_length"
+              size="small"
+              :show-button="false"
+              :min="1"
+              :max="80"
+            />
+          </NFormItemGi>
+          <NFormItemGi span="24" path="max_tokens" label="最大字符数">
+            <NSlider v-model:value="userConfigForm.max_tokens" :step="10" :min="100" :max="2000" />
+            <NInputNumber
+              v-model:value="userConfigForm.max_tokens"
+              size="small"
+              :show-button="false"
+              :min="100"
+              :max="2000"
+            />
+          </NFormItemGi>
+          <NFormItemGi span="24" path="temperature" label="随机性">
+            <NSlider v-model:value="userConfigForm.temperature" :step="0.1" :min="0.1" :max="1" />
+            <NInputNumber
+              v-model:value="userConfigForm.temperature"
+              size="small"
+              :show-button="false"
+              :min="0.1"
+              :max="1"
+            />
+          </NFormItemGi>
         </NGrid>
       </NForm>
     </NModal>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
-@/stores/modules/globalConfig/settings
+<style scoped lang="scss">
+:deep(.n-input-number) {
+  width: 70px;
+  margin-left: 10px;
+}
+</style>

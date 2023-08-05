@@ -156,6 +156,19 @@ export function useChat() {
         // 生成新的消息时，清空当前消息
         currentMessage.content = ''
 
+        if (!roleConfigStore.getRoleConfigAttr('stream')) {
+          response.text().then((text: string) => {
+            currentMessage.content = JSON.parse(text).choices[0].message.content
+            sessionStore.setRequesting(false)
+
+            nextTick(() => {
+              scrollToBottom('message_list')
+            })
+            console.log('done')
+          })
+          return
+        }
+
         const throttleScrollBottom = throttle(() => {
           scrollToBottom('message_list', false)
         }, 50)
