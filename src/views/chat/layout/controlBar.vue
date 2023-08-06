@@ -2,13 +2,14 @@
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
 import { ref, computed, nextTick } from 'vue'
-import { NButton, NIcon, NSelect, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NSelect, NSpace, NTooltip, useMessage } from 'naive-ui'
 import {
   ChatSettings24Regular,
   StyleGuide24Regular,
   DarkTheme24Regular,
   DocumentBulletListClock24Regular,
-  FormNew24Regular
+  FormNew24Regular,
+  Stop24Filled
 } from '@vicons/fluent'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
@@ -16,10 +17,11 @@ import { useSession } from '@/hooks/chat/useSession'
 import { useChat } from '@/hooks/chat/useChat'
 import { useSessionSwitchLayoutAnimation } from '@/hooks/useAnimation'
 
+const message = useMessage()
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { initSession, seveSession } = useSession()
-const { initChatStatus } = useChat()
+const { sessionStore, initSession, seveSession } = useSession()
+const { initChatStatus, abortMessage } = useChat()
 
 const userSettingsModalRef = ref<InstanceType<typeof RoleSettings> | null>()
 const historyMsgRef = ref<InstanceType<typeof HistoryMessage> | null>()
@@ -81,10 +83,18 @@ function handleOpenHistorySession() {
 
 // 新话题
 function handleNewSession() {
-  // FIXME 在一个消息请求正在进行时执行清空操作，请求未停止，请求结束后，会将最后一条消息添加到历史消息中
+  sessionStore.getRequesting && abortMessage()
   seveSession()
   initSession()
   initChatStatus()
+}
+// 终止正在进行的消息请求
+function handleAbortMessage() {
+  if (!sessionStore.getRequesting) {
+    message.warning('当前没有正在进行的消息请求')
+  } else {
+    abortMessage()
+  }
 }
 </script>
 
@@ -175,6 +185,23 @@ function handleNewSession() {
           </NButton>
         </template>
         新话题
+      </NTooltip>
+      <NTooltip trigger="hover" :delay="1000">
+        <template #trigger>
+          <NButton
+            ghost
+            size="small"
+            type="error"
+            round
+            :focusable="false"
+            @click="handleAbortMessage"
+          >
+            <template #icon>
+              <NIcon> <Stop24Filled /> </NIcon>
+            </template>
+          </NButton>
+        </template>
+        终止消息请求
       </NTooltip>
     </NSpace>
     <NSpace>

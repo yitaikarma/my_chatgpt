@@ -4,11 +4,13 @@ import { useMessage, NButton, NIcon, NSpace, NTooltip, NInput } from 'naive-ui'
 import { AddCircle24Regular, DocumentEdit24Regular, Delete24Regular } from '@vicons/fluent'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useSession } from '@/hooks/chat/useSession'
+import { useChat } from '@/hooks/chat/useChat'
 import { useInitListAnimation } from '@/hooks/useAnimation'
 
 const message = useMessage()
 const { roleConfigStore, addRole, changeRole, deleteRole } = useRoleConfig()
 const { sessionStore, initRoleSession } = useSession()
+const { abortMessage } = useChat()
 
 const roleList = toRef(() => roleConfigStore.getRoleList)
 const active = ref(false)
@@ -52,12 +54,14 @@ function toggleActive(flag = false) {
 
 // 添加新角色
 function handleAddNewRole() {
+  sessionStore.getRequesting && abortMessage()
   addRole()
   initRoleSession(roleConfigStore.current_role_uuid)
 }
 
 // 切换角色
 function handleChangeRole(uuid: string) {
+  sessionStore.getRequesting && abortMessage()
   changeRole(uuid)
 }
 

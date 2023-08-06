@@ -7,53 +7,54 @@
  */
 export const transformSSEMessage = (
   streamBody: ReadableStream,
-  callback: (done: boolean, textDataList: any[]) => void
+  callback: (done: boolean, textDataList: any[], abort?: () => void) => void
 ) => {
-  // FIXME: 健壮性需要优化
-  if (!streamBody) return
   const reader = streamBody.getReader()
   const decoder = new TextDecoder()
+  let result
 
-  async function readStream() {
-    const { done, value } = await reader.read()
+  new ReadableStream({
+    start(controller) {
+      const abort = () => {
+        // controller.close()
+        reader.cancel()
+        console.log('Stream: ABORT')
+      }
 
-    let result = []
-    if (!done) {
-      const message = decoder.decode(value, { stream: !done })
-      // console.log('Stream: ', message)
-      // 提取json字符串中的对象字符串
-      const jsonList = message.match(/(?<=data: )\{.*\}/g)
-      // console.log('jsonList: ', jsonList)
-      if (jsonList)
-        result = jsonList.map((json) => {
-          const obj = JSON.parse(json)
-          if (obj instanceof Object) {
-            return obj
+      // The following function handles each data chunk
+      function push() {
+        // "done" is a Boolean and value a "Uint8Array"
+        reader.read().then(({ done, value }) => {
+          // Is there no more data to read?
+          if (done) {
+            // Tell the browser that we have finished sending data
+            callback(done, [])
+            controller.close()
+            reader.releaseLock()
+            console.log('Stream: DONE')
+            return
           }
+
+          result = []
+          const message = decoder.decode(value, { stream: !done })
+          // console.log('Stream: ', message)
+          const jsonList = message.match(/(?<=data: )\{.*\}/g)
+          // console.log('jsonList: ', jsonList)
+          if (jsonList)
+            result = jsonList.map((json) => {
+              const obj = JSON.parse(json)
+              if (obj instanceof Object) {
+                return obj
+              }
+            })
+
+          // Get the data and send it to the browser via the controller
+          //   controller.enqueue(value)
+          callback && callback(done, result, abort)
+          push()
         })
-      // if (jsonList) {
-      //   for (let i = 0; i < jsonList.length; i++) {
-      //     const json = jsonList[i]
-      //     if (json) {
-      //       try {
-      //         const obj = JSON.parse(json)
-      //         if (obj instanceof Object) {
-      //           result.push(obj)
-      //         }
-      //       } catch (e) {
-      //         console.log(e)
-      //       }
-      //     }
-      //   }
-      // }
-
-      readStream()
-    } else {
-      console.log('Stream: DONE')
+      }
+      push()
     }
-
-    callback && callback(done, result)
-  }
-
-  readStream()
+  })
 }

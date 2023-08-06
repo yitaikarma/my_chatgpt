@@ -12,11 +12,13 @@ import {
 } from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useSession } from '@/hooks/chat/useSession'
+import { useChat } from '@/hooks/chat/useChat'
 import { useEachElement, useInitListAnimation } from '@/hooks/useAnimation'
 import { scrollToBottom } from '@/utils/operationElement'
 
 const message = useMessage()
 const { sessionStore } = useSession()
+const { abortMessage } = useChat()
 
 const historyList = toRef(() => sessionStore.getHistoryList())
 const active = ref(false)
@@ -54,6 +56,8 @@ function handleAfterEnter() {
 
 // 恢复历史话题
 function handleRestoreTopic(index: number) {
+  sessionStore.getRequesting && abortMessage()
+
   const messageList = sessionStore.getCurrentSessionAttr('message_list')
   const currentSession = sessionStore.getCurrentSession
 

@@ -6,14 +6,11 @@ import { transformSSEMessage } from '@/utils/transform'
 import { scrollToBottom } from '@/utils/operationElement'
 import { throttle } from '@/utils/functions/throttle'
 
-// import { ChatGPTAPI } from 'chatgpt'
-// import { Configuration, OpenAIApi } from 'openai';
-
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore, sessionTemplate } = useSession()
-
-// let openai = null
+// 终止 SSE 连接
+const abortController = new AbortController()
 
 export function useChat() {
   // 初始化聊天状态
@@ -21,30 +18,6 @@ export function useChat() {
     sessionStore.setQuestionText('')
     sessionStore.setRequesting(false)
   }
-
-  // 创建 Node-GPT
-  // function createGPT() {
-
-  //   const configuration = new Configuration({
-  //     apiKey
-  //   });
-
-  //   openai = new OpenAIApi(configuration);
-
-  //   // async function getCompletionFromOpenAI() {
-  //   //   const completion = await openai.createChatCompletion({
-  //   //     model: 'gpt-3.5-turbo',
-  //   //     messages: [
-  //   //       { role: 'user', content: 'Hello!' }
-  //   //     ],
-  //   //     temperature: 0,
-  //   //   });
-
-  //   //   console.log(completion.data.choices[0].message.content);
-  //   // }
-
-  //   // getCompletionFromOpenAI();
-  // }
 
   // 创建请求参数
   const createRequestParams = () => {
@@ -62,6 +35,7 @@ export function useChat() {
 
     const requestOptions = {
       method: 'POST',
+      // signal: abortController.signal,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${globalConfigStore.getConfigAttr('api_key')}`
@@ -87,7 +61,6 @@ export function useChat() {
 
     beforeSendMessage()
 
-    // openai.createChatCompletion(requestOptions.body)
     fetch(globalConfigStore.getConfigAttr('api_url'), createRequestParams())
       .then((response: Response) => {
         afterSendMessage('successful', response)
@@ -95,6 +68,17 @@ export function useChat() {
       .catch((error) => {
         afterSendMessage('failed', error)
       })
+  }
+
+  /**
+   * 终止消息请求
+   */
+  const abortMessage = () => {
+    sessionStore.setRequesting(false)
+    sessionStore.deleteCurrentMessage(-1)
+
+    // abortController.abort()
+    // abortController.signal.addEventListener('abort', () => {})
   }
 
   /**
@@ -156,9 +140,12 @@ export function useChat() {
         // 生成新的消息时，清空当前消息
         currentMessage.content = ''
 
+        // 处理非流式响应
         if (!roleConfigStore.getRoleConfigAttr('stream')) {
           response.text().then((text: string) => {
             currentMessage.content = JSON.parse(text).choices[0].message.content
+            const message = { role: 'assistant', content: currentMessage.content }
+            sessionStore.updateCurrentSessionAttr('request_message_list', [message])
             sessionStore.setRequesting(false)
 
             nextTick(() => {
@@ -173,8 +160,11 @@ export function useChat() {
           scrollToBottom('message_list', false)
         }, 50)
 
-        transformSSEMessage(response.body, (done, streamDataList) => {
-          if (done) {
+        transformSSEMessage(response.body, (done, streamDataList, abort) => {
+          // 终止 stream
+          !sessionStore.getRequesting && abort && abort()
+
+          if (done || !sessionStore.getRequesting) {
             const message = { role: 'assistant', content: currentMessage.content }
             sessionStore.updateCurrentSessionAttr('request_message_list', [message])
             sessionStore.setRequesting(false)
@@ -209,5 +199,5 @@ export function useChat() {
     }
   }
 
-  return { initChatStatus, sendMessage }
+  return { initChatStatus, sendMessage, abortMessage }
 }
