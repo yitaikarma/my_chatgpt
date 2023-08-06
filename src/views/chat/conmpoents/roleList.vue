@@ -174,29 +174,12 @@ function handledeleteRole(target_uuid: string) {
 </template>
 
 <style lang="scss" scoped>
-.scroll::-webkit-scrollbar {
-  height: 16px;
-}
-
-.scroll::-webkit-scrollbar-thumb {
-  border: 6px solid var(--color-bg);
-  border-radius: 50px;
-  background-color: var(--color-scroll-thumb-bg);
-}
-
-.scroll::-webkit-scrollbar-corner {
-  background-color: var(--color-bg);
-}
-
-.scroll::-webkit-scrollbar-thumb:hover {
-  border: 4px solid var(--color-bg);
-  background-color: var(--color-scroll-thumb-bg);
-}
 :deep(.n-drawer-header__main) {
   width: 100%;
 }
 .role_container {
   width: 300px;
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;

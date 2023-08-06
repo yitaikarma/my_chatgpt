@@ -2,8 +2,14 @@
 @import './base.scss';
 @import './highlight/tokyo-night-light.scss';
 @import './highlight/tokyo-night-dark.scss';
+@import './code.scss';
 
-$test-color: red;
+@font-face {
+  font-family: 'FiraCode';
+  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
+    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
+    url('@/assets/fonts/FiraCode-Regular.woff2');
+}
 
 #app {
   width: 100%;

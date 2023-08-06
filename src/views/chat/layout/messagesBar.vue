@@ -202,38 +202,6 @@ function renderMarkdown(text: string) {
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'FiraCode';
-  src: url('@/assets/fonts/FiraCode-VF.woff2'), url('@/assets/fonts/FiraCode-Light.woff2'),
-    url('@/assets/fonts/FiraCode-Bold.woff2'), url('@/assets/fonts/FiraCode-Medium.woff2'),
-    url('@/assets/fonts/FiraCode-Regular.woff2');
-}
-.scroll {
-  &::-webkit-scrollbar {
-    height: 16px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border: 6px solid var(--color-bg);
-    border-radius: 50px;
-    background-color: var(--color-scroll-thumb-bg);
-    // transition: border-color 0.5s ease-out, background-color 0.5s ease-out;
-  }
-
-  &::-webkit-scrollbar-corner {
-    background-color: var(--color-bg);
-  }
-
-  // .scroll::-webkit-scrollbar-track {
-  //   background-color: #232425;
-  // }
-
-  &::-webkit-scrollbar-thumb:hover {
-    border: 4px solid var(--color-bg);
-    background-color: var(--color-scroll-thumb-bg);
-  }
-}
-
 .message_container {
   width: 100%;
   height: 100%;
@@ -443,55 +411,5 @@ function renderMarkdown(text: string) {
       }
     }
   }
-}
-
-:deep(.code-block) {
-  overflow: hidden;
-  margin: 1rem 0;
-  border-radius: 6px;
-  .code-block-info {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 14px;
-    color: #6565ff;
-    font-size: 0.75rem;
-    background-color: var(--color-code-bg-header);
-    transition: background-color 0.5s ease-out;
-  }
-  .code_scroll::-webkit-scrollbar {
-    height: 16px;
-  }
-
-  .code_scroll::-webkit-scrollbar-thumb {
-    background: #29356f;
-    border: 6px solid #1d2636;
-  }
-
-  .code_scroll::-webkit-scrollbar-track {
-    background: #1d2636;
-  }
-  .hljs {
-    font-family: 'FiraCode';
-  }
-
-  /* Copy */
-  .copy-button {
-    margin-left: 10px;
-    padding: 2px 6px;
-    border: none;
-    border-radius: 4px;
-    background-color: #6565ff;
-    color: #fff;
-    cursor: pointer;
-  }
-}
-
-:deep(.code_inline) {
-  margin: 0.1em;
-  // border-radius: 4px;
-  // background: #262631;
-  white-space: nowrap;
-  color: #8f68cd;
 }
 </style>
