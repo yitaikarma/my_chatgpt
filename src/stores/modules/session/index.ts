@@ -182,6 +182,7 @@ export const useSessionStore = defineStore('session', {
       this.role_collection[this.current_role_uuid].current.message_list.splice(index, 1)
       this.role_collection[this.current_role_uuid].current.request_message_list?.splice(index, 1)
 
+      // FIXME: 消息和请求消息的索引不一致，可以把第一条展示招呼语的消息独立出来，不参与增删
       // 删除历史会话的消息
       this.role_collection[this.current_role_uuid].history_list.forEach((item) => {
         if (item.uuid === current_session_uuid) {

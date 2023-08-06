@@ -42,6 +42,7 @@ watch(
 
 onBeforeMount(() => {
   init()
+  // BUG: n-input的 autosize底层执行时机比较晚，或者是静态修改
   sessionTransform()
 })
 

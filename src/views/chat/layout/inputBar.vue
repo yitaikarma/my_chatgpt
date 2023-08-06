@@ -46,11 +46,13 @@ function handleEnter(event: KeyboardEvent) {
 
 <template>
   <div class="user_wrapper">
+    <!-- BUG: autosize底层执行时机比较晚，或者是静态修改 -->
     <NInput
       type="textarea"
       v-model:value="questionText"
       show-count
       bordered
+      maxlength="2000"
       :autosize="{ minRows: 4, maxRows: 6 }"
       :placeholder="placeholder"
     >
