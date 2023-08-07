@@ -74,6 +74,7 @@ export function useChat() {
    * 终止消息请求
    */
   const abortMessage = () => {
+    // FIXME: 无法终止非stream模式的请求
     sessionStore.setRequesting(false)
     sessionStore.deleteCurrentMessage(-1)
 
