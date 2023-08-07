@@ -66,6 +66,12 @@ function submitCallback() {
     }
   })
 }
+
+// 重置缓存
+function resetCache() {
+  window.localStorage.clear()
+  window.location.reload()
+}
 </script>
 <template>
   <div>
@@ -80,7 +86,7 @@ function submitCallback() {
       negative-text="取消"
       @positive-click="submitCallback"
       @negative-click="cancelCallback"
-      style="width: 600px; border-radius: 6px"
+      style="width: 800px; border-radius: 6px"
     >
       <NForm
         ref="formRef"
@@ -148,7 +154,7 @@ function submitCallback() {
             <NInput v-model:value="configForm.role_remarks" clearable placeholder="必填" />
           </NFormItemGi>
           <!-- feedback="角色或指令需清晰易懂，明确且有逻辑。参考角色指令大全" -->
-          <NFormItemGridItem span="24" path="role_directive" label="角色指令">
+          <NFormItemGi span="24" path="role_directive" label="角色指令">
             <NInput
               v-model:value="configForm.role_directive"
               type="textarea"
@@ -156,7 +162,18 @@ function submitCallback() {
               placeholder="必填"
               :autosize="{ minRows: 4, maxRows: 8 }"
             />
-          </NFormItemGridItem>
+          </NFormItemGi>
+          <NFormItemGi
+            span="24"
+            path="role_remarks"
+            label="清空缓存"
+            feedback="重置所有设置和记录，会刷新页面"
+          >
+            <n-popconfirm @positive-click="resetCache">
+              <template #trigger> <NButton type="error" ghost> 重置 </NButton> </template>
+              确认清空所有设置、角色、聊天记录吗？
+            </n-popconfirm>
+          </NFormItemGi>
         </NGrid>
       </NForm>
     </NModal>
@@ -164,4 +181,3 @@ function submitCallback() {
 </template>
 
 <style scoped lang="scss"></style>
-@/stores/modules/globalConfig/settings
