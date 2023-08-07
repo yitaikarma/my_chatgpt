@@ -16,7 +16,6 @@ export const transformSSEMessage = (
   new ReadableStream({
     start(controller) {
       const abort = () => {
-        // controller.close()
         reader.cancel()
         console.log('Stream: ABORT')
       }
@@ -36,17 +35,20 @@ export const transformSSEMessage = (
           }
 
           result = []
-          const message = decoder.decode(value, { stream: !done })
+          const message = decoder.decode(value)
           // console.log('Stream: ', message)
           const jsonList = message.match(/(?<=data: )\{.*\}/g)
           // console.log('jsonList: ', jsonList)
-          if (jsonList)
-            result = jsonList.map((json) => {
-              const obj = JSON.parse(json)
-              if (obj instanceof Object) {
-                return obj
-              }
-            })
+          if (jsonList) {
+            result = jsonList.map((json) => JSON.parse(json))
+          }
+          // if (jsonList)
+          //   result = jsonList.map((json) => {
+          //     const obj = JSON.parse(json)
+          //     if (obj instanceof Object) {
+          //       return obj
+          //     }
+          //   })
 
           // Get the data and send it to the browser via the controller
           //   controller.enqueue(value)
