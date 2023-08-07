@@ -10,7 +10,7 @@ const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore, sessionTemplate } = useSession()
 // 终止 SSE 连接
-const abortController = new AbortController()
+// const abortController = new AbortController()
 
 export function useChat() {
   // 初始化聊天状态
@@ -79,7 +79,10 @@ export function useChat() {
     sessionStore.deleteCurrentMessage(-1)
 
     // abortController.abort()
-    // abortController.signal.addEventListener('abort', () => {})
+    // abortController.signal.addEventListener('abort', () => {
+    //   sessionStore.setRequesting(false)
+    //   sessionStore.deleteCurrentMessage(-1)
+    // })
   }
 
   /**
@@ -162,14 +165,18 @@ export function useChat() {
         }, 50)
 
         transformSSEMessage(response.body, (done, streamDataList, abort) => {
-          // 终止 stream
-          !sessionStore.getRequesting && abort && abort()
-
-          if (done || !sessionStore.getRequesting) {
+          // 处理stream结束
+          if (done && sessionStore.getRequesting) {
             const message = { role: 'assistant', content: currentMessage.content }
             sessionStore.updateCurrentSessionAttr('request_message_list', [message])
             sessionStore.setRequesting(false)
             console.log('done')
+            return
+          }
+
+          // 终止stream
+          if (!sessionStore.getRequesting) {
+            abort && abort()
             return
           }
 

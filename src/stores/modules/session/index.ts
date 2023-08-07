@@ -181,12 +181,25 @@ export const useSessionStore = defineStore('session', {
 
       // 删除当前会话的消息
       this.role_collection[this.current_role_uuid].current.message_list.splice(index, 1)
-      this.role_collection[this.current_role_uuid].current.request_message_list?.splice(index, 1)
 
       // 删除历史会话的消息
       this.role_collection[this.current_role_uuid].history_list.forEach((item) => {
         if (item.uuid === current_session_uuid) {
           item.message_list.splice(index, 1)
+        }
+      })
+    },
+    // 删除角色某条消息
+    deleteCurrentRequestMessage(index: number) {
+      // TODO: 数据需要加入 current_session_uuid
+      const current_session_uuid = this.role_collection[this.current_role_uuid].current.uuid
+
+      // 删除当前会话的消息
+      this.role_collection[this.current_role_uuid].current.request_message_list?.splice(index, 1)
+
+      // 删除历史会话的消息
+      this.role_collection[this.current_role_uuid].history_list.forEach((item) => {
+        if (item.uuid === current_session_uuid) {
           item.request_message_list?.splice(index, 1)
         }
       })

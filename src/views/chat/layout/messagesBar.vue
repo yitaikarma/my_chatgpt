@@ -17,7 +17,7 @@ import { scrollToBottom } from '@/utils/operationElement'
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
 const { sessionStore, initSession, getFullMessageList } = useSession()
-const { initChatStatus, sendMessage } = useChat()
+const { initChatStatus, sendMessage, abortMessage } = useChat()
 const message = useMessage()
 
 let md: MarkdownIt | null = null
@@ -44,6 +44,14 @@ onBeforeMount(() => {
   init()
   // BUG: n-input的 autosize底层执行时机比较晚，或者是静态修改
   sessionTransform()
+
+  // 关闭页面/刷新页面/跳转页面前，如果有正在进行的事务，处理数据后终止
+  function beforeUnloadHandler() {
+    sessionStore.getRequesting && abortMessage()
+    window.removeEventListener('beforeunload', beforeUnloadHandler)
+  }
+
+  window.addEventListener('beforeunload', beforeUnloadHandler)
 })
 
 // 初始化
@@ -109,6 +117,7 @@ function resendMessage(content: string) {
 function removeMessage(index: number) {
   if (!sessionStore.getRequesting) {
     sessionStore.deleteCurrentMessage(index)
+    sessionStore.deleteCurrentRequestMessage(index)
   } else {
     message.warning('正在请求中，请稍后重试', { duration: 1000 })
   }
