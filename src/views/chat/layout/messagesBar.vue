@@ -12,7 +12,7 @@ import { useInitListAnimation } from '@/hooks/useAnimation'
 import { useMarkdown } from '@/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 import { scrollToBottom } from '@/utils/operationElement'
-import { debounce } from '@/utils/functions/debounce'
+// import { debounce } from '@/utils/functions/debounce'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
@@ -82,16 +82,16 @@ function copyMessage(event: MouseEvent, content: string) {
     text: () => content
   })
 
-  const debounceSetClipboard = debounce(() => {
-    setTimeout(() => {
-      clipboardStatus.value = '拷贝'
-    }, 1000)
-  }, 1000)
+  // const debounceSetClipboard = debounce(() => {
+  //   setTimeout(() => {
+  //     clipboardStatus.value = '拷贝'
+  //   }, 1000)
+  // }, 1000)
 
   clipboard.on('success', () => {
     message.success('已拷贝到剪贴板', { duration: 1000 })
-    clipboardStatus.value = '已拷贝'
-    debounceSetClipboard()
+    // clipboardStatus.value = '已拷贝'
+    // debounceSetClipboard()
   })
 }
 
