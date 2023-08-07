@@ -127,7 +127,7 @@ function handledeleteRole(target_uuid: string) {
               <div class="history_total">
                 {{
                   `${sessionStore.getRoleSession(item.uuid).history_list.length}个历史话题,
-                    ${sessionStore.getRoleSession(item.uuid).current.message_list.length - 1}条会话`
+                    ${sessionStore.getRoleSession(item.uuid).current.message_list.length}条会话`
                 }}
               </div>
             </div>

@@ -53,9 +53,9 @@ export function useSession() {
     // 会话模板
     const session = {
       uuid: generateUUIDUsingMathRandom(),
-      title: greetingsMessage.content,
+      title: '会话',
       date: new Date().toLocaleString(),
-      message_list: [greetingsMessage],
+      message_list: [],
       request_message_list: [],
       is_history: false
     }
@@ -95,19 +95,34 @@ export function useSession() {
   }
 
   /**
+   * 获取完整会话
+   * @returns 完整会话
+   */
+  const getFullMessageList = () => {
+    return [sessionTemplate().greetingsMessage, ...sessionStore.getCurrentSession.message_list]
+  }
+
+  /**
    * 保存当前会话
    */
   const seveSession = () => {
     // FIXME: 当前历史删除后，又继续发送消息，需要再次保存为历史
     const messageList = sessionStore.getCurrentSessionAttr('message_list')
     // 未进行过对话，不保存
-    if (messageList.length < 2) return
-
-    const currentSession = sessionStore.getCurrentSession
-    if (!currentSession.is_history) {
-      sessionStore.updateCurrentSessionToHistory()
+    if (messageList.length > 0) {
+      const currentSession = sessionStore.getCurrentSession
+      if (!currentSession.is_history) {
+        sessionStore.updateCurrentSessionToHistory()
+      }
     }
   }
 
-  return { sessionStore, sessionTemplate, initRoleSession, initSession, seveSession }
+  return {
+    sessionStore,
+    sessionTemplate,
+    initRoleSession,
+    initSession,
+    getFullMessageList,
+    seveSession
+  }
 }

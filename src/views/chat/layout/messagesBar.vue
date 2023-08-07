@@ -7,21 +7,21 @@ import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useSession } from '@/hooks/chat/useSession'
 import { useChat } from '@/hooks/chat/useChat'
+import { useClipboard } from '@/hooks/useClipoard'
 import { useInitListAnimation } from '@/hooks/useAnimation'
 import { useMarkdown } from '@/hooks/useMarkdown'
 import type MarkdownIt from 'markdown-it'
 import { scrollToBottom } from '@/utils/operationElement'
-import { useClipboard } from '@/hooks/useClipoard'
 import { debounce } from '@/utils/functions/debounce'
 
 const { globalConfigStore } = useConfig()
 const { roleConfigStore } = useRoleConfig()
-const { sessionStore, initSession } = useSession()
+const { sessionStore, initSession, getFullMessageList } = useSession()
 const { initChatStatus, sendMessage } = useChat()
 const message = useMessage()
 
 let md: MarkdownIt | null = null
-const messageList = toRef(() => sessionStore.getCurrentSession.message_list)
+const messageList = toRef(() => getFullMessageList())
 const chatTheme = toRef(() => globalConfigStore.getConfigAttr('chat_theme'))
 const userNick = toRef(() => roleConfigStore.getRoleConfigAttr('user_nick'))
 const roleNick = toRef(() => roleConfigStore.getRoleConfigAttr('role_nick'))
@@ -48,7 +48,6 @@ onBeforeMount(() => {
 
 // 初始化
 function init() {
-  // createGPT()
   md = useMarkdown()
   initChatStatus()
   // 没有历史消息则初始化
@@ -98,14 +97,21 @@ function copyMessage(event: MouseEvent, content: string) {
 
 // 重发消息
 function resendMessage(content: string) {
-  sessionStore.setQuestionText(content)
-  if (!sessionStore.getRequesting) sendMessage()
+  if (!sessionStore.getRequesting) {
+    sessionStore.setQuestionText(content)
+    sendMessage()
+  } else {
+    message.warning('正在请求中，请稍后重试', { duration: 1000 })
+  }
 }
 
 // 移除消息
 function removeMessage(index: number) {
-  // 每条消息都需要一个唯一的uuid
-  sessionStore.deleteCurrentMessage(index)
+  if (!sessionStore.getRequesting) {
+    sessionStore.deleteCurrentMessage(index)
+  } else {
+    message.warning('正在请求中，请稍后重试', { duration: 1000 })
+  }
 }
 
 // 渲染markdown
@@ -145,7 +151,7 @@ function renderMarkdown(text: string) {
                     size="small"
                     type="default"
                     :focusable="false"
-                    @click="removeMessage(i)"
+                    @click="removeMessage(i - 1)"
                   >
                     <template #icon>
                       <NIcon> <Delete24Regular /> </NIcon>
@@ -187,9 +193,6 @@ function renderMarkdown(text: string) {
                 {{ clipboardStatus }}
               </NTooltip>
             </NSpace>
-            <!-- <div class="message_control_item" @click="copySession($event, item.content)">
-              <NIcon size="large"> <CopyOutline /> </NIcon>
-            </div> -->
           </div>
         </div>
         <div class="message_content">

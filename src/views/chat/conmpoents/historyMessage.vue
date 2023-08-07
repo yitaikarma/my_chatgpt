@@ -61,7 +61,7 @@ function handleRestoreTopic(index: number) {
   const messageList = sessionStore.getCurrentSessionAttr('message_list')
   const currentSession = sessionStore.getCurrentSession
 
-  if (messageList.length > 2) {
+  if (messageList.length > 0) {
     // 未进行过对话，不保存
     if (!currentSession.is_history) {
       sessionStore.updateCurrentSessionToHistory()
