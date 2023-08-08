@@ -8,8 +8,5 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
-    NFormItemGridItem: typeof import('naive-ui')['NFormItemGridItem']
-    RouterLink: typeof import('vue-router')['RouterLink']
-    RouterView: typeof import('vue-router')['RouterView']
   }
 }

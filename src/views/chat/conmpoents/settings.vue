@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import {
+  NButton,
   NForm,
   NFormItemGi,
   NGrid,
   NInput,
   NModal,
+  NPopconfirm,
   NRadio,
   NRadioGroup,
   NSelect,
@@ -164,10 +166,10 @@ function resetCache() {
             />
           </NFormItemGi>
           <NFormItemGi span="24" label="清空缓存" feedback="重置所有设置和记录，会刷新页面">
-            <n-popconfirm @positive-click="resetCache">
+            <NPopconfirm @positive-click="resetCache">
               <template #trigger> <NButton type="error" ghost> 重置 </NButton> </template>
               确认清空所有设置、角色、聊天记录吗？
-            </n-popconfirm>
+            </NPopconfirm>
           </NFormItemGi>
         </NGrid>
       </NForm>
