@@ -17,8 +17,7 @@
   },
   "lint-staged": {
     "src/**/*.{vue,js,jsx,ts,tsx,json}": [
-      "pnpm run lint",
-      "prettier --write"
+      "pnpm run lint"
     ]
   },
   "dependencies": {
