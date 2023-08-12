@@ -1,5 +1,3 @@
-import { ref, onBeforeMount, onUnmounted } from 'vue'
-
 /**
  * 事件监听器
  * @param element 元素

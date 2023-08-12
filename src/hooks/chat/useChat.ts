@@ -1,4 +1,3 @@
-import { nextTick } from 'vue'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useSession } from '@/hooks/chat/useSession'

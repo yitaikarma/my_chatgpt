@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { ref, toRef, nextTick, watch } from 'vue'
-import {
-  useMessage,
-  NButton,
-  NDrawer,
-  NDrawerContent,
-  NIcon,
-  NSpace,
-  NTooltip,
-  NInput
-} from 'naive-ui'
 import { DocumentEdit24Regular, Delete24Regular, Chat24Regular } from '@vicons/fluent'
 import { useSession } from '@/hooks/chat/useSession'
 import { useChat } from '@/hooks/chat/useChat'

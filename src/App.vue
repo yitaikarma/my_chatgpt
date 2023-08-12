@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// import { RouterView } from 'vue-router'
-// import { NConfigProvider, NMessageProvider, zhCN, dateZhCN } from 'naive-ui'
 import { zhCN, dateZhCN } from 'naive-ui'
 import { useTheme } from '@/hooks/useTheme'
 

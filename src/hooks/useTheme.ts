@@ -1,4 +1,3 @@
-import { computed, onBeforeMount } from 'vue'
 import { darkTheme, useOsTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'

@@ -1,17 +1,4 @@
 <script setup lang="ts">
-import { ref, toRef, watchEffect } from 'vue'
-import {
-  NForm,
-  NFormItemGi,
-  NGrid,
-  NInput,
-  NInputNumber,
-  NModal,
-  NSelect,
-  NSlider,
-  NSwitch,
-  useMessage
-} from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
 import { useRoleConfig } from '@/hooks/chat/useRoleConfig'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import Settings from '@/views/chat/conmpoents/settings.vue'
 import RoleList from '@/views/chat/conmpoents/roleList.vue'
-import { ref } from 'vue'
-import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { Settings24Regular } from '@vicons/fluent'
 
 const settingsRef = ref<InstanceType<typeof Settings> | null>(null)

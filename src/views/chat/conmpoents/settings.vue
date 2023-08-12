@@ -1,19 +1,4 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
-import {
-  NButton,
-  NForm,
-  NFormItemGi,
-  NGrid,
-  NInput,
-  NModal,
-  NPopconfirm,
-  NRadio,
-  NRadioGroup,
-  NSelect,
-  NSpace,
-  useMessage
-} from 'naive-ui'
 import type { FormRules, FormInst } from 'naive-ui'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'
 

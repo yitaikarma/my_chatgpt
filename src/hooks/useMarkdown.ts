@@ -1,4 +1,3 @@
-import { onMounted } from 'vue'
 import MarkdownIt from 'markdown-it'
 import Clipboard from 'clipboard'
 import hljs from 'highlight.js'

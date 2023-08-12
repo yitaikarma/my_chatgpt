@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, toRef, nextTick, watch, onBeforeMount } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, useMessage } from 'naive-ui'
 import { Delete24Regular } from '@vicons/fluent'
 import { CopyOutline, RefreshOutline } from '@vicons/ionicons5'
 import { useConfig } from '@/hooks/chat/useGlobalConfig'

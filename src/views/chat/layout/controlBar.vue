@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import RoleSettings from '@/views/chat/conmpoents/roleSettings.vue'
 import HistoryMessage from '@/views/chat/conmpoents/historyMessage.vue'
-import { ref, computed, nextTick } from 'vue'
-import { NButton, NIcon, NSelect, NSpace, NTooltip, useMessage } from 'naive-ui'
 import {
   ChatSettings24Regular,
   StyleGuide24Regular,

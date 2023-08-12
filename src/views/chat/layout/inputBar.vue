@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { NButton, NIcon, NInput, useMessage } from 'naive-ui'
 import { Send } from '@vicons/tabler'
 import { useChat } from '@/hooks/chat/useChat'
 import { useSession } from '@/hooks/chat/useSession'
