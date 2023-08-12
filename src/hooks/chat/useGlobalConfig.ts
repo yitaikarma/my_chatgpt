@@ -1,4 +1,4 @@
-import type { _DeepPartial } from 'pinia'
+// import type { _DeepPartial } from 'pinia'
 import { useGlobalConfig } from '@/stores/modules/globalConfig'
 
 export function useConfig() {
