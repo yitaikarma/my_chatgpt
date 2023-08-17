@@ -1,7 +1,16 @@
 {
   "name": "my_chatgpt",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
+  "description": "基于Vue3+TS的ChatGPT聊天机器人",
+  "author": "yitaikarma <final620472@outlook.com>",
+  "keywords": [
+    "chatgpt",
+    "chatbot",
+    "vue",
+    "vite",
+    "typescript"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
